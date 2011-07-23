@@ -1,0 +1,444 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
+		ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF113DB539C00448025 /* Foundation.framework */; };
+		ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF313DB539C00448025 /* CoreGraphics.framework */; };
+		ADB75BFA13DB539C00448025 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = ADB75BF813DB539C00448025 /* InfoPlist.strings */; };
+		ADB75BFC13DB539C00448025 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75BFB13DB539C00448025 /* main.m */; };
+		ADB75C0013DB539C00448025 /* SwitchControlAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75BFF13DB539C00448025 /* SwitchControlAppDelegate.m */; };
+		ADB75C0313DB539C00448025 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C0113DB539C00448025 /* MainWindow.xib */; };
+		ADB75C0B13DB539C00448025 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75C0A13DB539C00448025 /* SenTestingKit.framework */; };
+		ADB75C0C13DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
+		ADB75C0D13DB539C00448025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF113DB539C00448025 /* Foundation.framework */; };
+		ADB75C0E13DB539C00448025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF313DB539C00448025 /* CoreGraphics.framework */; };
+		ADB75C1613DB539C00448025 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1413DB539C00448025 /* InfoPlist.strings */; };
+		ADB75C1813DB539C00448025 /* SwitchControlTests.h in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1713DB539C00448025 /* SwitchControlTests.h */; };
+		ADB75C1A13DB539C00448025 /* SwitchControlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75C1913DB539C00448025 /* SwitchControlTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		ADB75C0F13DB539C00448025 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = ADB75BE213DB539C00448025 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ADB75BEA13DB539C00448025;
+			remoteInfo = SwitchControl;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		ADB75BEB13DB539C00448025 /* SwitchControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitchControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADB75BEF13DB539C00448025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		ADB75BF113DB539C00448025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		ADB75BF313DB539C00448025 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		ADB75BF713DB539C00448025 /* SwitchControl-Info.plist */ = {isa = PBXFileReference; path = "SwitchControl-Info.plist"; sourceTree = "<group>"; };
+		ADB75BF913DB539C00448025 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		ADB75BFB13DB539C00448025 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		ADB75BFD13DB539C00448025 /* SwitchControl-Prefix.pch */ = {isa = PBXFileReference; path = "SwitchControl-Prefix.pch"; sourceTree = "<group>"; };
+		ADB75BFE13DB539C00448025 /* SwitchControlAppDelegate.h */ = {isa = PBXFileReference; path = SwitchControlAppDelegate.h; sourceTree = "<group>"; };
+		ADB75BFF13DB539C00448025 /* SwitchControlAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchControlAppDelegate.m; sourceTree = "<group>"; };
+		ADB75C0213DB539C00448025 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		ADB75C0913DB539C00448025 /* SwitchControlTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwitchControlTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADB75C0A13DB539C00448025 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		ADB75C1313DB539C00448025 /* SwitchControlTests-Info.plist */ = {isa = PBXFileReference; path = "SwitchControlTests-Info.plist"; sourceTree = "<group>"; };
+		ADB75C1513DB539C00448025 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		ADB75C1713DB539C00448025 /* SwitchControlTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchControlTests.h; sourceTree = "<group>"; };
+		ADB75C1913DB539C00448025 /* SwitchControlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchControlTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		ADB75BE813DB539C00448025 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */,
+				ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */,
+				ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ADB75C0513DB539C00448025 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADB75C0B13DB539C00448025 /* SenTestingKit.framework in Frameworks */,
+				ADB75C0C13DB539C00448025 /* UIKit.framework in Frameworks */,
+				ADB75C0D13DB539C00448025 /* Foundation.framework in Frameworks */,
+				ADB75C0E13DB539C00448025 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		ADB75BE013DB539C00448025 = {
+			isa = PBXGroup;
+			children = (
+				ADB75BF513DB539C00448025 /* SwitchControl */,
+				ADB75C1113DB539C00448025 /* SwitchControlTests */,
+				ADB75BEE13DB539C00448025 /* Frameworks */,
+				ADB75BEC13DB539C00448025 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		ADB75BEC13DB539C00448025 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				ADB75BEB13DB539C00448025 /* SwitchControl.app */,
+				ADB75C0913DB539C00448025 /* SwitchControlTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		ADB75BEE13DB539C00448025 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ADB75BEF13DB539C00448025 /* UIKit.framework */,
+				ADB75BF113DB539C00448025 /* Foundation.framework */,
+				ADB75BF313DB539C00448025 /* CoreGraphics.framework */,
+				ADB75C0A13DB539C00448025 /* SenTestingKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		ADB75BF513DB539C00448025 /* SwitchControl */ = {
+			isa = PBXGroup;
+			children = (
+				ADB75BFE13DB539C00448025 /* SwitchControlAppDelegate.h */,
+				ADB75BFF13DB539C00448025 /* SwitchControlAppDelegate.m */,
+				ADB75C0113DB539C00448025 /* MainWindow.xib */,
+				ADB75BF613DB539C00448025 /* Supporting Files */,
+			);
+			path = SwitchControl;
+			sourceTree = "<group>";
+		};
+		ADB75BF613DB539C00448025 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				ADB75BF713DB539C00448025 /* SwitchControl-Info.plist */,
+				ADB75BF813DB539C00448025 /* InfoPlist.strings */,
+				ADB75BFB13DB539C00448025 /* main.m */,
+				ADB75BFD13DB539C00448025 /* SwitchControl-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ADB75C1113DB539C00448025 /* SwitchControlTests */ = {
+			isa = PBXGroup;
+			children = (
+				ADB75C1713DB539C00448025 /* SwitchControlTests.h */,
+				ADB75C1913DB539C00448025 /* SwitchControlTests.m */,
+				ADB75C1213DB539C00448025 /* Supporting Files */,
+			);
+			path = SwitchControlTests;
+			sourceTree = "<group>";
+		};
+		ADB75C1213DB539C00448025 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				ADB75C1313DB539C00448025 /* SwitchControlTests-Info.plist */,
+				ADB75C1413DB539C00448025 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		ADB75BEA13DB539C00448025 /* SwitchControl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ADB75C1D13DB539C00448025 /* Build configuration list for PBXNativeTarget "SwitchControl" */;
+			buildPhases = (
+				ADB75BE713DB539C00448025 /* Sources */,
+				ADB75BE813DB539C00448025 /* Frameworks */,
+				ADB75BE913DB539C00448025 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwitchControl;
+			productName = SwitchControl;
+			productReference = ADB75BEB13DB539C00448025 /* SwitchControl.app */;
+			productType = "com.apple.product-type.application";
+		};
+		ADB75C0813DB539C00448025 /* SwitchControlTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ADB75C2013DB539C00448025 /* Build configuration list for PBXNativeTarget "SwitchControlTests" */;
+			buildPhases = (
+				ADB75C0413DB539C00448025 /* Sources */,
+				ADB75C0513DB539C00448025 /* Frameworks */,
+				ADB75C0613DB539C00448025 /* Resources */,
+				ADB75C0713DB539C00448025 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				ADB75C1013DB539C00448025 /* PBXTargetDependency */,
+			);
+			name = SwitchControlTests;
+			productName = SwitchControlTests;
+			productReference = ADB75C0913DB539C00448025 /* SwitchControlTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		ADB75BE213DB539C00448025 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "PAW Solutions";
+			};
+			buildConfigurationList = ADB75BE513DB539C00448025 /* Build configuration list for PBXProject "SwitchControl" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = ADB75BE013DB539C00448025;
+			productRefGroup = ADB75BEC13DB539C00448025 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				ADB75BEA13DB539C00448025 /* SwitchControl */,
+				ADB75C0813DB539C00448025 /* SwitchControlTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		ADB75BE913DB539C00448025 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADB75BFA13DB539C00448025 /* InfoPlist.strings in Resources */,
+				ADB75C0313DB539C00448025 /* MainWindow.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ADB75C0613DB539C00448025 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADB75C1613DB539C00448025 /* InfoPlist.strings in Resources */,
+				ADB75C1813DB539C00448025 /* SwitchControlTests.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		ADB75C0713DB539C00448025 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		ADB75BE713DB539C00448025 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADB75BFC13DB539C00448025 /* main.m in Sources */,
+				ADB75C0013DB539C00448025 /* SwitchControlAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		ADB75C0413DB539C00448025 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				ADB75C1A13DB539C00448025 /* SwitchControlTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		ADB75C1013DB539C00448025 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ADB75BEA13DB539C00448025 /* SwitchControl */;
+			targetProxy = ADB75C0F13DB539C00448025 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		ADB75BF813DB539C00448025 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				ADB75BF913DB539C00448025 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		ADB75C0113DB539C00448025 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				ADB75C0213DB539C00448025 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		ADB75C1413DB539C00448025 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				ADB75C1513DB539C00448025 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		ADB75C1B13DB539C00448025 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		ADB75C1C13DB539C00448025 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		ADB75C1E13DB539C00448025 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
+				INFOPLIST_FILE = "SwitchControl/SwitchControl-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		ADB75C1F13DB539C00448025 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
+				INFOPLIST_FILE = "SwitchControl/SwitchControl-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		ADB75C2113DB539C00448025 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/SwitchControl.app/SwitchControl";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
+				INFOPLIST_FILE = "SwitchControlTests/SwitchControlTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		ADB75C2213DB539C00448025 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/SwitchControl.app/SwitchControl";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
+				INFOPLIST_FILE = "SwitchControlTests/SwitchControlTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		ADB75BE513DB539C00448025 /* Build configuration list for PBXProject "SwitchControl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ADB75C1B13DB539C00448025 /* Debug */,
+				ADB75C1C13DB539C00448025 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		ADB75C1D13DB539C00448025 /* Build configuration list for PBXNativeTarget "SwitchControl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ADB75C1E13DB539C00448025 /* Debug */,
+				ADB75C1F13DB539C00448025 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		ADB75C2013DB539C00448025 /* Build configuration list for PBXNativeTarget "SwitchControlTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ADB75C2113DB539C00448025 /* Debug */,
+				ADB75C2213DB539C00448025 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = ADB75BE213DB539C00448025 /* Project object */;
+}
