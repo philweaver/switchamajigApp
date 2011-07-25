@@ -7,14 +7,19 @@
 //
 
 #import "SwitchControlAppDelegate.h"
+#import "singleSwitchView.h"
 
 @implementation SwitchControlAppDelegate
 
 @synthesize window = _window;
-
+@synthesize singleSwitchViewController = _singleSwitchViewController;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    singleSwitchView *aViewController = [[singleSwitchView alloc] initWithNibName:@"singleSwitchView" bundle:nil];
+    [self setSingleSwitchViewController:aViewController];
+    [aViewController release];
+    [[self window] setRootViewController: [self singleSwitchViewController]];
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -60,6 +65,7 @@
 
 - (void)dealloc
 {
+    [_singleSwitchViewController release];
     [_window release];
     [super dealloc];
 }

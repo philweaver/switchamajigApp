@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-
+@class singleSwitchView;
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, retain) singleSwitchView *singleSwitchViewController;
 
 @end

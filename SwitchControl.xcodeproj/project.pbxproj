@@ -21,6 +21,8 @@
 		ADB75C1613DB539C00448025 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1413DB539C00448025 /* InfoPlist.strings */; };
 		ADB75C1813DB539C00448025 /* SwitchControlTests.h in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1713DB539C00448025 /* SwitchControlTests.h */; };
 		ADB75C1A13DB539C00448025 /* SwitchControlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75C1913DB539C00448025 /* SwitchControlTests.m */; };
+		ADB75C2613DBD1F900448025 /* singleSwitchView.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75C2413DBD1F900448025 /* singleSwitchView.m */; };
+		ADB75C2713DBD1F900448025 /* singleSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C2513DBD1F900448025 /* singleSwitchView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,19 +40,22 @@
 		ADB75BEF13DB539C00448025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		ADB75BF113DB539C00448025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		ADB75BF313DB539C00448025 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		ADB75BF713DB539C00448025 /* SwitchControl-Info.plist */ = {isa = PBXFileReference; path = "SwitchControl-Info.plist"; sourceTree = "<group>"; };
+		ADB75BF713DB539C00448025 /* SwitchControl-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SwitchControl-Info.plist"; sourceTree = "<group>"; };
 		ADB75BF913DB539C00448025 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		ADB75BFB13DB539C00448025 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		ADB75BFD13DB539C00448025 /* SwitchControl-Prefix.pch */ = {isa = PBXFileReference; path = "SwitchControl-Prefix.pch"; sourceTree = "<group>"; };
-		ADB75BFE13DB539C00448025 /* SwitchControlAppDelegate.h */ = {isa = PBXFileReference; path = SwitchControlAppDelegate.h; sourceTree = "<group>"; };
+		ADB75BFD13DB539C00448025 /* SwitchControl-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SwitchControl-Prefix.pch"; sourceTree = "<group>"; };
+		ADB75BFE13DB539C00448025 /* SwitchControlAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchControlAppDelegate.h; sourceTree = "<group>"; };
 		ADB75BFF13DB539C00448025 /* SwitchControlAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchControlAppDelegate.m; sourceTree = "<group>"; };
 		ADB75C0213DB539C00448025 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
 		ADB75C0913DB539C00448025 /* SwitchControlTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwitchControlTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADB75C0A13DB539C00448025 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
-		ADB75C1313DB539C00448025 /* SwitchControlTests-Info.plist */ = {isa = PBXFileReference; path = "SwitchControlTests-Info.plist"; sourceTree = "<group>"; };
+		ADB75C1313DB539C00448025 /* SwitchControlTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SwitchControlTests-Info.plist"; sourceTree = "<group>"; };
 		ADB75C1513DB539C00448025 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		ADB75C1713DB539C00448025 /* SwitchControlTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchControlTests.h; sourceTree = "<group>"; };
 		ADB75C1913DB539C00448025 /* SwitchControlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchControlTests.m; sourceTree = "<group>"; };
+		ADB75C2313DBD1F900448025 /* singleSwitchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = singleSwitchView.h; sourceTree = "<group>"; };
+		ADB75C2413DBD1F900448025 /* singleSwitchView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = singleSwitchView.m; sourceTree = "<group>"; };
+		ADB75C2513DBD1F900448025 /* singleSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = singleSwitchView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +119,9 @@
 				ADB75BFE13DB539C00448025 /* SwitchControlAppDelegate.h */,
 				ADB75BFF13DB539C00448025 /* SwitchControlAppDelegate.m */,
 				ADB75C0113DB539C00448025 /* MainWindow.xib */,
+				ADB75C2313DBD1F900448025 /* singleSwitchView.h */,
+				ADB75C2413DBD1F900448025 /* singleSwitchView.m */,
+				ADB75C2513DBD1F900448025 /* singleSwitchView.xib */,
 				ADB75BF613DB539C00448025 /* Supporting Files */,
 			);
 			path = SwitchControl;
@@ -221,6 +229,7 @@
 			files = (
 				ADB75BFA13DB539C00448025 /* InfoPlist.strings in Resources */,
 				ADB75C0313DB539C00448025 /* MainWindow.xib in Resources */,
+				ADB75C2713DBD1F900448025 /* singleSwitchView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +267,7 @@
 			files = (
 				ADB75BFC13DB539C00448025 /* main.m in Sources */,
 				ADB75C0013DB539C00448025 /* SwitchControlAppDelegate.m in Sources */,
+				ADB75C2613DBD1F900448025 /* singleSwitchView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
