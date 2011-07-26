@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 
 @interface singleSwitchView : UIViewController
+{
+    int switch_state;
+}
+@property (nonatomic, readwrite) int server_socket;
 - (IBAction)activate:(id)sender;
 - (IBAction)deactivate:(id)sender;
 

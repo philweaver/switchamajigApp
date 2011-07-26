@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD87654D13DE7D7A005A8971 /* twoSwitchView.m in Sources */ = {isa = PBXBuildFile; fileRef = AD87654B13DE7D7A005A8971 /* twoSwitchView.m */; };
+		AD87654E13DE7D7A005A8971 /* twoSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD87654C13DE7D7A005A8971 /* twoSwitchView.xib */; };
 		ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
 		ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF113DB539C00448025 /* Foundation.framework */; };
 		ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF313DB539C00448025 /* CoreGraphics.framework */; };
@@ -36,6 +38,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD87654A13DE7D7A005A8971 /* twoSwitchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = twoSwitchView.h; sourceTree = "<group>"; };
+		AD87654B13DE7D7A005A8971 /* twoSwitchView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = twoSwitchView.m; sourceTree = "<group>"; };
+		AD87654C13DE7D7A005A8971 /* twoSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = twoSwitchView.xib; sourceTree = "<group>"; };
 		ADB75BEB13DB539C00448025 /* SwitchControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitchControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADB75BEF13DB539C00448025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		ADB75BF113DB539C00448025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -123,6 +128,9 @@
 				ADB75C2413DBD1F900448025 /* singleSwitchView.m */,
 				ADB75C2513DBD1F900448025 /* singleSwitchView.xib */,
 				ADB75BF613DB539C00448025 /* Supporting Files */,
+				AD87654A13DE7D7A005A8971 /* twoSwitchView.h */,
+				AD87654B13DE7D7A005A8971 /* twoSwitchView.m */,
+				AD87654C13DE7D7A005A8971 /* twoSwitchView.xib */,
 			);
 			path = SwitchControl;
 			sourceTree = "<group>";
@@ -230,6 +238,7 @@
 				ADB75BFA13DB539C00448025 /* InfoPlist.strings in Resources */,
 				ADB75C0313DB539C00448025 /* MainWindow.xib in Resources */,
 				ADB75C2713DBD1F900448025 /* singleSwitchView.xib in Resources */,
+				AD87654E13DE7D7A005A8971 /* twoSwitchView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +277,7 @@
 				ADB75BFC13DB539C00448025 /* main.m in Sources */,
 				ADB75C0013DB539C00448025 /* SwitchControlAppDelegate.m in Sources */,
 				ADB75C2613DBD1F900448025 /* singleSwitchView.m in Sources */,
+				AD87654D13DE7D7A005A8971 /* twoSwitchView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,6 +449,7 @@
 				ADB75C1F13DB539C00448025 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		ADB75C2013DB539C00448025 /* Build configuration list for PBXNativeTarget "SwitchControlTests" */ = {
 			isa = XCConfigurationList;
@@ -447,6 +458,7 @@
 				ADB75C2213DB539C00448025 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

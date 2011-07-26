@@ -1,21 +1,20 @@
 //
-//  singleSwitchView.m
+//  twoSwitchView.m
 //  SwitchControl
 //
-//  Created by Phil Weaver on 7/23/11.
+//  Created by Phil Weaver on 7/25/11.
 //  Copyright 2011 PAW Solutions. All rights reserved.
 //
 
-#import "singleSwitchView.h"
+#import "twoSwitchView.h"
 
-@implementation singleSwitchView
+@implementation twoSwitchView
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        switch_state = 0;
     }
     return self;
 }
@@ -46,24 +45,7 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-	return NO;
-}
-#define MAX_STRING 1024
-- (IBAction)activate:(id)sender {
-    [sender setBackgroundColor:[UIColor blueColor]];
-    switch_state |= 0x20;
-    char string[MAX_STRING];
-    sprintf(string, "set sys output 0x%04x\r", switch_state);
-    write([self server_socket], string, strlen(string));
+	return YES;
 }
 
-- (IBAction)deactivate:(id)sender {
-    [sender setBackgroundColor:[UIColor yellowColor]];
-    switch_state &= ~0x20;
-    char string[MAX_STRING];
-    sprintf(string, "set sys output 0x%04x\r", switch_state);
-    write([self server_socket], string, strlen(string));
-}
-
-@synthesize server_socket;
 @end
