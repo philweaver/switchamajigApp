@@ -46,7 +46,10 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-	return YES;
+    if(interfaceOrientation == UIInterfaceOrientationPortrait)
+        return YES;
+    
+    return NO;
 }
 
 #define MAX_STRING 1024

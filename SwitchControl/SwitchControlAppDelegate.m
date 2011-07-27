@@ -54,7 +54,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     twoSwitchView *a2ViewController = [[twoSwitchView alloc] initWithNibName:@"twoSwitchView" bundle:nil];
     [self setTwoSwitchViewController:a2ViewController];
     [a2ViewController release];
-    [[self window] setRootViewController: [self singleSwitchViewController]];
+    [[self window] setRootViewController: [self twoSwitchViewController]];
     [self.window makeKeyAndVisible];
     
     // Initialize connection with remote switch
@@ -112,6 +112,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     sleep(1);
     
     [[self singleSwitchViewController] setServer_socket:server_socket];
+    [[self twoSwitchViewController] setServer_socket:server_socket];
     return YES;
 }
 
