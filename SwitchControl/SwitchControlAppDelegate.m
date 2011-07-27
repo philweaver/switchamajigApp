@@ -8,6 +8,7 @@
 
 #import "SwitchControlAppDelegate.h"
 #import "singleSwitchView.h"
+#import "twoSwitchView.h"
 #import "sys/socket.h"
 #import "netinet/in.h"
 #import "netdb.h"
@@ -18,6 +19,7 @@ int portno = 2000;
 
 @synthesize window = _window;
 @synthesize singleSwitchViewController = _singleSwitchViewController;
+@synthesize twoSwitchViewController = _twoSwitchViewController;
 
 bool verify_socket_reply(int socket, const char *expected_string);
 bool verify_socket_reply(int socket, const char *expected_string) {
@@ -49,6 +51,9 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     singleSwitchView *aViewController = [[singleSwitchView alloc] initWithNibName:@"singleSwitchView" bundle:nil];
     [self setSingleSwitchViewController:aViewController];
     [aViewController release];
+    twoSwitchView *a2ViewController = [[twoSwitchView alloc] initWithNibName:@"twoSwitchView" bundle:nil];
+    [self setTwoSwitchViewController:a2ViewController];
+    [a2ViewController release];
     [[self window] setRootViewController: [self singleSwitchViewController]];
     [self.window makeKeyAndVisible];
     

@@ -50,7 +50,7 @@
 }
 #define MAX_STRING 1024
 - (IBAction)activate:(id)sender {
-    [sender setBackgroundColor:[UIColor blueColor]];
+    //[sender setBackgroundColor:[UIColor blueColor]];
     switch_state |= 0x20;
     char string[MAX_STRING];
     sprintf(string, "set sys output 0x%04x\r", switch_state);
@@ -58,7 +58,7 @@
 }
 
 - (IBAction)deactivate:(id)sender {
-    [sender setBackgroundColor:[UIColor yellowColor]];
+    //[sender setBackgroundColor:[UIColor yellowColor]];
     switch_state &= ~0x20;
     char string[MAX_STRING];
     sprintf(string, "set sys output 0x%04x\r", switch_state);
