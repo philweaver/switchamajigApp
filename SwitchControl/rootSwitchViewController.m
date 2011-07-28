@@ -9,6 +9,7 @@
 #import "rootSwitchViewController.h"
 #import "singleSwitchView.h"
 #import "twoSwitchView.h"
+#import "fourSwitchAcrossView.h"
 @implementation rootSwitchViewController
 @synthesize server_socket;
 
@@ -61,6 +62,13 @@
 
 - (IBAction)launchTwoSwitch:(id)sender {
     twoSwitchView *newView = [[twoSwitchView alloc] initWithNibName:@"twoSwitchView" bundle:nil];
+    [newView setServer_socket:[self server_socket]];
+    [self.navigationController pushViewController:newView animated:YES];
+    [newView release];
+}
+
+- (IBAction)launchFourAcrossSwitch:(id)sender {
+    fourSwitchAcrossView *newView = [[fourSwitchAcrossView alloc] initWithNibName:@"fourSwitchAcrossView" bundle:nil];
     [newView setServer_socket:[self server_socket]];
     [self.navigationController pushViewController:newView animated:YES];
     [newView release];

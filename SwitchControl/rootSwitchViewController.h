@@ -13,5 +13,6 @@
 
 - (IBAction)launchOneSwitch:(id)sender;
 - (IBAction)launchTwoSwitch:(id)sender;
+- (IBAction)launchFourAcrossSwitch:(id)sender;
 
 @end
