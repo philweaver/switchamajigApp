@@ -16,6 +16,7 @@
     if (self) {
         // Custom initialization
         switch_state = 0;
+        [super setWantsFullScreenLayout:YES];
     }
     return self;
 }
@@ -50,6 +51,9 @@
         return YES;
     
     return NO;
+}
+-(void) viewWillAppear:(BOOL)animated {
+    [[UIDevice currentDevice] setOrientation:UIInterfaceOrientationPortrait];
 }
 
 #define MAX_STRING 1024

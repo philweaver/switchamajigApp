@@ -7,8 +7,7 @@
 //
 
 #import "SwitchControlAppDelegate.h"
-#import "singleSwitchView.h"
-#import "twoSwitchView.h"
+#import "rootSwitchViewController.h"
 #import "sys/socket.h"
 #import "netinet/in.h"
 #import "netdb.h"
@@ -18,8 +17,7 @@ char hostname[] = "172.16.1.42";
 int portno = 2000;
 
 @synthesize window = _window;
-@synthesize singleSwitchViewController = _singleSwitchViewController;
-@synthesize twoSwitchViewController = _twoSwitchViewController;
+@synthesize navigationController = _navigationController;
 
 bool verify_socket_reply(int socket, const char *expected_string);
 bool verify_socket_reply(int socket, const char *expected_string) {
@@ -48,15 +46,13 @@ bool verify_socket_reply(int socket, const char *expected_string) {
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    singleSwitchView *aViewController = [[singleSwitchView alloc] initWithNibName:@"singleSwitchView" bundle:nil];
-    [self setSingleSwitchViewController:aViewController];
-    [aViewController release];
-    twoSwitchView *a2ViewController = [[twoSwitchView alloc] initWithNibName:@"twoSwitchView" bundle:nil];
-    [self setTwoSwitchViewController:a2ViewController];
-    [a2ViewController release];
-    [[self window] setRootViewController: [self twoSwitchViewController]];
-    [self.window makeKeyAndVisible];
-    
+    rootSwitchViewController *rootController = [[rootSwitchViewController alloc] initWithNibName:@"rootSwitchViewController" bundle:nil];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:rootController];
+    [self setNavigationController:navController];
+    [navController release];
+    [[self window] setRootViewController: [self navigationController]];
+    [self.window makeKeyAndVisible];    
+
     // Initialize connection with remote switch
     int server_socket;
     server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -111,8 +107,8 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     write(server_socket, "set sys output 0\r", strlen("set sys output 0\r"));
     sleep(1);
     
-    [[self singleSwitchViewController] setServer_socket:server_socket];
-    [[self twoSwitchViewController] setServer_socket:server_socket];
+    [rootController setServer_socket:server_socket];
+    [rootController release];
     return YES;
 }
 
@@ -157,7 +153,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
 
 - (void)dealloc
 {
-    [_singleSwitchViewController release];
+    [_navigationController release];
     [_window release];
     [super dealloc];
 }

@@ -25,6 +25,8 @@
 		ADB75C1A13DB539C00448025 /* SwitchControlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75C1913DB539C00448025 /* SwitchControlTests.m */; };
 		ADB75C2613DBD1F900448025 /* singleSwitchView.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75C2413DBD1F900448025 /* singleSwitchView.m */; };
 		ADB75C2713DBD1F900448025 /* singleSwitchView.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C2513DBD1F900448025 /* singleSwitchView.xib */; };
+		ADBA89BA13E0D09500A89CB6 /* rootSwitchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADBA89B813E0D09500A89CB6 /* rootSwitchViewController.m */; };
+		ADBA89BB13E0D09500A89CB6 /* rootSwitchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +63,9 @@
 		ADB75C2313DBD1F900448025 /* singleSwitchView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = singleSwitchView.h; sourceTree = "<group>"; };
 		ADB75C2413DBD1F900448025 /* singleSwitchView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = singleSwitchView.m; sourceTree = "<group>"; };
 		ADB75C2513DBD1F900448025 /* singleSwitchView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = singleSwitchView.xib; sourceTree = "<group>"; };
+		ADBA89B713E0D09500A89CB6 /* rootSwitchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rootSwitchViewController.h; sourceTree = "<group>"; };
+		ADBA89B813E0D09500A89CB6 /* rootSwitchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = rootSwitchViewController.m; sourceTree = "<group>"; };
+		ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = rootSwitchViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +136,9 @@
 				AD87654A13DE7D7A005A8971 /* twoSwitchView.h */,
 				AD87654B13DE7D7A005A8971 /* twoSwitchView.m */,
 				AD87654C13DE7D7A005A8971 /* twoSwitchView.xib */,
+				ADBA89B713E0D09500A89CB6 /* rootSwitchViewController.h */,
+				ADBA89B813E0D09500A89CB6 /* rootSwitchViewController.m */,
+				ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */,
 			);
 			path = SwitchControl;
 			sourceTree = "<group>";
@@ -239,6 +247,7 @@
 				ADB75C0313DB539C00448025 /* MainWindow.xib in Resources */,
 				ADB75C2713DBD1F900448025 /* singleSwitchView.xib in Resources */,
 				AD87654E13DE7D7A005A8971 /* twoSwitchView.xib in Resources */,
+				ADBA89BB13E0D09500A89CB6 /* rootSwitchViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +287,7 @@
 				ADB75C0013DB539C00448025 /* SwitchControlAppDelegate.m in Sources */,
 				ADB75C2613DBD1F900448025 /* singleSwitchView.m in Sources */,
 				AD87654D13DE7D7A005A8971 /* twoSwitchView.m in Sources */,
+				ADBA89BA13E0D09500A89CB6 /* rootSwitchViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

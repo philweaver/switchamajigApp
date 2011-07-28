@@ -1,21 +1,22 @@
 //
-//  singleSwitchView.m
+//  rootSwitchViewController.m
 //  SwitchControl
 //
-//  Created by Phil Weaver on 7/23/11.
+//  Created by Phil Weaver on 7/27/11.
 //  Copyright 2011 PAW Solutions. All rights reserved.
 //
 
+#import "rootSwitchViewController.h"
 #import "singleSwitchView.h"
-
-@implementation singleSwitchView
+#import "twoSwitchView.h"
+@implementation rootSwitchViewController
+@synthesize server_socket;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        switch_state = 0;
     }
     return self;
 }
@@ -46,29 +47,20 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-	return NO;
+    return YES;
 }
 
--(void) viewWillAppear:(BOOL)animated {
-    [[UIDevice currentDevice] setOrientation:UIInterfaceOrientationPortrait];
+- (IBAction)launchOneSwitch:(id)sender {
+    singleSwitchView *newView = [[singleSwitchView alloc] initWithNibName:@"singleSwitchView" bundle:nil];
+    [newView setServer_socket:[self server_socket]];
+    [self.navigationController pushViewController:newView animated:YES];
+    [newView release];
 }
 
-#define MAX_STRING 1024
-- (IBAction)activate:(id)sender {
-    //[sender setBackgroundColor:[UIColor blueColor]];
-    switch_state |= 0x20;
-    char string[MAX_STRING];
-    sprintf(string, "set sys output 0x%04x\r", switch_state);
-    write([self server_socket], string, strlen(string));
+- (IBAction)launchTwoSwitch:(id)sender {
+    twoSwitchView *newView = [[twoSwitchView alloc] initWithNibName:@"twoSwitchView" bundle:nil];
+    [newView setServer_socket:[self server_socket]];
+    [self.navigationController pushViewController:newView animated:YES];
+    [newView release];
 }
-
-- (IBAction)deactivate:(id)sender {
-    //[sender setBackgroundColor:[UIColor yellowColor]];
-    switch_state &= ~0x20;
-    char string[MAX_STRING];
-    sprintf(string, "set sys output 0x%04x\r", switch_state);
-    write([self server_socket], string, strlen(string));
-}
-
-@synthesize server_socket;
 @end

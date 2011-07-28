@@ -9,11 +9,10 @@
 #import <UIKit/UIKit.h>
 @class singleSwitchView;
 @class twoSwitchView;
+@class rootSwitchViewController;
 
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
-@property (nonatomic, retain) singleSwitchView *singleSwitchViewController;
-@property (nonatomic, retain) twoSwitchView *twoSwitchViewController;
-
+@property (nonatomic, retain) UINavigationController *navigationController;
 @end
