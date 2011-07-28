@@ -11,9 +11,13 @@
 @interface singleSwitchView : UIViewController
 {
     int switch_state;
+    UIButton *backButton;
 }
 @property (nonatomic, readwrite) int server_socket;
 - (IBAction)activate:(id)sender;
 - (IBAction)deactivate:(id)sender;
+- (IBAction)back:(id)sender;
+- (IBAction)enableBack:(id)sender;
+@property (nonatomic, retain) IBOutlet UIButton *backButton;
 
 @end

@@ -9,6 +9,7 @@
 #import "twoSwitchView.h"
 
 @implementation twoSwitchView
+@synthesize backButton;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -35,10 +36,12 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    [self.backButton setEnabled:NO];
 }
 
 - (void)viewDidUnload
 {
+    [self setBackButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -62,6 +65,8 @@
     char string[MAX_STRING];
     sprintf(string, "set sys output 0x%04x\r", switch_state);
     write([self server_socket], string, strlen(string));
+    [self.backButton setEnabled:NO];
+
 }
 
 - (IBAction)deactivate1:(id)sender {
@@ -76,6 +81,7 @@
     char string[MAX_STRING];
     sprintf(string, "set sys output 0x%04x\r", switch_state);
     write([self server_socket], string, strlen(string));
+    [self.backButton setEnabled:NO];
 }
 
 - (IBAction)deactivate2:(id)sender {
@@ -84,6 +90,19 @@
     sprintf(string, "set sys output 0x%04x\r", switch_state);
     write([self server_socket], string, strlen(string));
 }
+
+- (IBAction)back:(id)sender {
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+- (IBAction)enableBack:(id)sender {
+    [self.backButton setEnabled:YES];
+}
+     
 @synthesize server_socket;
 
+- (void)dealloc {
+    [backButton release];
+    [super dealloc];
+}
 @end
