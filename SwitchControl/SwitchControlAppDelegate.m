@@ -8,40 +8,12 @@
 
 #import "SwitchControlAppDelegate.h"
 #import "rootSwitchViewController.h"
-#import "sys/socket.h"
-#import "netinet/in.h"
-#import "netdb.h"
 
 @implementation SwitchControlAppDelegate
-char hostname[] = "172.16.1.42";
-int portno = 2000;
 
 @synthesize window = _window;
 @synthesize navigationController = _navigationController;
 
-bool verify_socket_reply(int socket, const char *expected_string);
-bool verify_socket_reply(int socket, const char *expected_string) {
-    int expected_len = strlen(expected_string);
-    char *buffer = malloc(expected_len);
-    if(!buffer)
-        return false;
-    int total_bytes_read = 0;
-    while(total_bytes_read < expected_len) {
-        int bytes_read = read(socket, buffer+total_bytes_read, expected_len - total_bytes_read);
-        if(!bytes_read) {
-            sleep(1);
-        }
-        for(int i=total_bytes_read; i < total_bytes_read + bytes_read; ++i) {
-            if(expected_string[i] != buffer[i]) {
-                free(buffer);
-                return false;
-            }
-        }
-        total_bytes_read += bytes_read;
-    }
-    free(buffer);
-    return true;
-}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -53,61 +25,6 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     [[self window] setRootViewController: [self navigationController]];
     [self.window makeKeyAndVisible];    
 
-    // Initialize connection with remote switch
-    int server_socket;
-    server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(server_socket < 0) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                message:@"Failed to open socket."  
-                                                delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];  
-        [message show];  
-        [message release];  
-    }
-    char on = 1;
-    setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-    struct hostent *host = gethostbyname(hostname);
-    struct sockaddr_in sin;
-    memcpy(&sin.sin_addr.s_addr, host->h_addr, host->h_length);
-    sin.sin_family = AF_INET;
-    sin.sin_port = htons(portno);
-    if(connect(server_socket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                          message:@"Failed to connect."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-    }
-    if(!verify_socket_reply(server_socket, "*HELLO*")) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                          message:@"Did Not Receive hello."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-        
-    }
-    write(server_socket, "$$$", 3);
-    if(!verify_socket_reply(server_socket, "CMD")) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                          message:@"Did Not Receive cmd."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-        
-    }
-    write(server_socket, "\r", 1);
-    sleep(1);
-    write(server_socket, "set sys output 0\r", strlen("set sys output 0\r"));
-    sleep(1);
-    
-    [rootController setServer_socket:server_socket];
     [rootController release];
     return YES;
 }
