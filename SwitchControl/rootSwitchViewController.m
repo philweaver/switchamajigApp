@@ -13,6 +13,9 @@
 #import "sys/socket.h"
 #import "netinet/in.h"
 #import "netdb.h"
+#include "sys/unistd.h"
+#include "sys/fcntl.h"
+#include "sys/poll.h"
 
 @implementation rootSwitchViewController
 @synthesize hostname_field;
@@ -97,6 +100,8 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     int total_bytes_read = 0;
     while(total_bytes_read < expected_len) {
         int bytes_read = read(socket, buffer+total_bytes_read, expected_len - total_bytes_read);
+        if(bytes_read < 0)
+            return false;
         if(!bytes_read) {
             sleep(1);
         }
@@ -146,17 +151,28 @@ int connect_to_switch(char hostname[])
     memcpy(&sin.sin_addr.s_addr, host->h_addr, host->h_length);
     sin.sin_family = AF_INET;
     sin.sin_port = htons(portno);
+    int socket_flags = fcntl(server_socket, F_GETFL);
+    socket_flags |= O_NONBLOCK;
+    fcntl(server_socket, F_SETFL, socket_flags);
     if(connect(server_socket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                          message:@"Failed to connect."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-        close(server_socket);
-        return -1;
+        struct pollfd socket_poll;
+        socket_poll.fd = server_socket;
+        socket_poll.events = POLLOUT;
+        int poll_ret = poll(&socket_poll, 1, 1000);
+        if(poll_ret <= 0) {
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                              message:@"Failed to connect."  
+                                                             delegate:nil  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];  
+            [message show];  
+            [message release];
+            close(server_socket);
+            return -1;
+        }
     }
+    socket_flags &= ~O_NONBLOCK;
+    fcntl(server_socket, F_SETFL, socket_flags);
     if(!verify_socket_reply(server_socket, "*HELLO*")) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
                                                           message:@"Did Not Receive hello."  
