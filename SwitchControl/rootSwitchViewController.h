@@ -27,7 +27,6 @@
 - (IBAction)launchTwoSwitch:(id)sender;
 - (IBAction)launchFourAcrossSwitch:(id)sender;
 - (IBAction)detect:(id)sender;
-@property (nonatomic, retain) IBOutlet UITextField *hostname_field;
 @property (nonatomic, retain) IBOutlet UIButton *chooseOneSwitchButton;
 @property (nonatomic, retain) IBOutlet UIButton *chooseTwoSwitchButton;
 @property (nonatomic, retain) IBOutlet UIButton *chooseFourAcrossButton;

@@ -285,7 +285,6 @@ int connect_to_switch(char hostname[])
     // Now loop and listen for switches
     id start = [NSDate date];
     char buffer[2*EXPECTED_PACKET_SIZE+1];
-    printf("Starting loop.\n");
     struct timeval tv;
     fd_set readfds;
     tv.tv_sec = 10;
@@ -303,7 +302,7 @@ int connect_to_switch(char hostname[])
         if((numbytes < 0) && (errno == EWOULDBLOCK))
             numbytes = 0;
         if(numbytes < 0) {
-            printf("Error numbytes=%d\n", numbytes);
+            //printf("Error numbytes=%d\n", numbytes);
             UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error checking for data."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
             [message show];  
             [message release];
@@ -330,8 +329,8 @@ int connect_to_switch(char hostname[])
             [mempool release];
             return;
         }
-        if(numbytes)
-            printf("numbytes=%d\n", numbytes);
+        //if(numbytes)
+        //    printf("numbytes=%d\n", numbytes);
         if(numbytes != EXPECTED_PACKET_SIZE)
             continue;
         // Get the IP address in string format
@@ -339,7 +338,7 @@ int connect_to_switch(char hostname[])
         struct sockaddr *sockaddr_ptr = (struct sockaddr *) &switch_address;
         
         inet_ntop(switch_address.ss_family, (sockaddr_ptr->sa_family == AF_INET) ? (void*)&(((struct sockaddr_in *)sockaddr_ptr)->sin_addr) : (void*)&(((struct sockaddr_in6 *)sockaddr_ptr)->sin6_addr), ip_addr_string, sizeof(ip_addr_string));
-        printf("Received: %s from %s\n", buffer+DEVICE_STRING_OFFSET, ip_addr_string);
+        //printf("Received: %s from %s\n", buffer+DEVICE_STRING_OFFSET, ip_addr_string);
         NSString *switchName = [NSString stringWithCString:buffer+DEVICE_STRING_OFFSET encoding:NSASCIIStringEncoding];
         NSString *ipAddrStr = [NSString stringWithCString:ip_addr_string encoding:NSASCIIStringEncoding];
         if(!CFDictionaryContainsKey((CFDictionaryRef) switchNameDictionary, switchName)) {
@@ -349,7 +348,6 @@ int connect_to_switch(char hostname[])
         
     }
     FD_ZERO(&readfds);
-    printf("Loop complete.\n");
     close(detect_socket);
     [self performSelectorOnMainThread:@selector(reload_switch_name_table) withObject:nil waitUntilDone:NO];
 
@@ -381,7 +379,6 @@ int connect_to_switch(char hostname[])
     NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex(switchNameArray, indexPath.row)];
     char mystring[1024];
     [switchName getCString:mystring maxLength:1024 encoding:[NSString defaultCStringEncoding]];
-    printf("Selected %s\n", mystring);
     NSString *ipAddr;
     //ipAddr = CFDictionaryGetValue(switchNameDictionary, switchName);
     if(!CFDictionaryGetValueIfPresent(switchNameDictionary, switchName, (const void **) &ipAddr)) {
@@ -392,7 +389,8 @@ int connect_to_switch(char hostname[])
     }
     char ip_addr_string[2*INET6_ADDRSTRLEN];
     [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
-    printf("IP addr %s\n", ip_addr_string);
+    if(server_socket >= 0)
+        close(server_socket);
     server_socket = connect_to_switch(ip_addr_string);
     if(server_socket < 0) {
         [self disable_switch_view_buttons];
