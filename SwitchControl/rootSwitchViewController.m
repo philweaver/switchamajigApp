@@ -17,6 +17,7 @@
 #include "sys/fcntl.h"
 #include "sys/poll.h"
 #include "arpa/inet.h"
+#include "errno.h"
 
 @implementation rootSwitchViewController
 @synthesize chooseOneSwitchButton;
@@ -120,8 +121,10 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     int total_bytes_read = 0;
     while(total_bytes_read < expected_len) {
         int bytes_read = read(socket, buffer+total_bytes_read, expected_len - total_bytes_read);
-        if(bytes_read < 0)
+        if(bytes_read < 0) {
+            printf("%s\n", strerror(errno));
             return false;
+        }
         if(!bytes_read) {
             sleep(1);
         }
