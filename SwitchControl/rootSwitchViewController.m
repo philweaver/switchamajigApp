@@ -23,7 +23,6 @@
 @synthesize chooseOneSwitchButton;
 @synthesize chooseTwoSwitchButton;
 @synthesize chooseFourAcrossButton;
-@synthesize detectProgressBar;
 @synthesize switchNameTableView;
 
 - (void)dealloc {
@@ -43,8 +42,7 @@
     if (self) {
         // Custom initialization
         server_socket = -1;
-        switchNameDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-        switchNameArray = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
+        appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
     }
     return self;
 }
@@ -66,8 +64,8 @@
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
     [self disable_switch_view_buttons];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
 }
-
 - (void)viewDidUnload
 {
     [self setChooseOneSwitchButton:nil];
@@ -241,12 +239,7 @@ int connect_to_switch(char hostname[])
     return;
 }
 
-// Detect switches in area
-#define EXPECTED_PACKET_SIZE 110
-#define DEVICE_STRING_OFFSET 60
-#define SCAN_TIME_SECONDS 10.0
 - (IBAction)detect:(id)sender {
-    [self performSelectorInBackground:@selector(detect_switches) withObject:nil];
     return;
 }
 
@@ -254,108 +247,13 @@ int connect_to_switch(char hostname[])
     [detectProgressBar setProgress:detect_progress];
 }
 
-- (void) reload_switch_name_table {
-    [switchNameTableView reloadData];
-}
-- (void)detect_switches {
-    NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
-    CFDictionaryRemoveAllValues(switchNameDictionary);
-    CFArrayRemoveAllValues(switchNameArray);
-    detect_progress = 0.0;
-    [self performSelectorOnMainThread:@selector(update_detect_progress) withObject:nil waitUntilDone:NO];
-    int detect_socket;
-    detect_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if(socket < 0) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error opening socked."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-        [mempool release];
-        return;
-    }
-    struct sockaddr_in sockin_addr;
-    memset(&sockin_addr, 0, sizeof(sockin_addr));
-    sockin_addr.sin_family = AF_INET;
-    sockin_addr.sin_port = htons(55555);
-    sockin_addr.sin_addr.s_addr = INADDR_ANY;
-    if(bind(detect_socket, (struct sockaddr *) &sockin_addr, sizeof(sockin_addr)) < 0) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error binding socked."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-        close(detect_socket);
-        [mempool release];
-        return;
-    }
-    // Now loop and listen for switches
-    id start = [NSDate date];
-    char buffer[2*EXPECTED_PACKET_SIZE+1];
-    struct timeval tv;
-    fd_set readfds;
-    tv.tv_sec = 10;
-    tv.tv_usec = 250000;
-    FD_ZERO(&readfds);
-    FD_SET(detect_socket, &readfds);
-    while([start timeIntervalSinceNow] > -SCAN_TIME_SECONDS) {
-        struct sockaddr_storage switch_address;
-        socklen_t addr_len = sizeof(switch_address);
-        //  Use a non-blocking receive to see if anything arrived 
-        int socket_flags = fcntl(server_socket, F_GETFL);
-        socket_flags |= O_NONBLOCK;
-        fcntl(server_socket, F_SETFL, socket_flags);
-        int numbytes = recvfrom(detect_socket, buffer, 2*EXPECTED_PACKET_SIZE, MSG_PEEK | MSG_DONTWAIT, (struct sockaddr *) &switch_address, &addr_len);
-        if((numbytes < 0) && (errno == EWOULDBLOCK))
-            numbytes = 0;
-        if(numbytes < 0) {
-            //printf("Error numbytes=%d\n", numbytes);
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error checking for data."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-            [message show];  
-            [message release];
-            FD_ZERO(&readfds);
-            close(detect_socket);
-            [mempool release];
-            return;
-            
-        }
-        // Switch to blocking and receive any data that's available.
-        socket_flags &= ~O_NONBLOCK;
-        fcntl(server_socket, F_SETFL, socket_flags);
-        numbytes = (numbytes) ? (recvfrom(detect_socket, buffer, EXPECTED_PACKET_SIZE, 0, (struct sockaddr *) &switch_address, &addr_len)) : 0;
-        id currentTime = [NSDate date];
-        detect_progress = [currentTime timeIntervalSinceDate:start] / SCAN_TIME_SECONDS;
-        [self performSelectorOnMainThread:@selector(update_detect_progress) withObject:nil waitUntilDone:NO];
-
-        if(numbytes < 0){
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error on recvfrom."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-            [message show];  
-            [message release];
-            FD_ZERO(&readfds);
-            close(detect_socket);
-            [mempool release];
-            return;
-        }
-        //if(numbytes)
-        //    printf("numbytes=%d\n", numbytes);
-        if(numbytes != EXPECTED_PACKET_SIZE)
-            continue;
-        // Get the IP address in string format
-        char ip_addr_string[INET6_ADDRSTRLEN];
-        struct sockaddr *sockaddr_ptr = (struct sockaddr *) &switch_address;
-        
-        inet_ntop(switch_address.ss_family, (sockaddr_ptr->sa_family == AF_INET) ? (void*)&(((struct sockaddr_in *)sockaddr_ptr)->sin_addr) : (void*)&(((struct sockaddr_in6 *)sockaddr_ptr)->sin6_addr), ip_addr_string, sizeof(ip_addr_string));
-        //printf("Received: %s from %s\n", buffer+DEVICE_STRING_OFFSET, ip_addr_string);
-        NSString *switchName = [NSString stringWithCString:buffer+DEVICE_STRING_OFFSET encoding:NSASCIIStringEncoding];
-        NSString *ipAddrStr = [NSString stringWithCString:ip_addr_string encoding:NSASCIIStringEncoding];
-        if(!CFDictionaryContainsKey((CFDictionaryRef) switchNameDictionary, switchName)) {
-            CFArrayAppendValue(switchNameArray, switchName);
-            CFDictionaryAddValue(switchNameDictionary, switchName, ipAddrStr);
-        }
-        
-    }
-    FD_ZERO(&readfds);
-    close(detect_socket);
+- (void) switch_names_updated:(NSNotification *) notification {
     [self performSelectorOnMainThread:@selector(reload_switch_name_table) withObject:nil waitUntilDone:NO];
-
-    [mempool release];
-    return;
+}
+- (void) reload_switch_name_table {
+    [[appDelegate switchDataLock] lock];
+    [switchNameTableView reloadData];
+    [[appDelegate switchDataLock] unlock];
 }
 
 // Code to support table displaying the names of the switches discovered during detect
@@ -364,7 +262,7 @@ int connect_to_switch(char hostname[])
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return CFDictionaryGetCount(switchNameDictionary);
+    return CFDictionaryGetCount([appDelegate switchNameDictionary]);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -372,19 +270,19 @@ int connect_to_switch(char hostname[])
     if(cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"] autorelease];
     }
-    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex(switchNameArray, indexPath.row)];
+    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     cell.textLabel.text = switchName;
     return cell;
 }
 
 // Support for connecting to a swtich when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex(switchNameArray, indexPath.row)];
+    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     char mystring[1024];
     [switchName getCString:mystring maxLength:1024 encoding:[NSString defaultCStringEncoding]];
     NSString *ipAddr;
     //ipAddr = CFDictionaryGetValue(switchNameDictionary, switchName);
-    if(!CFDictionaryGetValueIfPresent(switchNameDictionary, switchName, (const void **) &ipAddr)) {
+    if(!CFDictionaryGetValueIfPresent([appDelegate switchNameDictionary], switchName, (const void **) &ipAddr)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         [message release];

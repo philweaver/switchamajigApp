@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SwitchControlAppDelegate.h"
 
 @interface rootSwitchViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
     UIButton *chooseOneSwitchButton;
@@ -15,22 +16,18 @@
     UIProgressView *detectProgressBar;
     int server_socket;
     float detect_progress;
-    CFMutableDictionaryRef switchNameDictionary;
-    CFMutableArrayRef switchNameArray;
+    SwitchControlAppDelegate *appDelegate;
 }
+- (void) switch_names_updated:(NSNotification *) notification;
+- (void) reload_switch_name_table;
 - (void)disable_switch_view_buttons; 
 - (void)enable_switch_view_buttons;
-- (void)detect_switches;
-- (void)update_detect_progress;
-- (void)reload_switch_name_table;
 - (IBAction)launchOneSwitch:(id)sender;
 - (IBAction)launchTwoSwitch:(id)sender;
 - (IBAction)launchFourAcrossSwitch:(id)sender;
-- (IBAction)detect:(id)sender;
 @property (nonatomic, retain) IBOutlet UIButton *chooseOneSwitchButton;
 @property (nonatomic, retain) IBOutlet UIButton *chooseTwoSwitchButton;
 @property (nonatomic, retain) IBOutlet UIButton *chooseFourAcrossButton;
-@property (nonatomic, retain) IBOutlet UIProgressView *detectProgressBar;
 @property (nonatomic, retain) IBOutlet UITableView *switchNameTableView;
 
 @end
