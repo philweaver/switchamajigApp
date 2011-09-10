@@ -10,6 +10,7 @@
 #import "singleSwitchView.h"
 #import "twoSwitchView.h"
 #import "fourSwitchAcrossView.h"
+#import "switchPanelViewController.h"
 #import "sys/socket.h"
 #import "netinet/in.h"
 #import "netdb.h"
@@ -63,8 +64,9 @@
     // Do any additional setup after loading the view from its nib.
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
-    [self disable_switch_view_buttons];
+    [self enable_switch_view_buttons];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
+    active_switch_index = -1;
 }
 - (void)viewDidUnload
 {
@@ -90,10 +92,17 @@
 }
 
 - (IBAction)launchOneSwitch:(id)sender {
+#if 1
+    // Load programatically-created view
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    [self.navigationController pushViewController:viewController animated:YES];
+    [viewController release];
+#else
     singleSwitchView *newView = [[singleSwitchView alloc] initWithNibName:@"singleSwitchView" bundle:nil];
     [newView setServer_socket:server_socket];
     [self.navigationController pushViewController:newView animated:YES];
     [newView release];
+#endif
 }
 
 - (IBAction)launchTwoSwitch:(id)sender {
@@ -272,6 +281,9 @@ int connect_to_switch(char hostname[])
     }
     NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     cell.textLabel.text = switchName;
+    if(indexPath.row == active_switch_index) {
+        cell.detailTextLabel.text = [NSString stringWithCString:"Connected" encoding:NSASCIIStringEncoding];
+    }
     return cell;
 }
 
@@ -295,9 +307,11 @@ int connect_to_switch(char hostname[])
     server_socket = connect_to_switch(ip_addr_string);
     if(server_socket < 0) {
         [self disable_switch_view_buttons];
+        active_switch_index = -1;
     } else {
         [self enable_switch_view_buttons];
+        active_switch_index = indexPath.row;
     }
-
+    [self reload_switch_name_table];
 }
 @end

@@ -17,6 +17,7 @@
     int server_socket;
     float detect_progress;
     SwitchControlAppDelegate *appDelegate;
+    int active_switch_index;
 }
 - (void) switch_names_updated:(NSNotification *) notification;
 - (void) reload_switch_name_table;
