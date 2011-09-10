@@ -16,6 +16,7 @@
 #include "sys/poll.h"
 #include "arpa/inet.h"
 #include "errno.h"
+#include "Reachability.h"
 
 @implementation SwitchControlAppDelegate
 
@@ -28,16 +29,29 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    // Check if we have network access
+    Reachability *r = [Reachability reachabilityForLocalWiFi];
+    NetworkStatus internetStatus = [r currentReachabilityStatus];
+    if(internetStatus == NotReachable) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:@"No WiFi Connection."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        
+    }
+    
+    // Initialize the root view controller
     rootSwitchViewController *rootController = [[rootSwitchViewController alloc] initWithNibName:@"rootSwitchViewController" bundle:nil];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:rootController];
-    [self setSwitchDataLock:[[NSLock alloc] init]];
     [self setNavigationController:navController];
     [navController release];
     [[self window] setRootViewController: [self navigationController]];
     [self.window makeKeyAndVisible];    
     [rootController release];
+    // Initialize the list of switches and the lock that keeps it threadsafe
+    [self setSwitchDataLock:[[NSLock alloc] init]];
     [self setSwitchNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
     [self setSwitchNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
+    // Start the background thread that listens for switches
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
 
     return YES;
