@@ -37,15 +37,32 @@
 - (void)loadView
 {
     appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
-	CGRect cgRct = CGRectMake(0, 20, 768, 1004);
+	CGRect cgRct = CGRectMake(0, 20, 1024, 748);
     UIView *myView = [[UIView alloc] initWithFrame:cgRct];
     [myView setBackgroundColor:[UIColor blackColor]];
 	myView.autoresizesSubviews = YES;
     [self setButtonToSwitchDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
+    
+    // Create two-button combo to allow navigation
+    id allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    CGRect buttonRect = CGRectMake(412, 704, 200, 44);
+    [allowNavButton setFrame:buttonRect];
+    [allowNavButton setTitle:[NSString stringWithCString:"Enable Back Button" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+    [allowNavButton addTarget:self action:@selector(allowNavigation:) forControlEvents:UIControlEventTouchUpInside]; 
+    [myView addSubview:allowNavButton];
+
+    backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    buttonRect = CGRectMake(490, 0, 44, 44);
+    [backButton setFrame:buttonRect];
+    [backButton setTitle:[NSString stringWithCString:"Back" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+    [backButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    [backButton addTarget:self action:@selector(goBack:) forControlEvents:UIControlEventTouchUpInside];
+    [backButton setEnabled:NO];
+    [myView addSubview:backButton];
 
     // Create single button
     id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    CGRect buttonRect = CGRectMake(50, 50, 668, 954);
+    buttonRect = CGRectMake(50, 50, 924, 638);
     [myButton setFrame:buttonRect];
     [myButton setBackgroundColor:[UIColor yellowColor]];
     [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
@@ -53,6 +70,7 @@
     [myView addSubview:myButton];
     NSNumber *switchNum = [NSNumber numberWithInt:1];
     CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
+    
 	self.view = myView;
     [myView release];
 }
@@ -102,5 +120,15 @@
     }
     
     [appDelegate deactivate:[switchNum intValue]];
+}
+// Navigation back to root controller
+- (IBAction)allowNavigation:(id)sender {
+    [backButton setEnabled:YES];
+}
+- (IBAction)disallowNavigation:(id)sender{
+    [backButton setEnabled:NO];
+}
+- (IBAction)goBack:(id)sender{
+    [self.navigationController popViewControllerAnimated:YES];
 }
 @end

@@ -80,12 +80,12 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    if(interfaceOrientation == UIInterfaceOrientationPortrait)
+    if((interfaceOrientation == UIInterfaceOrientationLandscapeLeft) || (interfaceOrientation == UIInterfaceOrientationLandscapeRight))
         return YES;
     return NO;
 }
 -(void) viewWillAppear:(BOOL)animated {
-    [[UIDevice currentDevice] setOrientation : UIInterfaceOrientationPortrait];
+    [[self navigationController] setNavigationBarHidden:YES];
 }
 
 - (IBAction)launchOneSwitch:(id)sender {

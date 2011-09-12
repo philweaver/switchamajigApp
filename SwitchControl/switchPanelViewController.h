@@ -10,10 +10,12 @@
 #import "SwitchControlAppDelegate.h"
 @interface switchPanelViewController : UIViewController {
     SwitchControlAppDelegate *appDelegate;
-
+    id backButton;
 }
 @property (nonatomic) CFMutableDictionaryRef buttonToSwitchDictionary;
-
+- (IBAction)allowNavigation:(id)sender;
+- (IBAction)disallowNavigation:(id)sender;
+- (IBAction)goBack:(id)sender;
 - (IBAction)onSwitchActivated:(id)sender;
 - (IBAction)onSwitchDeactivated:(id)sender;
 @end
