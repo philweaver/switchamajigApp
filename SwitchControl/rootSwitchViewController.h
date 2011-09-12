@@ -13,9 +13,6 @@
     UIButton *chooseOneSwitchButton;
     UIButton *chooseTwoSwitchButton;
     UIButton *chooseFourAcrossButton;
-    UIProgressView *detectProgressBar;
-    int server_socket;
-    float detect_progress;
     SwitchControlAppDelegate *appDelegate;
     int active_switch_index;
 }

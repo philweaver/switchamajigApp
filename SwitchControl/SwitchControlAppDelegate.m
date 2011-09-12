@@ -25,6 +25,7 @@
 @synthesize switchDataLock = _switchDataLock;
 @synthesize switchNameDictionary = _switchNameDictionary;
 @synthesize switchNameArray = _switchNameArray;
+@synthesize switch_socket = _switch_socket;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -53,7 +54,9 @@
     [self setSwitchNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
     // Start the background thread that listens for switches
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
-
+    //  Initialize switch state
+    [self setSwitch_socket:-1];
+    switch_state = 0;
     return YES;
 }
 
@@ -191,6 +194,37 @@
     close(detect_socket);
     [mempool release];
     return;
+}
+
+#define MAX_STRING 1024
+static int convertFromLogicalToPhysicalSwitchMask(int logicalSwitchMask) {
+    int physicalSwitchMask = 0;
+    if(logicalSwitchMask & 0x01)
+        physicalSwitchMask |= 0x20;
+    if(logicalSwitchMask & 0x02)
+        physicalSwitchMask |= 0x40;
+    if(logicalSwitchMask & 0x04)
+        physicalSwitchMask |= 0x80;
+    if(logicalSwitchMask & 0x08)
+        physicalSwitchMask |= 0x100;
+    return physicalSwitchMask;
+}
+- (void)activate:(int)switchMask {
+    if([self switch_socket] >= 0) {
+        switch_state |= switchMask;
+        char string[MAX_STRING];
+        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
+        write([self switch_socket], string, strlen(string));
+    }
+}
+
+- (void)deactivate:(int)switchMask {
+    if([self switch_socket] >= 0) {
+        switch_state &= ~switchMask;
+        char string[MAX_STRING];
+        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
+        write([self switch_socket], string, strlen(string));
+    }
 }
 
 @end

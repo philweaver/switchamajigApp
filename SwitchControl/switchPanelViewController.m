@@ -7,8 +7,10 @@
 //
 
 #import "switchPanelViewController.h"
-
+#import "stdio.h"
 @implementation switchPanelViewController
+
+@synthesize buttonToSwitchDictionary;
 
 /*
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -39,14 +41,18 @@
     UIView *myView = [[UIView alloc] initWithFrame:cgRct];
     [myView setBackgroundColor:[UIColor blackColor]];
 	myView.autoresizesSubviews = YES;
-    
+    [self setButtonToSwitchDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
+
     // Create single button
     id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
     CGRect buttonRect = CGRectMake(50, 50, 668, 954);
     [myButton setFrame:buttonRect];
     [myButton setBackgroundColor:[UIColor yellowColor]];
-    [myView addSubview:myButton]; 
-    
+    [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
+    [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)]; 
+    [myView addSubview:myButton];
+    NSNumber *switchNum = [NSNumber numberWithInt:1];
+    CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
 	self.view = myView;
     [myView release];
 }
@@ -64,6 +70,7 @@
 {
     [super viewDidUnload];
     // Release any retained subviews of the main view.
+    CFRelease([self buttonToSwitchDictionary]);
     // e.g. self.myOutlet = nil;
 }
 
@@ -73,4 +80,27 @@
 	return YES;
 }
 
+// Handlers for switches activated/deactiveated. They send commands to delegate
+- (IBAction)onSwitchActivated:(id)sender {
+    NSNumber *switchNum;
+    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switchNum)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        return;
+    }
+
+    [appDelegate activate:[switchNum intValue]];
+}
+- (IBAction)onSwitchDeactivated:(id)sender {
+    NSNumber *switchNum;
+    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switchNum)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        return;
+    }
+    
+    [appDelegate deactivate:[switchNum intValue]];
+}
 @end

@@ -30,7 +30,6 @@
     [chooseOneSwitchButton release];
     [chooseTwoSwitchButton release];
     [chooseFourAcrossButton release];
-    [detectProgressBar release];
     [switchNameTableView release];
     switchNameTableView = nil;
     [switchNameTableView release];
@@ -42,7 +41,6 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
-        server_socket = -1;
         appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
     }
     return self;
@@ -73,7 +71,6 @@
     [self setChooseOneSwitchButton:nil];
     [self setChooseTwoSwitchButton:nil];
     [self setChooseFourAcrossButton:nil];
-    [self setDetectProgressBar:nil];
     [self setSwitchNameTableView:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
@@ -99,7 +96,7 @@
     [viewController release];
 #else
     singleSwitchView *newView = [[singleSwitchView alloc] initWithNibName:@"singleSwitchView" bundle:nil];
-    [newView setServer_socket:server_socket];
+    [newView setServer_socket:[appDelegate switch_socket]];
     [self.navigationController pushViewController:newView animated:YES];
     [newView release];
 #endif
@@ -107,14 +104,14 @@
 
 - (IBAction)launchTwoSwitch:(id)sender {
     twoSwitchView *newView = [[twoSwitchView alloc] initWithNibName:@"twoSwitchView" bundle:nil];
-    [newView setServer_socket:server_socket];
+    [newView setServer_socket:[appDelegate switch_socket]];
     [self.navigationController pushViewController:newView animated:YES];
     [newView release];
 }
 
 - (IBAction)launchFourAcrossSwitch:(id)sender {
     fourSwitchAcrossView *newView = [[fourSwitchAcrossView alloc] initWithNibName:@"fourSwitchAcrossView" bundle:nil];
-    [newView setServer_socket:server_socket];
+    [newView setServer_socket:[appDelegate switch_socket]];
     [self.navigationController pushViewController:newView animated:YES];
     [newView release];
 }
@@ -252,10 +249,6 @@ int connect_to_switch(char hostname[])
     return;
 }
 
-- (void)update_detect_progress {
-    [detectProgressBar setProgress:detect_progress];
-}
-
 - (void) switch_names_updated:(NSNotification *) notification {
     [self performSelectorOnMainThread:@selector(reload_switch_name_table) withObject:nil waitUntilDone:NO];
 }
@@ -302,10 +295,11 @@ int connect_to_switch(char hostname[])
     }
     char ip_addr_string[2*INET6_ADDRSTRLEN];
     [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
-    if(server_socket >= 0)
-        close(server_socket);
-    server_socket = connect_to_switch(ip_addr_string);
-    if(server_socket < 0) {
+    if([appDelegate switch_socket] >= 0)
+        close([appDelegate switch_socket]);
+    int switch_socket = connect_to_switch(ip_addr_string);
+    [appDelegate setSwitch_socket:switch_socket];
+    if([appDelegate switch_socket] < 0) {
         [self disable_switch_view_buttons];
         active_switch_index = -1;
     } else {

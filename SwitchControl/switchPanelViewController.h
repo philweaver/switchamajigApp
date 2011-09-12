@@ -12,5 +12,8 @@
     SwitchControlAppDelegate *appDelegate;
 
 }
+@property (nonatomic) CFMutableDictionaryRef buttonToSwitchDictionary;
 
+- (IBAction)onSwitchActivated:(id)sender;
+- (IBAction)onSwitchDeactivated:(id)sender;
 @end
