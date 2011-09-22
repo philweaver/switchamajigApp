@@ -27,5 +27,4 @@
 @property (nonatomic, retain) IBOutlet UIButton *chooseTwoSwitchButton;
 @property (nonatomic, retain) IBOutlet UIButton *chooseFourAcrossButton;
 @property (nonatomic, retain) IBOutlet UITableView *switchNameTableView;
-
 @end

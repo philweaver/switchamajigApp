@@ -18,4 +18,6 @@
 - (IBAction)goBack:(id)sender;
 - (IBAction)onSwitchActivated:(id)sender;
 - (IBAction)onSwitchDeactivated:(id)sender;
+@property (nonatomic, retain) NSString *filename;
+
 @end

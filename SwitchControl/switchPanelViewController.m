@@ -8,10 +8,12 @@
 
 #import "switchPanelViewController.h"
 #import "stdio.h"
+#import "DDXMLDocument.h"
+
 @implementation switchPanelViewController
 
 @synthesize buttonToSwitchDictionary;
-
+@synthesize filename;
 /*
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -32,6 +34,19 @@
 }
 
 #pragma mark - View lifecycle
+char *myXmlCString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \
+<panel> \
+<panelelement> \
+<frame>50 50 924 638</frame> \
+<rgbacolor>1.0 1.0 0.0 1.0</rgbacolor> \
+<switchmask>1</switchmask> \
+</panelelement> \
+<panelelement> \
+<frame>100 100 100 100</frame> \
+<rgbacolor>0.0 1.0 0.0 1.0</rgbacolor> \
+<switchmask>1</switchmask> \
+</panelelement> \
+</panel>";
 
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView
@@ -60,17 +75,88 @@
     [backButton setEnabled:NO];
     [myView addSubview:backButton];
 
-    // Create single button
-    id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    buttonRect = CGRectMake(50, 50, 924, 638);
-    [myButton setFrame:buttonRect];
-    [myButton setBackgroundColor:[UIColor yellowColor]];
-    [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
-    [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)]; 
-    [myView addSubview:myButton];
-    NSNumber *switchNum = [NSNumber numberWithInt:1];
-    CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
+    NSError *xmlError=nil, *fileError=nil;
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"singleSwitchPanel" withExtension:@"xml"];
+    NSString *xmlString = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&fileError];
     
+    DDXMLDocument *xmlDoc = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:&xmlError];
+    if(xmlDoc == nil) {
+        NSLog(@"XML Open Failed.");
+    }
+    NSArray *elementNodes = [xmlDoc nodesForXPath:@".//panel/panelelement" error:&xmlError];
+    printf("Found %d elements.\n", [elementNodes count]);
+    // Display all elements of the switch panel
+    DDXMLNode *element;
+    for(element in elementNodes) {
+        NSArray *frameNodes = [element nodesForXPath:@".//frame" error:&xmlError];
+        NSArray *colorNodes = [element nodesForXPath:@".//rgbacolor" error:&xmlError];
+        NSArray *maskNodes = [element nodesForXPath:@".//switchmask" error:&xmlError];
+        printf("element with kind %d, %d children, %d frames %d colors %d masks\n", [element kind], [element childCount], [frameNodes count], [colorNodes count], [maskNodes count]);
+        // Read frame
+        if([frameNodes count] <= 0) {
+            NSLog(@"No frame found.\n");
+            continue;
+        }
+
+        DDXMLNode *frameNode = [frameNodes objectAtIndex:0];
+        NSString *frameString = [frameNode stringValue];
+        NSLog(@"frame %@", frameString);
+        NSScanner *frameScan = [[NSScanner alloc] initWithString:frameString];
+        int x, y, w, h;
+        bool x_ok = [frameScan scanInt:&x];
+        bool y_ok = [frameScan scanInt:&y];
+        bool w_ok = [frameScan scanInt:&w];
+        bool h_ok = [frameScan scanInt:&h];
+        if(!x_ok || !y_ok || !w_ok || !h_ok)
+            continue;
+        printf("Frame numbers extracted: %d %d %d %d\n", x, y, w, h);
+        buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
+        [frameScan release];
+
+        // Read color
+        if([colorNodes count] <= 0) {
+            NSLog(@"No frame found.\n");
+            continue;
+        }
+        DDXMLNode *colorNode = [colorNodes objectAtIndex:0];
+        NSString *colorString = [colorNode stringValue];
+        NSLog(@"color %@", colorString);
+        NSScanner *colorScan = [[NSScanner alloc] initWithString:colorString];
+        CGFloat r, g, b, a;
+        bool r_ok = [colorScan scanFloat:&r];
+        bool g_ok = [colorScan scanFloat:&g];
+        bool b_ok = [colorScan scanFloat:&b];
+        bool a_ok = [colorScan scanFloat:&a];
+        if(!r_ok || !g_ok || !b_ok || !a_ok)
+            continue;
+        printf("Color numbers extracted: %f %f %f %f\n", r, g, b, a);
+        [colorScan release];
+        
+        // Read switch mask
+        if([colorNodes count] <= 0) {
+            NSLog(@"No frame found.\n");
+            continue;
+        }
+        DDXMLNode *maskNode = [maskNodes objectAtIndex:0];
+        NSString *maskString = [maskNode stringValue];
+        NSLog(@"mask %@", maskString);
+        NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
+        int mask;
+        bool mask_ok = [maskScan scanInt:&mask];
+        if(!mask_ok)
+            continue;
+        printf("Switch mask: %d\n", mask);
+        [maskScan release];
+        // Create the specified button
+        id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [myButton setFrame:buttonRect];
+        [myButton setBackgroundColor:[UIColor colorWithRed:r green:g blue:b alpha:a]];
+        [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
+        [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)]; 
+        [myView addSubview:myButton];
+        NSNumber *switchNum = [NSNumber numberWithInt:mask];
+        CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
+    }
 	self.view = myView;
     [myView release];
 }
@@ -89,6 +175,7 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     CFRelease([self buttonToSwitchDictionary]);
+    [filename release];
     // e.g. self.myOutlet = nil;
 }
 

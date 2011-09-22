@@ -92,6 +92,7 @@
 #if 1
     // Load programatically-created view
     switchPanelViewController *viewController = [switchPanelViewController alloc];
+    [viewController setFilename:@"singleSwitchPanel.xml"];
     [self.navigationController pushViewController:viewController animated:YES];
     [viewController release];
 #else
