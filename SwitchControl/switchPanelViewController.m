@@ -34,19 +34,6 @@
 }
 
 #pragma mark - View lifecycle
-char *myXmlCString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \
-<panel> \
-<panelelement> \
-<frame>50 50 924 638</frame> \
-<rgbacolor>1.0 1.0 0.0 1.0</rgbacolor> \
-<switchmask>1</switchmask> \
-</panelelement> \
-<panelelement> \
-<frame>100 100 100 100</frame> \
-<rgbacolor>0.0 1.0 0.0 1.0</rgbacolor> \
-<switchmask>1</switchmask> \
-</panelelement> \
-</panel>";
 
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView
@@ -76,7 +63,7 @@ char *myXmlCString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \
     [myView addSubview:backButton];
 
     NSError *xmlError=nil, *fileError=nil;
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"singleSwitchPanel" withExtension:@"xml"];
+    NSURL *url = [[NSBundle mainBundle] URLForResource:[self filename] withExtension:@"xml"];
     NSString *xmlString = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&fileError];
     
     DDXMLDocument *xmlDoc = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:&xmlError];

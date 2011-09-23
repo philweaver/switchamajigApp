@@ -7,9 +7,6 @@
 //
 
 #import "rootSwitchViewController.h"
-#import "singleSwitchView.h"
-#import "twoSwitchView.h"
-#import "fourSwitchAcrossView.h"
 #import "switchPanelViewController.h"
 #import "sys/socket.h"
 #import "netinet/in.h"
@@ -89,32 +86,27 @@
 }
 
 - (IBAction)launchOneSwitch:(id)sender {
-#if 1
     // Load programatically-created view
     switchPanelViewController *viewController = [switchPanelViewController alloc];
-    [viewController setFilename:@"singleSwitchPanel.xml"];
+    [viewController setFilename:@"singleSwitchPanel"];
     [self.navigationController pushViewController:viewController animated:YES];
     [viewController release];
-#else
-    singleSwitchView *newView = [[singleSwitchView alloc] initWithNibName:@"singleSwitchView" bundle:nil];
-    [newView setServer_socket:[appDelegate switch_socket]];
-    [self.navigationController pushViewController:newView animated:YES];
-    [newView release];
-#endif
 }
 
 - (IBAction)launchTwoSwitch:(id)sender {
-    twoSwitchView *newView = [[twoSwitchView alloc] initWithNibName:@"twoSwitchView" bundle:nil];
-    [newView setServer_socket:[appDelegate switch_socket]];
-    [self.navigationController pushViewController:newView animated:YES];
-    [newView release];
+    // Load programatically-created view
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    [viewController setFilename:@"twoSwitchPanel"];
+    [self.navigationController pushViewController:viewController animated:YES];
+    [viewController release];
 }
 
 - (IBAction)launchFourAcrossSwitch:(id)sender {
-    fourSwitchAcrossView *newView = [[fourSwitchAcrossView alloc] initWithNibName:@"fourSwitchAcrossView" bundle:nil];
-    [newView setServer_socket:[appDelegate switch_socket]];
-    [self.navigationController pushViewController:newView animated:YES];
-    [newView release];
+    // Load programatically-created view
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    [viewController setFilename:@"fourSwitchPanel"];
+    [self.navigationController pushViewController:viewController animated:YES];
+    [viewController release];
 }
 int portno = 2000;
 bool verify_socket_reply(int socket, const char *expected_string);

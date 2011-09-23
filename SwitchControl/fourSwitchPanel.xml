@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+    <panelelement>
+        <frame>50 50 192 638</frame>
+        <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
+        <switchmask>1</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>292 50 192 638</frame>
+        <rgbacolor>0.0 0.0 1.0 1.0</rgbacolor>
+        <switchmask>2</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>534 50 192 638</frame>
+        <rgbacolor>1.0 0.0 1.0 1.0</rgbacolor>
+        <switchmask>4</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>776 50 192 638</frame>
+        <rgbacolor>0.0 1.0 1.0 1.0</rgbacolor>
+        <switchmask>8</switchmask>
+    </panelelement>
+</panel>
