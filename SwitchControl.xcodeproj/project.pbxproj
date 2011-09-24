@@ -14,7 +14,6 @@
 		AD61F247141F13E100010895 /* DDXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F243141F13E100010895 /* DDXMLElement.m */; };
 		AD61F248141F13E100010895 /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F245141F13E100010895 /* DDXMLNode.m */; };
 		AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F24A141F140B00010895 /* NSString+DDXML.m */; };
-		AD61F24E141F188C00010895 /* twoSwitchPanel.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD61F24D141F188C00010895 /* twoSwitchPanel.xml */; };
 		ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
 		ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF113DB539C00448025 /* Foundation.framework */; };
 		ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF313DB539C00448025 /* CoreGraphics.framework */; };
@@ -29,10 +28,16 @@
 		ADB75C1613DB539C00448025 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1413DB539C00448025 /* InfoPlist.strings */; };
 		ADB75C1813DB539C00448025 /* SwitchControlTests.h in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1713DB539C00448025 /* SwitchControlTests.h */; };
 		ADB75C1A13DB539C00448025 /* SwitchControlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75C1913DB539C00448025 /* SwitchControlTests.m */; };
-		ADBA89BA13E0D09500A89CB6 /* rootSwitchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADBA89B813E0D09500A89CB6 /* rootSwitchViewController.m */; };
 		ADBA89BB13E0D09500A89CB6 /* rootSwitchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */; };
-		ADC7C183142CFCD90045ABD0 /* singleSwitchPanel.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C182142CFCD90045ABD0 /* singleSwitchPanel.xml */; };
-		ADC7C185142D03890045ABD0 /* fourSwitchPanel.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C184142D03890045ABD0 /* fourSwitchPanel.xml */; };
+		ADC7C187142D5A830045ABD0 /* 1_yellow.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C186142D5A830045ABD0 /* 1_yellow.xml */; };
+		ADC7C189142D5B370045ABD0 /* 2_yellow_blue.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C188142D5B370045ABD0 /* 2_yellow_blue.xml */; };
+		ADC7C18B142D5B920045ABD0 /* 4_across_y_b_m_c.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C18A142D5B920045ABD0 /* 4_across_y_b_m_c.xml */; };
+		ADC7C18D142D62970045ABD0 /* rootSwitchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADC7C18C142D62970045ABD0 /* rootSwitchViewController.m */; };
+		ADC7C18F142D63F80045ABD0 /* 1_green.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C18E142D63F80045ABD0 /* 1_green.xml */; };
+		ADC7C191142D64050045ABD0 /* 1_blue.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C190142D64050045ABD0 /* 1_blue.xml */; };
+		ADC7C193142D64110045ABD0 /* 1_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C192142D64110045ABD0 /* 1_red.xml */; };
+		ADC7C195142D64980045ABD0 /* 2_green_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C194142D64980045ABD0 /* 2_green_red.xml */; };
+		ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,7 +66,6 @@
 		AD61F249141F140B00010895 /* NSString+DDXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDXML.h"; path = "kissxml/KissXML/Categories/NSString+DDXML.h"; sourceTree = "<group>"; };
 		AD61F24A141F140B00010895 /* NSString+DDXML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDXML.m"; path = "kissxml/KissXML/Categories/NSString+DDXML.m"; sourceTree = "<group>"; };
 		AD61F24C141F141900010895 /* DDXMLPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLPrivate.h; path = kissxml/KissXML/Private/DDXMLPrivate.h; sourceTree = "<group>"; };
-		AD61F24D141F188C00010895 /* twoSwitchPanel.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = twoSwitchPanel.xml; sourceTree = "<group>"; };
 		ADB75BEB13DB539C00448025 /* SwitchControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitchControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADB75BEF13DB539C00448025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		ADB75BF113DB539C00448025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -80,10 +84,16 @@
 		ADB75C1713DB539C00448025 /* SwitchControlTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchControlTests.h; sourceTree = "<group>"; };
 		ADB75C1913DB539C00448025 /* SwitchControlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchControlTests.m; sourceTree = "<group>"; };
 		ADBA89B713E0D09500A89CB6 /* rootSwitchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rootSwitchViewController.h; sourceTree = "<group>"; };
-		ADBA89B813E0D09500A89CB6 /* rootSwitchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = rootSwitchViewController.m; sourceTree = "<group>"; };
 		ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = rootSwitchViewController.xib; sourceTree = "<group>"; };
-		ADC7C182142CFCD90045ABD0 /* singleSwitchPanel.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = singleSwitchPanel.xml; sourceTree = "<group>"; };
-		ADC7C184142D03890045ABD0 /* fourSwitchPanel.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = fourSwitchPanel.xml; sourceTree = "<group>"; };
+		ADC7C186142D5A830045ABD0 /* 1_yellow.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_yellow.xml; sourceTree = "<group>"; };
+		ADC7C188142D5B370045ABD0 /* 2_yellow_blue.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 2_yellow_blue.xml; sourceTree = "<group>"; };
+		ADC7C18A142D5B920045ABD0 /* 4_across_y_b_m_c.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_across_y_b_m_c.xml; sourceTree = "<group>"; };
+		ADC7C18C142D62970045ABD0 /* rootSwitchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = rootSwitchViewController.m; sourceTree = "<group>"; };
+		ADC7C18E142D63F80045ABD0 /* 1_green.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_green.xml; sourceTree = "<group>"; };
+		ADC7C190142D64050045ABD0 /* 1_blue.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_blue.xml; sourceTree = "<group>"; };
+		ADC7C192142D64110045ABD0 /* 1_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_red.xml; sourceTree = "<group>"; };
+		ADC7C194142D64980045ABD0 /* 2_green_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 2_green_red.xml; sourceTree = "<group>"; };
+		ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_scross_g_r_b_y.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,6 +142,14 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */,
+				ADC7C194142D64980045ABD0 /* 2_green_red.xml */,
+				ADC7C192142D64110045ABD0 /* 1_red.xml */,
+				ADC7C190142D64050045ABD0 /* 1_blue.xml */,
+				ADC7C18E142D63F80045ABD0 /* 1_green.xml */,
+				ADC7C18A142D5B920045ABD0 /* 4_across_y_b_m_c.xml */,
+				ADC7C188142D5B370045ABD0 /* 2_yellow_blue.xml */,
+				ADC7C186142D5A830045ABD0 /* 1_yellow.xml */,
 				ADB75BF513DB539C00448025 /* SwitchControl */,
 				ADB75C1113DB539C00448025 /* SwitchControlTests */,
 				ADB75BEE13DB539C00448025 /* Frameworks */,
@@ -163,7 +181,6 @@
 		ADB75BF513DB539C00448025 /* SwitchControl */ = {
 			isa = PBXGroup;
 			children = (
-				ADC7C182142CFCD90045ABD0 /* singleSwitchPanel.xml */,
 				AD61F23D141F13BA00010895 /* KissXML */,
 				AD3DD723141ACA0800DB8AEB /* Reachability.h */,
 				AD3DD724141ACA0900DB8AEB /* Reachability.m */,
@@ -171,13 +188,11 @@
 				ADB75BFF13DB539C00448025 /* SwitchControlAppDelegate.m */,
 				ADB75C0113DB539C00448025 /* MainWindow.xib */,
 				ADB75BF613DB539C00448025 /* Supporting Files */,
+				ADC7C18C142D62970045ABD0 /* rootSwitchViewController.m */,
 				ADBA89B713E0D09500A89CB6 /* rootSwitchViewController.h */,
-				ADBA89B813E0D09500A89CB6 /* rootSwitchViewController.m */,
 				ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */,
 				AD3DD729141B1DF100DB8AEB /* switchPanelViewController.h */,
 				AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */,
-				AD61F24D141F188C00010895 /* twoSwitchPanel.xml */,
-				ADC7C184142D03890045ABD0 /* fourSwitchPanel.xml */,
 			);
 			path = SwitchControl;
 			sourceTree = "<group>";
@@ -285,9 +300,14 @@
 				ADB75BFA13DB539C00448025 /* InfoPlist.strings in Resources */,
 				ADB75C0313DB539C00448025 /* MainWindow.xib in Resources */,
 				ADBA89BB13E0D09500A89CB6 /* rootSwitchViewController.xib in Resources */,
-				AD61F24E141F188C00010895 /* twoSwitchPanel.xml in Resources */,
-				ADC7C183142CFCD90045ABD0 /* singleSwitchPanel.xml in Resources */,
-				ADC7C185142D03890045ABD0 /* fourSwitchPanel.xml in Resources */,
+				ADC7C187142D5A830045ABD0 /* 1_yellow.xml in Resources */,
+				ADC7C189142D5B370045ABD0 /* 2_yellow_blue.xml in Resources */,
+				ADC7C18B142D5B920045ABD0 /* 4_across_y_b_m_c.xml in Resources */,
+				ADC7C18F142D63F80045ABD0 /* 1_green.xml in Resources */,
+				ADC7C191142D64050045ABD0 /* 1_blue.xml in Resources */,
+				ADC7C193142D64110045ABD0 /* 1_red.xml in Resources */,
+				ADC7C195142D64980045ABD0 /* 2_green_red.xml in Resources */,
+				ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,13 +345,13 @@
 			files = (
 				ADB75BFC13DB539C00448025 /* main.m in Sources */,
 				ADB75C0013DB539C00448025 /* SwitchControlAppDelegate.m in Sources */,
-				ADBA89BA13E0D09500A89CB6 /* rootSwitchViewController.m in Sources */,
 				AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */,
 				AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */,
 				AD61F246141F13E100010895 /* DDXMLDocument.m in Sources */,
 				AD61F247141F13E100010895 /* DDXMLElement.m in Sources */,
 				AD61F248141F13E100010895 /* DDXMLNode.m in Sources */,
 				AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */,
+				ADC7C18D142D62970045ABD0 /* rootSwitchViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

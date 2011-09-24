@@ -13,7 +13,7 @@
 @implementation switchPanelViewController
 
 @synthesize buttonToSwitchDictionary;
-@synthesize filename;
+@synthesize urlToLoad;
 /*
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -63,8 +63,7 @@
     [myView addSubview:backButton];
 
     NSError *xmlError=nil, *fileError=nil;
-    NSURL *url = [[NSBundle mainBundle] URLForResource:[self filename] withExtension:@"xml"];
-    NSString *xmlString = [NSString stringWithContentsOfURL:url encoding:NSUTF8StringEncoding error:&fileError];
+    NSString *xmlString = [NSString stringWithContentsOfURL:urlToLoad encoding:NSUTF8StringEncoding error:&fileError];
     
     DDXMLDocument *xmlDoc = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:&xmlError];
     if(xmlDoc == nil) {
@@ -162,7 +161,7 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     CFRelease([self buttonToSwitchDictionary]);
-    [filename release];
+    [urlToLoad release];
     // e.g. self.myOutlet = nil;
 }
 

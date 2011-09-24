@@ -106,7 +106,7 @@
     [_window release];
     [_switchDataLock release];
     CFRelease([self switchNameDictionary]);
-    CFRelease([self switchNameDictionary]);
+    CFRelease([self switchNameArray]);
     [super dealloc];
 }
 

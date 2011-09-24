@@ -16,20 +16,18 @@
 #include "sys/poll.h"
 #include "arpa/inet.h"
 #include "errno.h"
+#import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
-@synthesize chooseOneSwitchButton;
-@synthesize chooseTwoSwitchButton;
-@synthesize chooseFourAcrossButton;
+@synthesize panelSelectionScrollView;
 @synthesize switchNameTableView;
 
 - (void)dealloc {
-    [chooseOneSwitchButton release];
-    [chooseTwoSwitchButton release];
-    [chooseFourAcrossButton release];
     [switchNameTableView release];
     switchNameTableView = nil;
     [switchNameTableView release];
+    [panelSelectionScrollView release];
+    CFRelease(switchPanelURLDictionary);
     [super dealloc];
 }
 
@@ -52,24 +50,67 @@
 }
 
 #pragma mark - View lifecycle
-
+#define switch_select_button_w 102
+#define switch_select_button_h 77
+#define switch_select_button_spacing 50
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    switchPanelURLDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
     [self enable_switch_view_buttons];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
+    // Find all switch panel files
+    NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
+    NSURL *url;
+    
+    int current_button_x = switch_select_button_spacing;
+    int current_button_y = switch_select_button_spacing;
+    
+    for(url in xmlUrls) {
+        // Render view controller into image
+        switchPanelViewController *viewController = [switchPanelViewController alloc];
+        [viewController setUrlToLoad:url];
+        CGSize size = [[viewController view] bounds].size;
+        UIGraphicsBeginImageContext(size);
+        [[[viewController view] layer] renderInContext:UIGraphicsGetCurrentContext()];
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        // Create button with image
+        // Create the specified button
+        id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, switch_select_button_w, switch_select_button_h)];
+        [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)]; 
+        [panelSelectionScrollView addSubview:myButton];
+        current_button_y += switch_select_button_h + switch_select_button_spacing;
+        if(current_button_y + switch_select_button_h >= [panelSelectionScrollView bounds].size.height) {
+            current_button_y = switch_select_button_spacing;
+            current_button_x += switch_select_button_w + switch_select_button_spacing;
+        }
+        size = [myButton bounds].size;
+        UIGraphicsBeginImageContext(size);
+        [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
+        UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        [myButton setImage:scaledImage forState:UIControlStateNormal];
+        [viewController release];
+        CFDictionaryAddValue(switchPanelURLDictionary, myButton, url);
+    }
+    [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, 100)];
+    [panelSelectionScrollView setScrollEnabled:YES];
+    
     active_switch_index = -1;
 }
 - (void)viewDidUnload
 {
-    [self setChooseOneSwitchButton:nil];
-    [self setChooseTwoSwitchButton:nil];
-    [self setChooseFourAcrossButton:nil];
     [self setSwitchNameTableView:nil];
+    [self setPanelSelectionScrollView:nil];
     [super viewDidUnload];
+    CFRelease(switchPanelURLDictionary);
+
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
 }
@@ -85,29 +126,23 @@
     [[self navigationController] setNavigationBarHidden:YES];
 }
 
-- (IBAction)launchOneSwitch:(id)sender {
+- (IBAction)launchSwitchPanel:(id)sender {
     // Load programatically-created view
     switchPanelViewController *viewController = [switchPanelViewController alloc];
-    [viewController setFilename:@"singleSwitchPanel"];
+    NSURL *url;
+    if(!CFDictionaryGetValueIfPresent(switchPanelURLDictionary, sender, (const void **) &url)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Panel dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        [viewController release];
+        return;
+    }
+
+    [viewController setUrlToLoad:url];
     [self.navigationController pushViewController:viewController animated:YES];
     [viewController release];
 }
 
-- (IBAction)launchTwoSwitch:(id)sender {
-    // Load programatically-created view
-    switchPanelViewController *viewController = [switchPanelViewController alloc];
-    [viewController setFilename:@"twoSwitchPanel"];
-    [self.navigationController pushViewController:viewController animated:YES];
-    [viewController release];
-}
-
-- (IBAction)launchFourAcrossSwitch:(id)sender {
-    // Load programatically-created view
-    switchPanelViewController *viewController = [switchPanelViewController alloc];
-    [viewController setFilename:@"fourSwitchPanel"];
-    [self.navigationController pushViewController:viewController animated:YES];
-    [viewController release];
-}
 int portno = 2000;
 bool verify_socket_reply(int socket, const char *expected_string);
 bool verify_socket_reply(int socket, const char *expected_string) {
@@ -225,16 +260,10 @@ int connect_to_switch(char hostname[])
 }
 
 -(void) disable_switch_view_buttons {
-    [self.chooseOneSwitchButton setEnabled:NO];
-    [self.chooseTwoSwitchButton setEnabled:NO];
-    [self.chooseFourAcrossButton setEnabled:NO];
     return;
 }
 
 -(void) enable_switch_view_buttons {
-    [self.chooseOneSwitchButton setEnabled:YES];
-    [self.chooseTwoSwitchButton setEnabled:YES];
-    [self.chooseFourAcrossButton setEnabled:YES];
     return;
 }
 
@@ -273,7 +302,7 @@ int connect_to_switch(char hostname[])
     return cell;
 }
 
-// Support for connecting to a swtich when its name is selected from the table
+// Support for connecting to a switch when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     char mystring[1024];
