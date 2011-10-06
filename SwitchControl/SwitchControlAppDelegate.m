@@ -23,14 +23,15 @@
 {
     // Override point for customization after application launch.
     // Check if we have network access
-    Reachability *r = [Reachability reachabilityForLocalWiFi];
-    int retries = 5;
-    NetworkStatus internetStatus = [r currentReachabilityStatus];
-    while(retries && (internetStatus == NotReachable)) {
-        [NSThread sleepForTimeInterval:0.1];
+    NetworkStatus internetStatus;
+    int retries = 50;
+    do {
+        Reachability *r = [Reachability reachabilityForLocalWiFi];
         internetStatus = [r currentReachabilityStatus];
-        retries --;
-    }
+        if(internetStatus == NotReachable)
+            NSLog(@"Retrying check for network access.");
+        [NSThread sleepForTimeInterval:1.0];
+    } while((internetStatus == NotReachable) && retries--);
     if(internetStatus == NotReachable) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:@"No WiFi Connection."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
@@ -99,6 +100,8 @@
 
 - (void)dealloc
 {
+    if([self switch_socket] >= 0)
+        close([self switch_socket]);
     [_navigationController release];
     [_window release];
     [_switchDataLock release];
@@ -207,26 +210,8 @@ static int convertFromLogicalToPhysicalSwitchMask(int logicalSwitchMask) {
         physicalSwitchMask |= 0x100;
     return physicalSwitchMask;
 }
-- (void)activate:(int)switchMask {
-    if([self switch_socket] >= 0) {
-        switch_state |= switchMask;
-        char string[MAX_STRING];
-        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-        write([self switch_socket], string, strlen(string));
-    }
-}
-
-- (void)deactivate:(int)switchMask {
-    if([self switch_socket] >= 0) {
-        switch_state &= ~switchMask;
-        char string[MAX_STRING];
-        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-        write([self switch_socket], string, strlen(string));
-    }
-}
 
 // Utility function for verifying that we get the expected response from a socket
-int portno = 2000;
 bool verify_socket_reply(int socket, const char *expected_string);
 bool verify_socket_reply(int socket, const char *expected_string) {
     int expected_len = strlen(expected_string);
@@ -255,11 +240,51 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     return true;
 }
 
+- (void)activate:(int)switchMask {
+    if([self switch_socket] > 0) {
+        switch_state |= switchMask;
+        char string[MAX_STRING];
+        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
+        int retries = 5;
+        int retval;
+        do {
+            retval = write([self switch_socket], string, strlen(string));
+            if(retval < 0) {
+                [self connect_to_switch:last_hostname :NO];
+                NSLog(@"Retrying write for switch activate");
+            }
+            verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
+        } while((retval <= 0) && (retries--));
+    }
+}
+
+- (void)deactivate:(int)switchMask {
+    if([self switch_socket] > 0) {
+        switch_state &= ~switchMask;
+        char string[MAX_STRING];
+        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
+        int retries = 5;
+        int retval;
+        do {
+            retval = write([self switch_socket], string, strlen(string));
+            if(retval < 0) {
+                [self connect_to_switch:last_hostname :NO];
+                NSLog(@"Retrying write for switch activate");
+            }
+            verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
+        } while((retval <= 0) && (retries--));
+    }
+}
+
+int portno = 2000;
 // Initialize connection with remote switch
-- (int)connect_to_switch:(char*)hostname;
+- (int)connect_to_switch:(char*)hostname : (BOOL)showMessagesOnError;
 {
     int server_socket, socket_flags;
     int retries = 10;
+    if([self switch_socket] > 0)
+        close([self switch_socket]);
+    [self setSwitch_socket:0];
     while(retries--) {
         server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(server_socket < 0) {
@@ -267,13 +292,15 @@ bool verify_socket_reply(int socket, const char *expected_string) {
                 NSLog(@"Retrying socket open");
                 continue;
             }
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                              message:@"Failed to open socket."  
-                                                             delegate:nil  
-                                                    cancelButtonTitle:@"OK"  
-                                                    otherButtonTitles:nil];  
-            [message show];  
-            [message release];
+            if(showMessagesOnError) {
+                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                                  message:@"Failed to open socket."  
+                                                                 delegate:nil  
+                                                        cancelButtonTitle:@"OK"  
+                                                        otherButtonTitles:nil];  
+                [message show];  
+                [message release];
+            }
             return server_socket;
         }
         char on = 1;
@@ -285,13 +312,15 @@ bool verify_socket_reply(int socket, const char *expected_string) {
                 continue;
             }
             close(server_socket);
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                              message:@"Hostname not found."  
-                                                             delegate:nil  
-                                                    cancelButtonTitle:@"OK"  
-                                                    otherButtonTitles:nil];  
-            [message show];  
-            [message release];
+            if(showMessagesOnError) {
+                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                                  message:@"Hostname not found."  
+                                                                 delegate:nil  
+                                                        cancelButtonTitle:@"OK"  
+                                                        otherButtonTitles:nil];  
+                [message show];  
+                [message release];
+            }
             return -1;
         }
         struct sockaddr_in sin;
@@ -312,13 +341,15 @@ bool verify_socket_reply(int socket, const char *expected_string) {
                     NSLog(@"Retrying socket connect");
                     continue;
                 }
-                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                                  message:@"Failed to connect."  
-                                                                 delegate:nil  
-                                                        cancelButtonTitle:@"OK"  
-                                                        otherButtonTitles:nil];
-                [message show];  
-                [message release];
+                if(showMessagesOnError) {
+                    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                                      message:@"Failed to connect."  
+                                                                     delegate:nil  
+                                                            cancelButtonTitle:@"OK"  
+                                                            otherButtonTitles:nil];
+                    [message show];  
+                    [message release];
+                }
                 return -1;
             }
         }
@@ -331,13 +362,15 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     // FIXME: This combination will need changing once we're no longer using the first prototype
     write(server_socket, "$$$", 3);
     if(!verify_socket_reply(server_socket, "CMD")) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                          message:@"Did Not Receive cmd."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];  
-        [message show];  
-        [message release];
+        if(showMessagesOnError) {
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                              message:@"Did Not Receive cmd."  
+                                                             delegate:nil  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];  
+            [message show];  
+            [message release];
+        }
         close(server_socket);
         return -1;
     }
@@ -346,6 +379,8 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     write(server_socket, "set sys output 0\r", strlen("set sys output 0\r"));
     sleep(1);
     [self setSwitch_socket:server_socket];
+    //  Save last_hostname
+    memcpy(last_hostname, hostname, sizeof(hostname));
     return server_socket;
 }
 

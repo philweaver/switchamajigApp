@@ -173,6 +173,7 @@
 
 // Handlers for switches activated/deactiveated. They send commands to delegate
 - (IBAction)onSwitchActivated:(id)sender {
+    [backButton setEnabled:NO];
     NSNumber *switchNum;
     if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switchNum)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
@@ -184,6 +185,7 @@
     [appDelegate activate:[switchNum intValue]];
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
+    [backButton setEnabled:NO];
     NSNumber *switchNum;
     if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switchNum)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  

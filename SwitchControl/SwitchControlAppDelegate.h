@@ -21,11 +21,12 @@
 
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate> {
     int switch_state;
+    char last_hostname[2*INET6_ADDRSTRLEN];
 }
 - (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(int)switchMask;
 - (void)deactivate:(int)switchMask;
-- (int)connect_to_switch:(char*)hostname;
+- (int)connect_to_switch:(char*)hostname : (BOOL)showMessagesOnError;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchDataLock;

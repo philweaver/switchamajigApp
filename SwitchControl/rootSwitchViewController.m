@@ -193,9 +193,7 @@
     }
     char ip_addr_string[2*INET6_ADDRSTRLEN];
     [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
-    if([appDelegate switch_socket] >= 0)
-        close([appDelegate switch_socket]);
-    int switch_socket = [appDelegate connect_to_switch:ip_addr_string];
+    int switch_socket = [appDelegate connect_to_switch:ip_addr_string :YES];
     if(switch_socket < 0) {
         [self disable_switch_view_buttons];
         active_switch_index = -1;
