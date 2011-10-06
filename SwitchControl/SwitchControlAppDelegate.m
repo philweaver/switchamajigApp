@@ -8,14 +8,6 @@
 
 #import "SwitchControlAppDelegate.h"
 #import "rootSwitchViewController.h"
-#import "sys/socket.h"
-#import "netinet/in.h"
-#import "netdb.h"
-#include "sys/unistd.h"
-#include "sys/fcntl.h"
-#include "sys/poll.h"
-#include "arpa/inet.h"
-#include "errno.h"
 #include "Reachability.h"
 
 @implementation SwitchControlAppDelegate
@@ -32,12 +24,17 @@
     // Override point for customization after application launch.
     // Check if we have network access
     Reachability *r = [Reachability reachabilityForLocalWiFi];
+    int retries = 5;
     NetworkStatus internetStatus = [r currentReachabilityStatus];
+    while(retries && (internetStatus == NotReachable)) {
+        [NSThread sleepForTimeInterval:0.1];
+        internetStatus = [r currentReachabilityStatus];
+        retries --;
+    }
     if(internetStatus == NotReachable) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:@"No WiFi Connection."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         [message release];
-        
     }
     
     // Initialize the list of switches and the lock that keeps it threadsafe
@@ -227,5 +224,130 @@ static int convertFromLogicalToPhysicalSwitchMask(int logicalSwitchMask) {
         write([self switch_socket], string, strlen(string));
     }
 }
+
+// Utility function for verifying that we get the expected response from a socket
+int portno = 2000;
+bool verify_socket_reply(int socket, const char *expected_string);
+bool verify_socket_reply(int socket, const char *expected_string) {
+    int expected_len = strlen(expected_string);
+    char *buffer = malloc(expected_len);
+    if(!buffer)
+        return false;
+    int total_bytes_read = 0;
+    while(total_bytes_read < expected_len) {
+        int bytes_read = read(socket, buffer+total_bytes_read, expected_len - total_bytes_read);
+        if(bytes_read < 0) {
+            NSLog(@"%s\n", strerror(errno));
+            return false;
+        }
+        if(!bytes_read) {
+            sleep(1);
+        }
+        for(int i=total_bytes_read; i < total_bytes_read + bytes_read; ++i) {
+            if(expected_string[i] != buffer[i]) {
+                free(buffer);
+                return false;
+            }
+        }
+        total_bytes_read += bytes_read;
+    }
+    free(buffer);
+    return true;
+}
+
+// Initialize connection with remote switch
+- (int)connect_to_switch:(char*)hostname;
+{
+    int server_socket, socket_flags;
+    int retries = 10;
+    while(retries--) {
+        server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if(server_socket < 0) {
+            if(retries) {
+                NSLog(@"Retrying socket open");
+                continue;
+            }
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                              message:@"Failed to open socket."  
+                                                             delegate:nil  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];  
+            [message show];  
+            [message release];
+            return server_socket;
+        }
+        char on = 1;
+        setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+        struct hostent *host = gethostbyname(hostname);
+        if(!host) {
+            if(retries) {
+                NSLog(@"Retrying hostname not found");
+                continue;
+            }
+            close(server_socket);
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                              message:@"Hostname not found."  
+                                                             delegate:nil  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];  
+            [message show];  
+            [message release];
+            return -1;
+        }
+        struct sockaddr_in sin;
+        memcpy(&sin.sin_addr.s_addr, host->h_addr, host->h_length);
+        sin.sin_family = AF_INET;
+        sin.sin_port = htons(portno);
+        socket_flags = fcntl(server_socket, F_GETFL);
+        socket_flags |= O_NONBLOCK;
+        fcntl(server_socket, F_SETFL, socket_flags);
+        if(connect(server_socket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
+            struct pollfd socket_poll;
+            socket_poll.fd = server_socket;
+            socket_poll.events = POLLOUT;
+            int poll_ret = poll(&socket_poll, 1, 1000);
+            if(poll_ret <= 0) {
+                close(server_socket);
+                if(retries) {
+                    NSLog(@"Retrying socket connect");
+                    continue;
+                }
+                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                                  message:@"Failed to connect."  
+                                                                 delegate:nil  
+                                                        cancelButtonTitle:@"OK"  
+                                                        otherButtonTitles:nil];
+                [message show];  
+                [message release];
+                return -1;
+            }
+        }
+        // Slightly ugly way of terminating loop if we establish a connection
+        break;
+    }
+    socket_flags &= ~O_NONBLOCK;
+    fcntl(server_socket, F_SETFL, socket_flags);
+    verify_socket_reply(server_socket, "*HELLO*"); // Accept the response if we get it, but don't require it
+    // FIXME: This combination will need changing once we're no longer using the first prototype
+    write(server_socket, "$$$", 3);
+    if(!verify_socket_reply(server_socket, "CMD")) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                          message:@"Did Not Receive cmd."  
+                                                         delegate:nil  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        close(server_socket);
+        return -1;
+    }
+    write(server_socket, "\r", 1);
+    sleep(1);
+    write(server_socket, "set sys output 0\r", strlen("set sys output 0\r"));
+    sleep(1);
+    [self setSwitch_socket:server_socket];
+    return server_socket;
+}
+
 
 @end

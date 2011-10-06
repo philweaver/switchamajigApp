@@ -7,6 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "sys/socket.h"
+#import "netinet/in.h"
+#import "netdb.h"
+#import "sys/unistd.h"
+#import "sys/fcntl.h"
+#import "sys/poll.h"
+#import "arpa/inet.h"
+#import "errno.h"
 @class singleSwitchView;
 @class twoSwitchView;
 @class rootSwitchViewController;
@@ -17,6 +25,7 @@
 - (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(int)switchMask;
 - (void)deactivate:(int)switchMask;
+- (int)connect_to_switch:(char*)hostname;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchDataLock;
