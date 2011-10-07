@@ -17,11 +17,14 @@
 @synthesize switchDataLock = _switchDataLock;
 @synthesize switchNameDictionary = _switchNameDictionary;
 @synthesize switchNameArray = _switchNameArray;
+@synthesize active_switch_index = _active_switch_index;
 @synthesize switch_socket = _switch_socket;
+@synthesize switchMessage = _switchMessage;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [self setActive_switch_index:-1];
     // Check if we have network access
     NetworkStatus internetStatus;
     int retries = 50;
@@ -105,6 +108,7 @@
     [_navigationController release];
     [_window release];
     [_switchDataLock release];
+    [_switchMessage release];
     CFRelease([self switchNameDictionary]);
     CFRelease([self switchNameArray]);
     [super dealloc];
@@ -220,13 +224,24 @@ bool verify_socket_reply(int socket, const char *expected_string) {
         return false;
     int total_bytes_read = 0;
     while(total_bytes_read < expected_len) {
-        int bytes_read = read(socket, buffer+total_bytes_read, expected_len - total_bytes_read);
-        if(bytes_read < 0) {
-            NSLog(@"%s\n", strerror(errno));
+        struct timeval tv;
+        int bytes_read;
+        fd_set readfds;
+        tv.tv_sec = 0;
+        tv.tv_usec = 500000; // 0.5s
+        FD_ZERO(&readfds);
+        FD_SET(socket, &readfds);
+        select(socket+1, &readfds, NULL, NULL, &tv);
+        if(!FD_ISSET(socket, &readfds)) {
+            free(buffer);
             return false;
         }
-        if(!bytes_read) {
-            sleep(1);
+        bytes_read = 0;
+        bytes_read = recv(socket, buffer+total_bytes_read, expected_len - total_bytes_read, 0);
+        if(bytes_read <= 0) {
+            NSLog(@"%s\n", strerror(errno));
+            free(buffer);
+            return false;
         }
         for(int i=total_bytes_read; i < total_bytes_read + bytes_read; ++i) {
             if(expected_string[i] != buffer[i]) {
@@ -241,50 +256,83 @@ bool verify_socket_reply(int socket, const char *expected_string) {
 }
 
 - (void)activate:(int)switchMask {
+    int switchIndex = [self active_switch_index];
     if([self switch_socket] > 0) {
         switch_state |= switchMask;
         char string[MAX_STRING];
         sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-        int retries = 5;
+        int retries = 1;
         int retval;
         do {
             retval = write([self switch_socket], string, strlen(string));
-            if(retval < 0) {
-                [self connect_to_switch:last_hostname :NO];
+            if((retval < 0) && retries) {
+                [self connect_to_switch:switchIndex :NO];
                 NSLog(@"Retrying write for switch activate");
             }
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
         } while((retval <= 0) && (retries--));
     }
+    if([self active_switch_index] < 0)
+    {
+        NSString *switchName = (NSString*)CFArrayGetValueAtIndex([self switchNameArray], switchIndex);
+        NSString *switchNameText = [@"Lost connection to " stringByAppendingString:switchName];
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:switchNameText  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+    }
 }
 
 - (void)deactivate:(int)switchMask {
+    int switchIndex = [self active_switch_index];
     if([self switch_socket] > 0) {
         switch_state &= ~switchMask;
         char string[MAX_STRING];
         sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-        int retries = 5;
+        int retries = 1;
         int retval;
         do {
             retval = write([self switch_socket], string, strlen(string));
-            if(retval < 0) {
-                [self connect_to_switch:last_hostname :NO];
+            if((retval < 0) && retries) {
+                [self connect_to_switch:switchIndex :NO];
                 NSLog(@"Retrying write for switch activate");
             }
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
         } while((retval <= 0) && (retries--));
+    }
+    if([self active_switch_index] < 0)
+    {
+        NSString *switchName = (NSString*)CFArrayGetValueAtIndex([self switchNameArray], switchIndex);
+        NSString *switchNameText = [@"Lost connection to " stringByAppendingString:switchName];
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:switchNameText  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
+        [message show];  
+        [message release];
     }
 }
 
 int portno = 2000;
 // Initialize connection with remote switch
-- (int)connect_to_switch:(char*)hostname : (BOOL)showMessagesOnError;
+- (void)connect_to_switch:(int)indexOfSwitch : (BOOL)showMessagesOnError;
 {
-    int server_socket, socket_flags;
-    int retries = 10;
+    // Close any connections to switch that are active
     if([self switch_socket] > 0)
         close([self switch_socket]);
     [self setSwitch_socket:0];
+    [self setActive_switch_index:-1];
+    // Get name of switch
+    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([self switchNameArray], indexOfSwitch)];
+    char mystring[1024];
+    [switchName getCString:mystring maxLength:1024 encoding:[NSString defaultCStringEncoding]];
+    NSString *ipAddr;
+    if(!CFDictionaryGetValueIfPresent([self switchNameDictionary], switchName, (const void **) &ipAddr)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        return;
+    }
+    // Networking stuff to set up connection
+    int server_socket, socket_flags;
+    int retries = 10;
     while(retries--) {
         server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(server_socket < 0) {
@@ -301,11 +349,18 @@ int portno = 2000;
                 [message show];  
                 [message release];
             }
-            return server_socket;
+            return;
         }
         char on = 1;
         setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-        struct hostent *host = gethostbyname(hostname);
+        struct timeval tv;
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        setsockopt(server_socket, SOL_SOCKET, SO_SNDTIMEO, (void *)&tv, sizeof(tv));
+        setsockopt(server_socket, SOL_SOCKET, SO_RCVTIMEO, (void *)&tv, sizeof(tv));
+        char ip_addr_string[2*INET6_ADDRSTRLEN];
+        [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
+        struct hostent *host = gethostbyname(ip_addr_string);
         if(!host) {
             if(retries) {
                 NSLog(@"Retrying hostname not found");
@@ -321,7 +376,7 @@ int portno = 2000;
                 [message show];  
                 [message release];
             }
-            return -1;
+            return;
         }
         struct sockaddr_in sin;
         memcpy(&sin.sin_addr.s_addr, host->h_addr, host->h_length);
@@ -350,7 +405,7 @@ int portno = 2000;
                     [message show];  
                     [message release];
                 }
-                return -1;
+                return;
             }
         }
         // Slightly ugly way of terminating loop if we establish a connection
@@ -372,16 +427,19 @@ int portno = 2000;
             [message release];
         }
         close(server_socket);
-        return -1;
+        return;
     }
     write(server_socket, "\r", 1);
     sleep(1);
     write(server_socket, "set sys output 0\r", strlen("set sys output 0\r"));
     sleep(1);
+    // Prevent signals; we'll handle error messages instead
+    int set = 1;
+    setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
     [self setSwitch_socket:server_socket];
-    //  Save last_hostname
-    memcpy(last_hostname, hostname, sizeof(hostname));
-    return server_socket;
+    //  Save active switch index
+    [self setActive_switch_index:indexOfSwitch];
+    return;
 }
 
 

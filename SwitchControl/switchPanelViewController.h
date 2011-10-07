@@ -11,6 +11,7 @@
 @interface switchPanelViewController : UIViewController {
     SwitchControlAppDelegate *appDelegate;
     id backButton;
+    id textToShowSwitchName;
 }
 @property (nonatomic) CFMutableDictionaryRef buttonToSwitchDictionary;
 - (IBAction)allowNavigation:(id)sender;
@@ -18,6 +19,7 @@
 - (IBAction)goBack:(id)sender;
 - (IBAction)onSwitchActivated:(id)sender;
 - (IBAction)onSwitchDeactivated:(id)sender;
+- (void)updateSwitchNameText;
 @property (nonatomic, retain) NSURL *urlToLoad;
 
 @end

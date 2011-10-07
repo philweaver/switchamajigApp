@@ -143,10 +143,29 @@
         NSNumber *switchNum = [NSNumber numberWithInt:mask];
         CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
     }
+    
+    // Show what switch we're connected to
+    CGRect textRect = CGRectMake(700, 0, 324, 36);
+    textToShowSwitchName = [[UILabel alloc] initWithFrame:textRect];
+    [textToShowSwitchName setBackgroundColor:[UIColor blackColor]];
+    [self updateSwitchNameText];
+    [myView addSubview:textToShowSwitchName];
+    
 	self.view = myView;
     [myView release];
 }
-
+- (void)updateSwitchNameText {
+    [textToShowSwitchName setTextAlignment:UITextAlignmentLeft];
+    if([appDelegate active_switch_index] < 0) {
+        [textToShowSwitchName setTextColor:[UIColor redColor]];
+        [textToShowSwitchName setText:@"Not connected"];
+    } else {
+        [textToShowSwitchName setTextColor:[UIColor whiteColor]];
+        NSString *switchName = (NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], [appDelegate active_switch_index]);
+        NSString *switchNameText = [@"Connected to " stringByAppendingString:switchName];
+        [textToShowSwitchName setText:switchNameText];
+    }
+}
 
 /*
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
@@ -159,6 +178,7 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
+    
     // Release any retained subviews of the main view.
     CFRelease([self buttonToSwitchDictionary]);
     [urlToLoad release];
@@ -183,6 +203,7 @@
     }
 
     [appDelegate activate:[switchNum intValue]];
+    [self updateSwitchNameText];
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
     [backButton setEnabled:NO];
@@ -195,6 +216,7 @@
     }
     
     [appDelegate deactivate:[switchNum intValue]];
+    [self updateSwitchNameText];
 }
 // Navigation back to root controller
 - (IBAction)allowNavigation:(id)sender {

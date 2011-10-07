@@ -53,7 +53,6 @@
 
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
-    [self enable_switch_view_buttons];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
     // Find all switch panel files
     NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
@@ -93,8 +92,6 @@
     }
     [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, 100)];
     [panelSelectionScrollView setScrollEnabled:YES];
-    
-    active_switch_index = -1;
 }
 - (void)viewDidUnload
 {
@@ -116,6 +113,7 @@
 }
 -(void) viewWillAppear:(BOOL)animated {
     [[self navigationController] setNavigationBarHidden:YES];
+    [self reload_switch_name_table];
 }
 
 - (IBAction)launchSwitchPanel:(id)sender {
@@ -133,14 +131,6 @@
     [viewController setUrlToLoad:url];
     [self.navigationController pushViewController:viewController animated:YES];
     [viewController release];
-}
-
--(void) disable_switch_view_buttons {
-    return;
-}
-
--(void) enable_switch_view_buttons {
-    return;
 }
 
 - (IBAction)detect:(id)sender {
@@ -172,35 +162,16 @@
     }
     NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     cell.textLabel.text = switchName;
-    if(indexPath.row == active_switch_index) {
-        cell.detailTextLabel.text = [NSString stringWithCString:"Connected" encoding:NSASCIIStringEncoding];
-    }
+    if(indexPath.row == [appDelegate active_switch_index])
+        cell.detailTextLabel.text = @"Connected";
+    else
+        cell.detailTextLabel.text = @"";
     return cell;
 }
 
 // Support for connecting to a switch when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
-    char mystring[1024];
-    [switchName getCString:mystring maxLength:1024 encoding:[NSString defaultCStringEncoding]];
-    NSString *ipAddr;
-    //ipAddr = CFDictionaryGetValue(switchNameDictionary, switchName);
-    if(!CFDictionaryGetValueIfPresent([appDelegate switchNameDictionary], switchName, (const void **) &ipAddr)) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-        return;
-    }
-    char ip_addr_string[2*INET6_ADDRSTRLEN];
-    [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
-    int switch_socket = [appDelegate connect_to_switch:ip_addr_string :YES];
-    if(switch_socket < 0) {
-        [self disable_switch_view_buttons];
-        active_switch_index = -1;
-    } else {
-        [self enable_switch_view_buttons];
-        active_switch_index = indexPath.row;
-    }
+    [appDelegate connect_to_switch:indexPath.row :YES];
     [self reload_switch_name_table];
 }
 @end
