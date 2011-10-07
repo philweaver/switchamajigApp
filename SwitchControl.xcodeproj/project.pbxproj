@@ -38,6 +38,7 @@
 		ADC7C193142D64110045ABD0 /* 1_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C192142D64110045ABD0 /* 1_red.xml */; };
 		ADC7C195142D64980045ABD0 /* 2_green_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C194142D64980045ABD0 /* 2_green_red.xml */; };
 		ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */; };
+		ADE97CE1143FBFC800521DE0 /* 4_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE0143FBFC800521DE0 /* 4_steering.xml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +95,7 @@
 		ADC7C192142D64110045ABD0 /* 1_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_red.xml; sourceTree = "<group>"; };
 		ADC7C194142D64980045ABD0 /* 2_green_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 2_green_red.xml; sourceTree = "<group>"; };
 		ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_scross_g_r_b_y.xml; sourceTree = "<group>"; };
+		ADE97CE0143FBFC800521DE0 /* 4_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_steering.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +144,7 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				ADE97CE0143FBFC800521DE0 /* 4_steering.xml */,
 				ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */,
 				ADC7C194142D64980045ABD0 /* 2_green_red.xml */,
 				ADC7C192142D64110045ABD0 /* 1_red.xml */,
@@ -308,6 +311,7 @@
 				ADC7C193142D64110045ABD0 /* 1_red.xml in Resources */,
 				ADC7C195142D64980045ABD0 /* 2_green_red.xml in Resources */,
 				ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */,
+				ADE97CE1143FBFC800521DE0 /* 4_steering.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

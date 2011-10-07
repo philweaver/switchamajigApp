@@ -70,14 +70,12 @@
         NSLog(@"XML Open Failed.");
     }
     NSArray *elementNodes = [xmlDoc nodesForXPath:@".//panel/panelelement" error:&xmlError];
-    printf("Found %d elements.\n", [elementNodes count]);
     // Display all elements of the switch panel
     DDXMLNode *element;
     for(element in elementNodes) {
         NSArray *frameNodes = [element nodesForXPath:@".//frame" error:&xmlError];
         NSArray *colorNodes = [element nodesForXPath:@".//rgbacolor" error:&xmlError];
         NSArray *maskNodes = [element nodesForXPath:@".//switchmask" error:&xmlError];
-        printf("element with kind %d, %d children, %d frames %d colors %d masks\n", [element kind], [element childCount], [frameNodes count], [colorNodes count], [maskNodes count]);
         // Read frame
         if([frameNodes count] <= 0) {
             NSLog(@"No frame found.\n");
@@ -86,7 +84,6 @@
 
         DDXMLNode *frameNode = [frameNodes objectAtIndex:0];
         NSString *frameString = [frameNode stringValue];
-        NSLog(@"frame %@", frameString);
         NSScanner *frameScan = [[NSScanner alloc] initWithString:frameString];
         int x, y, w, h;
         bool x_ok = [frameScan scanInt:&x];
@@ -95,7 +92,6 @@
         bool h_ok = [frameScan scanInt:&h];
         if(!x_ok || !y_ok || !w_ok || !h_ok)
             continue;
-        printf("Frame numbers extracted: %d %d %d %d\n", x, y, w, h);
         buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
         [frameScan release];
 
@@ -106,7 +102,6 @@
         }
         DDXMLNode *colorNode = [colorNodes objectAtIndex:0];
         NSString *colorString = [colorNode stringValue];
-        NSLog(@"color %@", colorString);
         NSScanner *colorScan = [[NSScanner alloc] initWithString:colorString];
         CGFloat r, g, b, a;
         bool r_ok = [colorScan scanFloat:&r];
@@ -115,7 +110,6 @@
         bool a_ok = [colorScan scanFloat:&a];
         if(!r_ok || !g_ok || !b_ok || !a_ok)
             continue;
-        printf("Color numbers extracted: %f %f %f %f\n", r, g, b, a);
         [colorScan release];
         
         // Read switch mask
@@ -125,20 +119,32 @@
         }
         DDXMLNode *maskNode = [maskNodes objectAtIndex:0];
         NSString *maskString = [maskNode stringValue];
-        NSLog(@"mask %@", maskString);
         NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
         int mask;
         bool mask_ok = [maskScan scanInt:&mask];
         if(!mask_ok)
             continue;
-        printf("Switch mask: %d\n", mask);
         [maskScan release];
         // Create the specified button
         id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:buttonRect];
         [myButton setBackgroundColor:[UIColor colorWithRed:r green:g blue:b alpha:a]];
         [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
-        [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)]; 
+        [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)];
+        // Display on button what switches it activates
+        NSMutableString *switchesActivatedText =  [NSMutableString stringWithCapacity:64];
+        BOOL listedFirstSwitch = NO;
+        for(int bit=1; bit <= 16; ++bit) {
+            if(!(mask & (1 << (bit-1))))
+                continue;
+            if(listedFirstSwitch)
+                [switchesActivatedText appendString:@" and "];
+            [switchesActivatedText appendFormat:@"%d", bit];
+            listedFirstSwitch = YES;
+        }
+        
+        [myButton setTitle:switchesActivatedText forState:UIControlStateNormal];
+        [myButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [myView addSubview:myButton];
         NSNumber *switchNum = [NSNumber numberWithInt:mask];
         CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);

@@ -272,7 +272,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
         } while((retval <= 0) && (retries--));
     }
-    if([self active_switch_index] < 0)
+    if(([self active_switch_index] < 0) && (switchIndex >= 0))
     {
         NSString *switchName = (NSString*)CFArrayGetValueAtIndex([self switchNameArray], switchIndex);
         NSString *switchNameText = [@"Lost connection to " stringByAppendingString:switchName];
@@ -299,7 +299,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
         } while((retval <= 0) && (retries--));
     }
-    if([self active_switch_index] < 0)
+    if(([self active_switch_index] < 0) && (switchIndex >= 0))
     {
         NSString *switchName = (NSString*)CFArrayGetValueAtIndex([self switchNameArray], switchIndex);
         NSString *switchNameText = [@"Lost connection to " stringByAppendingString:switchName];
