@@ -171,7 +171,7 @@
 
 // Support for connecting to a switch when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [appDelegate connect_to_switch:indexPath.row :YES];
+    [appDelegate connect_to_switch:indexPath.row retries:10 showMessagesOnError:YES];
     [self reload_switch_name_table];
 }
 @end

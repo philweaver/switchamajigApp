@@ -55,10 +55,10 @@
     [self.window makeKeyAndVisible];    
     [rootController release];
     // Start the background thread that listens for switches
-    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     //  Initialize switch state
     [self setSwitch_socket:-1];
     switch_state = 0;
+    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     return YES;
 }
 
@@ -122,6 +122,29 @@
     NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
     CFDictionaryRemoveAllValues([self switchNameDictionary]);
     CFArrayRemoveAllValues([self switchNameArray]);
+    // Try to connect to last switch we were using
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cacheDirectory = [paths objectAtIndex:0];
+    NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
+    NSString *twoNames = [NSString stringWithContentsOfFile:filename encoding:NSUTF8StringEncoding error:nil];
+    if(twoNames) {
+        NSScanner *myScanner = [NSScanner scannerWithString:twoNames];
+        NSString *initialSwitchName, *initialIP;
+        [myScanner scanUpToString:@":" intoString:&initialSwitchName];
+        [myScanner scanString:@":" intoString:NULL];
+        initialIP = [twoNames substringFromIndex:[myScanner scanLocation]];
+        [[self switchDataLock] lock];
+        CFArrayAppendValue([self switchNameArray], initialSwitchName);
+        CFDictionaryAddValue([self switchNameDictionary], initialSwitchName, initialIP);
+        [[self switchDataLock] unlock];
+        [self connect_to_switch:0 retries:0 showMessagesOnError:NO];
+    }
+    if([self active_switch_index] < 0) {
+        CFDictionaryRemoveAllValues([self switchNameDictionary]);
+        CFArrayRemoveAllValues([self switchNameArray]);
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
+
     int detect_socket;
     detect_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if(socket < 0) {
@@ -266,7 +289,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
         do {
             retval = write([self switch_socket], string, strlen(string));
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex :NO];
+                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for switch activate");
             }
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
@@ -293,7 +316,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
         do {
             retval = write([self switch_socket], string, strlen(string));
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex :NO];
+                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for switch activate");
             }
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
@@ -312,7 +335,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
 
 int portno = 2000;
 // Initialize connection with remote switch
-- (void)connect_to_switch:(int)indexOfSwitch : (BOOL)showMessagesOnError;
+- (void)connect_to_switch:(int)switchIndex retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError
 {
     // Close any connections to switch that are active
     if([self switch_socket] > 0)
@@ -320,7 +343,8 @@ int portno = 2000;
     [self setSwitch_socket:0];
     [self setActive_switch_index:-1];
     // Get name of switch
-    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([self switchNameArray], indexOfSwitch)];
+    [[self switchDataLock] lock];
+    NSString *switchName = (NSString*)CFArrayGetValueAtIndex([self switchNameArray], switchIndex);
     char mystring[1024];
     [switchName getCString:mystring maxLength:1024 encoding:[NSString defaultCStringEncoding]];
     NSString *ipAddr;
@@ -328,15 +352,16 @@ int portno = 2000;
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         [message release];
+        [[self switchDataLock] unlock];
         return;
     }
+    [[self switchDataLock] unlock];
     // Networking stuff to set up connection
     int server_socket, socket_flags;
-    int retries = 10;
-    while(retries--) {
+    while(retries-- >= 0) {
         server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(server_socket < 0) {
-            if(retries) {
+            if(retries >= 0) {
                 NSLog(@"Retrying socket open");
                 continue;
             }
@@ -362,7 +387,7 @@ int portno = 2000;
         [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
         struct hostent *host = gethostbyname(ip_addr_string);
         if(!host) {
-            if(retries) {
+            if(retries >= 0) {
                 NSLog(@"Retrying hostname not found");
                 continue;
             }
@@ -392,7 +417,7 @@ int portno = 2000;
             int poll_ret = poll(&socket_poll, 1, 1000);
             if(poll_ret <= 0) {
                 close(server_socket);
-                if(retries) {
+                if(retries >= 0) {
                     NSLog(@"Retrying socket connect");
                     continue;
                 }
@@ -438,7 +463,13 @@ int portno = 2000;
     setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
     [self setSwitch_socket:server_socket];
     //  Save active switch index
-    [self setActive_switch_index:indexOfSwitch];
+    [self setActive_switch_index:switchIndex];
+    // Write the switch name and hostname to a temporary file
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cacheDirectory = [paths objectAtIndex:0];
+    NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
+    NSString *twoNames = [switchName stringByAppendingFormat:@":%@", ipAddr];
+    [twoNames writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:nil];
     return;
 }
 

@@ -25,7 +25,7 @@
 - (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(int)switchMask;
 - (void)deactivate:(int)switchMask;
-- (void)connect_to_switch:(int)switchIndex : (BOOL)showMessagesOnError;
+- (void)connect_to_switch:(int)switchIndex retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchDataLock;
