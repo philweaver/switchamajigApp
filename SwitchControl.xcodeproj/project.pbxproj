@@ -39,6 +39,8 @@
 		ADC7C195142D64980045ABD0 /* 2_green_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C194142D64980045ABD0 /* 2_green_red.xml */; };
 		ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */; };
 		ADE97CE1143FBFC800521DE0 /* 4_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE0143FBFC800521DE0 /* 4_steering.xml */; };
+		ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */; };
+		ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +98,9 @@
 		ADC7C194142D64980045ABD0 /* 2_green_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 2_green_red.xml; sourceTree = "<group>"; };
 		ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_scross_g_r_b_y.xml; sourceTree = "<group>"; };
 		ADE97CE0143FBFC800521DE0 /* 4_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_steering.xml; sourceTree = "<group>"; };
+		ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = helpDisplayViewController.h; path = ../helpDisplayViewController.h; sourceTree = "<group>"; };
+		ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = helpDisplayViewController.m; path = ../helpDisplayViewController.m; sourceTree = "<group>"; };
+		ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = helpDisplayViewController.xib; path = ../helpDisplayViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +189,9 @@
 		ADB75BF513DB539C00448025 /* SwitchControl */ = {
 			isa = PBXGroup;
 			children = (
+				ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */,
+				ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */,
+				ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */,
 				AD61F23D141F13BA00010895 /* KissXML */,
 				AD3DD723141ACA0800DB8AEB /* Reachability.h */,
 				AD3DD724141ACA0900DB8AEB /* Reachability.m */,
@@ -312,6 +320,7 @@
 				ADC7C195142D64980045ABD0 /* 2_green_red.xml in Resources */,
 				ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */,
 				ADE97CE1143FBFC800521DE0 /* 4_steering.xml in Resources */,
+				ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,6 +365,7 @@
 				AD61F248141F13E100010895 /* DDXMLNode.m in Sources */,
 				AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */,
 				ADC7C18D142D62970045ABD0 /* rootSwitchViewController.m in Sources */,
+				ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

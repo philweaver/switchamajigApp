@@ -8,11 +8,14 @@
 
 #import "rootSwitchViewController.h"
 #import "switchPanelViewController.h"
+#import "helpDisplayViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
 @synthesize panelSelectionScrollView;
 @synthesize switchNameTableView;
+@synthesize SwitchStatusText;
+@synthesize SwitchStatusActivity;
 
 - (void)dealloc {
     [switchNameTableView release];
@@ -20,6 +23,8 @@
     [switchNameTableView release];
     [panelSelectionScrollView release];
     CFRelease(switchPanelURLDictionary);
+    [SwitchStatusText release];
+    [SwitchStatusActivity release];
     [super dealloc];
 }
 
@@ -97,6 +102,8 @@
 {
     [self setSwitchNameTableView:nil];
     [self setPanelSelectionScrollView:nil];
+    [self setSwitchStatusText:nil];
+    [self setSwitchStatusActivity:nil];
     [super viewDidUnload];
     CFRelease(switchPanelURLDictionary);
 
@@ -133,6 +140,13 @@
     [viewController release];
 }
 
+- (IBAction)display_help:(id)sender {
+    [[self navigationController] setNavigationBarHidden:NO];
+    helpDisplayViewController *helpViewCtrl = [helpDisplayViewController alloc];
+    [self.navigationController pushViewController:helpViewCtrl animated:YES];
+    [helpViewCtrl release];
+}
+
 - (IBAction)detect:(id)sender {
     return;
 }
@@ -143,6 +157,14 @@
 - (void) reload_switch_name_table {
     [[appDelegate switchDataLock] lock];
     [switchNameTableView reloadData];
+    if(CFDictionaryGetCount([appDelegate switchNameDictionary])) {
+        [SwitchStatusText setText:@"Choose A Switch"];
+        [SwitchStatusActivity stopAnimating];
+    } else {
+        [SwitchStatusText setText:@"Searching For Switches"];
+        [SwitchStatusActivity startAnimating];
+    }
+    
     [[appDelegate switchDataLock] unlock];
 }
 
