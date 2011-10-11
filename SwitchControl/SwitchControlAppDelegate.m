@@ -8,7 +8,8 @@
 
 #import "SwitchControlAppDelegate.h"
 #import "rootSwitchViewController.h"
-#include "Reachability.h"
+#import "Reachability.h"
+#import "signal.h"
 
 @implementation SwitchControlAppDelegate
 
@@ -25,26 +26,17 @@
 {
     // Override point for customization after application launch.
     [self setActive_switch_index:-1];
-    // Check if we have network access
-    NetworkStatus internetStatus;
-    int retries = 50;
-    do {
-        Reachability *r = [Reachability reachabilityForLocalWiFi];
-        internetStatus = [r currentReachabilityStatus];
-        if(internetStatus == NotReachable)
-            NSLog(@"Retrying check for network access.");
-        [NSThread sleepForTimeInterval:1.0];
-    } while((internetStatus == NotReachable) && retries--);
-    if(internetStatus == NotReachable) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:@"No WiFi Connection."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-        [message show];  
-        [message release];
-    }
-    
+    // Disable SIGPIPE
+    struct sigaction sigpipeaction;
+    memset(&sigpipeaction, 0, sizeof(sigpipeaction));
+    sigpipeaction.sa_handler = SIG_IGN;
+    sigaction(SIGPIPE, &sigpipeaction, NULL);
     // Initialize the list of switches and the lock that keeps it threadsafe
     [self setSwitchDataLock:[[NSLock alloc] init]];
     [self setSwitchNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
     [self setSwitchNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
+    CFDictionaryRemoveAllValues([self switchNameDictionary]);    
+    CFArrayRemoveAllValues([self switchNameArray]);
 
     // Initialize the root view controller
     rootSwitchViewController *rootController = [[rootSwitchViewController alloc] initWithNibName:@"rootSwitchViewController" bundle:nil];
@@ -120,8 +112,23 @@
 
 - (void)Background_Thread_To_Detect_Switches {
     NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
-    CFDictionaryRemoveAllValues([self switchNameDictionary]);
-    CFArrayRemoveAllValues([self switchNameArray]);
+    // Check if we have network access
+    NetworkStatus internetStatus;
+    int retries = 50;
+    do {
+        Reachability *r = [Reachability reachabilityForLocalWiFi];
+        internetStatus = [r currentReachabilityStatus];
+        if(internetStatus == NotReachable)
+            NSLog(@"Retrying check for network access.");
+        [NSThread sleepForTimeInterval:1.0];
+    } while((internetStatus == NotReachable) && retries--);
+    if(internetStatus == NotReachable) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:@"No WiFi Connection."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        [mempool release];
+        return;
+    }
     // Try to connect to last switch we were using
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *cacheDirectory = [paths objectAtIndex:0];
@@ -287,7 +294,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
         int retries = 1;
         int retval;
         do {
-            retval = write([self switch_socket], string, strlen(string));
+            retval = send([self switch_socket], string, strlen(string), 0);
             if((retval < 0) && retries) {
                 [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for switch activate");
@@ -314,7 +321,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
         int retries = 1;
         int retval;
         do {
-            retval = write([self switch_socket], string, strlen(string));
+            retval = send([self switch_socket], string, strlen(string), 0);
             if((retval < 0) && retries) {
                 [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for switch activate");
@@ -378,6 +385,7 @@ int portno = 2000;
         }
         char on = 1;
         setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+        // Set timeout on all operations to 1 second
         struct timeval tv;
         tv.tv_sec = 1;
         tv.tv_usec = 0;
@@ -438,9 +446,13 @@ int portno = 2000;
     }
     socket_flags &= ~O_NONBLOCK;
     fcntl(server_socket, F_SETFL, socket_flags);
+    // Prevent signals; we'll handle error messages instead
+    int on;
+    setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on));
+
     verify_socket_reply(server_socket, "*HELLO*"); // Accept the response if we get it, but don't require it
     // FIXME: This combination will need changing once we're no longer using the first prototype
-    write(server_socket, "$$$", 3);
+    send(server_socket, "$$$", 3, 0);
     if(!verify_socket_reply(server_socket, "CMD")) {
         if(showMessagesOnError) {
             UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
@@ -454,13 +466,10 @@ int portno = 2000;
         close(server_socket);
         return;
     }
-    write(server_socket, "\r", 1);
+    send(server_socket, "\r", 1, 0);
     sleep(1);
-    write(server_socket, "set sys output 0\r", strlen("set sys output 0\r"));
+    send(server_socket, "set sys output 0\r", strlen("set sys output 0\r"), 0);
     sleep(1);
-    // Prevent signals; we'll handle error messages instead
-    int set = 1;
-    setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
     [self setSwitch_socket:server_socket];
     //  Save active switch index
     [self setActive_switch_index:switchIndex];
