@@ -122,9 +122,9 @@
         NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
         int mask;
         bool mask_ok = [maskScan scanInt:&mask];
+        [maskScan release];
         if(!mask_ok)
             continue;
-        [maskScan release];
         // Create the specified button
         myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:buttonRect];
@@ -156,9 +156,11 @@
     [textToShowSwitchName setBackgroundColor:[UIColor blackColor]];
     [self updateSwitchNameText];
     [myView addSubview:textToShowSwitchName];
+    [textToShowSwitchName release];
     
 	self.view = myView;
     [myView release];
+    [xmlDoc release];
 }
 - (void)updateSwitchNameText {
     [textToShowSwitchName setTextAlignment:UITextAlignmentLeft];
