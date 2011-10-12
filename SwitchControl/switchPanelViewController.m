@@ -46,7 +46,7 @@
     [self setButtonToSwitchDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
     
     // Create two-button combo to allow navigation
-    id allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     CGRect buttonRect = CGRectMake(412, 704, 200, 44);
     [allowNavButton setFrame:buttonRect];
     [allowNavButton setTitle:[NSString stringWithCString:"Enable Back Button" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
@@ -126,7 +126,7 @@
             continue;
         [maskScan release];
         // Create the specified button
-        id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:buttonRect];
         [myButton setBackgroundColor:[UIColor colorWithRed:r green:g blue:b alpha:a]];
         [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 

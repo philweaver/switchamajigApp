@@ -7,7 +7,13 @@
 //
 
 #import <SenTestingKit/SenTestingKit.h>
-
-@interface SwitchControlTests : SenTestCase
+#import "SwitchControlAppDelegate.h"
+#import "rootSwitchViewController.h"
+#import "switchPanelViewController.h"
+@interface SwitchControlTests : SenTestCase {
+    SwitchControlAppDelegate *app_delegate;
+    UINavigationController *nav_controller;
+    rootSwitchViewController *rootViewController;
+}
 
 @end

@@ -15,10 +15,12 @@
     CFMutableDictionaryRef switchPanelURLDictionary;
     UILabel *SwitchStatusText;
     UIActivityIndicatorView *SwitchStatusActivity;
+    UIButton *helpButton;
 }
 - (void) switch_names_updated:(NSNotification *) notification;
 - (void) reload_switch_name_table;
 - (IBAction)launchSwitchPanel:(id)sender;
+@property (nonatomic, retain) IBOutlet UIButton *helpButton;
 - (IBAction)display_help:(id)sender;
 @property (nonatomic, retain) IBOutlet UIScrollView *panelSelectionScrollView;
 @property (nonatomic, retain) IBOutlet UITableView *switchNameTableView;

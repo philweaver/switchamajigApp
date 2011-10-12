@@ -12,6 +12,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
+@synthesize helpButton;
 @synthesize panelSelectionScrollView;
 @synthesize switchNameTableView;
 @synthesize SwitchStatusText;
@@ -25,6 +26,7 @@
     CFRelease(switchPanelURLDictionary);
     [SwitchStatusText release];
     [SwitchStatusActivity release];
+    [helpButton release];
     [super dealloc];
 }
 
@@ -104,6 +106,7 @@
     [self setPanelSelectionScrollView:nil];
     [self setSwitchStatusText:nil];
     [self setSwitchStatusActivity:nil];
+    [self setHelpButton:nil];
     [super viewDidUnload];
     CFRelease(switchPanelURLDictionary);
 

@@ -8,9 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import "SwitchControlAppDelegate.h"
-@interface switchPanelViewController : UIViewController {
+@interface switchPanelViewController : UIViewController{
+@public
     SwitchControlAppDelegate *appDelegate;
     id backButton;
+    id allowNavButton;
+    id myButton; // last button initialized
     id textToShowSwitchName;
 }
 @property (nonatomic) CFMutableDictionaryRef buttonToSwitchDictionary;
