@@ -182,15 +182,23 @@
     [super viewDidLoad];
 }
 */
+- (void) dealloc {
+    if([self isViewLoaded]) {
+        CFRelease([self buttonToSwitchDictionary]);
+        [urlToLoad release];
+    }
+    [super dealloc];
+}
 
 - (void)viewDidUnload
 {
-    [super viewDidUnload];
     
     // Release any retained subviews of the main view.
     CFRelease([self buttonToSwitchDictionary]);
     [urlToLoad release];
     // e.g. self.myOutlet = nil;
+    [super viewDidUnload];
+
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
