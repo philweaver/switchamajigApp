@@ -76,6 +76,9 @@
         NSArray *frameNodes = [element nodesForXPath:@".//frame" error:&xmlError];
         NSArray *colorNodes = [element nodesForXPath:@".//rgbacolor" error:&xmlError];
         NSArray *maskNodes = [element nodesForXPath:@".//switchmask" error:&xmlError];
+        NSArray *sequenceNodes = [element nodesForXPath:@".//switchsequence" error:&xmlError];
+        NSArray *textNodes = [element nodesForXPath:@".//switchtext" error:&xmlError];
+
         // Read frame
         if([frameNodes count] <= 0) {
             NSLog(@"No frame found.\n");
@@ -90,14 +93,14 @@
         bool y_ok = [frameScan scanInt:&y];
         bool w_ok = [frameScan scanInt:&w];
         bool h_ok = [frameScan scanInt:&h];
+        [frameScan release];
         if(!x_ok || !y_ok || !w_ok || !h_ok)
             continue;
         buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
-        [frameScan release];
 
         // Read color
         if([colorNodes count] <= 0) {
-            NSLog(@"No frame found.\n");
+            NSLog(@"No color found.\n");
             continue;
         }
         DDXMLNode *colorNode = [colorNodes objectAtIndex:0];
@@ -108,46 +111,85 @@
         bool g_ok = [colorScan scanFloat:&g];
         bool b_ok = [colorScan scanFloat:&b];
         bool a_ok = [colorScan scanFloat:&a];
+        [colorScan release];
         if(!r_ok || !g_ok || !b_ok || !a_ok)
             continue;
-        [colorScan release];
         
-        // Read switch mask
-        if([colorNodes count] <= 0) {
-            NSLog(@"No frame found.\n");
+        // Read switch or sequence
+        if(([maskNodes count] <= 0) && ([sequenceNodes count] <= 0)) {
+            NSLog(@"No switch mask or sequence found.\n");
             continue;
         }
-        DDXMLNode *maskNode = [maskNodes objectAtIndex:0];
-        NSString *maskString = [maskNode stringValue];
-        NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
-        int mask;
-        bool mask_ok = [maskScan scanInt:&mask];
-        [maskScan release];
-        if(!mask_ok)
-            continue;
         // Create the specified button
         myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:buttonRect];
         [myButton setBackgroundColor:[UIColor colorWithRed:r green:g blue:b alpha:a]];
         [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
         [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)];
-        // Display on button what switches it activates
-        NSMutableString *switchesActivatedText =  [NSMutableString stringWithCapacity:64];
-        BOOL listedFirstSwitch = NO;
-        for(int bit=1; bit <= 16; ++bit) {
-            if(!(mask & (1 << (bit-1))))
+        if(![sequenceNodes count]) {
+            DDXMLNode *maskNode = [maskNodes objectAtIndex:0];
+            NSString *maskString = [maskNode stringValue];
+            NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
+            int mask;
+            bool mask_ok = [maskScan scanInt:&mask];
+            [maskScan release];
+            if(!mask_ok)
                 continue;
-            if(listedFirstSwitch)
-                [switchesActivatedText appendString:@" and "];
-            [switchesActivatedText appendFormat:@"%d", bit];
-            listedFirstSwitch = YES;
+            // Display on button what switches it activates
+            NSMutableString *switchesActivatedText =  [NSMutableString stringWithCapacity:64];
+            BOOL listedFirstSwitch = NO;
+            for(int bit=1; bit <= 16; ++bit) {
+                if(!(mask & (1 << (bit-1))))
+                    continue;
+                if(listedFirstSwitch)
+                    [switchesActivatedText appendString:@" and "];
+                [switchesActivatedText appendFormat:@"%d", bit];
+                listedFirstSwitch = YES;
+            }
+            [myButton setTitle:switchesActivatedText forState:UIControlStateNormal];
+            NSNumber *switchNum = [NSNumber numberWithInt:mask];
+            CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
+        } else {
+            // Create array to hold sequence
+            NSMutableArray *switchSequence = [[NSMutableArray alloc] initWithCapacity:5];
+            // Element 0: flag to shut down sequencing
+            NSNumber *num = [[NSNumber alloc] initWithInt:0];
+            [switchSequence insertObject:num atIndex:0];
+            [num release];
+            NSArray *sequenceElementNodes = [[sequenceNodes objectAtIndex:0] nodesForXPath:@".//sequenceelement" error:&xmlError];
+            DDXMLNode *sequenceElement;
+            for(sequenceElement in sequenceElementNodes) {
+                NSArray *maskNodes = [sequenceElement nodesForXPath:@".//switchmask" error:&xmlError];
+                NSArray *timeNodes = [sequenceElement nodesForXPath:@".//time" error:&xmlError];
+                if(![maskNodes count] || ![timeNodes count])
+                    continue;
+                NSString *maskString = [[maskNodes objectAtIndex:0] stringValue];
+                NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
+                int mask;
+                bool mask_ok = [maskScan scanInt:&mask];
+                [maskScan release];
+                if(!mask_ok)
+                    continue;
+                NSNumber *switchNum = [NSNumber numberWithInt:mask];
+                NSString *timeString = [[timeNodes objectAtIndex:0] stringValue];
+                NSScanner *timeScan = [[NSScanner alloc] initWithString:timeString];
+                float time;
+                bool time_ok = [timeScan scanFloat:&time];
+                [timeScan release];
+                if(!time_ok)
+                    continue;
+                NSNumber *timeNum = [NSNumber numberWithFloat:time];
+                [switchSequence addObject:switchNum];
+                [switchSequence addObject:timeNum];
+            }
+            CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchSequence);
+            [switchSequence release];
         }
-        
-        [myButton setTitle:switchesActivatedText forState:UIControlStateNormal];
+        if([textNodes count]) {
+            [myButton setTitle:[[textNodes objectAtIndex:0] stringValue] forState:UIControlStateNormal];
+        } 
         [myButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [myView addSubview:myButton];
-        NSNumber *switchNum = [NSNumber numberWithInt:mask];
-        CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
     }
     
     // Show what switch we're connected to
@@ -210,28 +252,28 @@
 // Handlers for switches activated/deactiveated. They send commands to delegate
 - (IBAction)onSwitchActivated:(id)sender {
     [backButton setEnabled:NO];
-    NSNumber *switchNum;
-    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switchNum)) {
+    NSObject *switches;
+    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switches)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         [message release];
         return;
     }
 
-    [appDelegate activate:[switchNum intValue]];
+    [appDelegate activate:switches];
     [self updateSwitchNameText];
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
     [backButton setEnabled:NO];
-    NSNumber *switchNum;
-    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switchNum)) {
+    NSObject *switches;
+    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switches)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         [message release];
         return;
     }
     
-    [appDelegate deactivate:[switchNum intValue]];
+    [appDelegate deactivate:switches];
     [self updateSwitchNameText];
 }
 // Navigation back to root controller

@@ -23,12 +23,14 @@
     int switch_state;
 }
 - (void)Background_Thread_To_Detect_Switches;
-- (void)activate:(int)switchMask;
-- (void)deactivate:(int)switchMask;
+- (void)activate:(NSObject *)switches;
+- (void)deactivate:(NSObject *)switches;
 - (void)connect_to_switch:(int)switchIndex retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
+- (void)SequenceThroughSwitches:(id)switchSequence;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchDataLock;
+@property (retain) NSLock *switchStateLock;
 @property (nonatomic) CFMutableDictionaryRef switchNameDictionary;
 @property (nonatomic) CFMutableArrayRef switchNameArray;
 @property (nonatomic) int active_switch_index;

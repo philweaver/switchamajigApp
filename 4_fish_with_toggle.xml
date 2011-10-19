@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+    <panelelement>
+        <frame>50 50 192 395</frame>
+        <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
+        <switchmask>1</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>292 50 192 395</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <switchmask>2</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>534 50 440 173</frame>
+        <rgbacolor>0.0 0.0 1.0 1.0</rgbacolor>
+        <switchmask>4</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>534 273 440 173</frame>
+        <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
+        <switchmask>8</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>50 495 944 173</frame>
+        <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
+        <switchtext>Toggle 1 and 2 for 1/2 second each</switchtext>
+        <switchsequence>
+            <sequenceelement>
+                <switchmask>1</switchmask>
+                <time>0.5</time>
+            </sequenceelement>
+            <sequenceelement>
+                <switchmask>2</switchmask>
+                <time>0.5</time>
+            </sequenceelement>
+        </switchsequence>
+    </panelelement>
+</panel>

@@ -16,6 +16,7 @@
 @synthesize window = _window;
 @synthesize navigationController = _navigationController;
 @synthesize switchDataLock = _switchDataLock;
+@synthesize switchStateLock = _switchStateLock;
 @synthesize switchNameDictionary = _switchNameDictionary;
 @synthesize switchNameArray = _switchNameArray;
 @synthesize active_switch_index = _active_switch_index;
@@ -51,6 +52,7 @@
     [self setSwitch_socket:-1];
     switch_state = 0;
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
+    [self setSwitchStateLock:[[NSLock alloc] init]];
     return YES;
 }
 
@@ -100,6 +102,7 @@
     [_navigationController release];
     [_window release];
     [_switchDataLock release];
+    [_switchStateLock release];
     [_switchMessage release];
     CFRelease([self switchNameDictionary]);
     CFRelease([self switchNameArray]);
@@ -266,7 +269,6 @@ bool verify_socket_reply(int socket, const char *expected_string) {
             free(buffer);
             return false;
         }
-        bytes_read = 0;
         bytes_read = recv(socket, buffer+total_bytes_read, expected_len - total_bytes_read, 0);
         if(bytes_read <= 0) {
             NSLog(@"%s\n", strerror(errno));
@@ -284,23 +286,57 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     free(buffer);
     return true;
 }
+- (void)SequenceThroughSwitches:(id)switchSequence {
+    NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
+    [switchSequence retain];
+    NSArray *sequence = (NSArray *)switchSequence;
+    int index = 1;
+    while(1) {
+        NSNumber *dontQuit = [sequence objectAtIndex:0];
+        if(![dontQuit integerValue])
+            break;
+        if([sequence count] < index+1) {
+            index = 1;
+            continue;
+        }
+        NSNumber *mask = [sequence objectAtIndex:index++];
+        NSNumber *time = [sequence objectAtIndex:index++];
+        [self activate:mask];
+        [NSThread sleepForTimeInterval:[time floatValue]];
+        [self deactivate:mask];
+    }
+    [switchSequence release];
+    [mempool release];
+}
 
-- (void)activate:(int)switchMask {
+- (void)activate:(NSObject *)switches {
     int switchIndex = [self active_switch_index];
-    if([self switch_socket] > 0) {
-        switch_state |= switchMask;
-        char string[MAX_STRING];
-        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-        int retries = 1;
-        int retval;
-        do {
-            retval = send([self switch_socket], string, strlen(string), 0);
-            if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
-                NSLog(@"Retrying write for switch activate");
-            }
-            verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
-        } while((retval <= 0) && (retries--));
+    if([switches isKindOfClass:[NSNumber class]]) {
+        // For a number, just turn on the appropriate switches
+        NSNumber *num = (NSNumber *)switches;
+        int switchMask = [num integerValue];
+        if([self switch_socket] > 0) {
+            [[self switchStateLock] lock];
+            switch_state |= switchMask;
+            char string[MAX_STRING];
+            sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
+            int retries = 1;
+            int retval;
+            do {
+                retval = send([self switch_socket], string, strlen(string), 0);
+                if((retval < 0) && retries) {
+                    [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
+                    NSLog(@"Retrying write for switch activate");
+                }
+                verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
+            } while((retval <= 0) && (retries--));
+            [[self switchStateLock] unlock];
+        }
+    } else {
+        // If it's not a number, it must be an array. The first element keeps the background thread active
+        NSMutableArray *array = (NSMutableArray *)switches;
+        [array replaceObjectAtIndex:0 withObject:[NSNumber numberWithInt:1]];
+        [self performSelectorInBackground:@selector(SequenceThroughSwitches:) withObject:(id)switches];
     }
     if(([self active_switch_index] < 0) && (switchIndex >= 0))
     {
@@ -312,22 +348,30 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     }
 }
 
-- (void)deactivate:(int)switchMask {
+- (void)deactivate:(NSObject *)switches {
     int switchIndex = [self active_switch_index];
-    if([self switch_socket] > 0) {
-        switch_state &= ~switchMask;
-        char string[MAX_STRING];
-        sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-        int retries = 1;
-        int retval;
-        do {
-            retval = send([self switch_socket], string, strlen(string), 0);
-            if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
-                NSLog(@"Retrying write for switch activate");
-            }
-            verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
-        } while((retval <= 0) && (retries--));
+    if([switches isKindOfClass:[NSNumber class]]) {
+        NSNumber *num = (NSNumber *)switches;
+        int switchMask = [num integerValue];
+        if([self switch_socket] > 0) {
+            switch_state &= ~switchMask;
+            char string[MAX_STRING];
+            sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
+            int retries = 1;
+            int retval;
+            do {
+                retval = send([self switch_socket], string, strlen(string), 0);
+                if((retval < 0) && retries) {
+                    [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
+                    NSLog(@"Retrying write for switch activate");
+                }
+                verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
+            } while((retval <= 0) && (retries--));
+        }
+    } else {
+        // Clear the first element to cause the thread to exit
+        NSMutableArray *array = (NSMutableArray *)switches;
+        [array replaceObjectAtIndex:0 withObject:[NSNumber numberWithInt:0]];
     }
     if(([self active_switch_index] < 0) && (switchIndex >= 0))
     {
@@ -364,7 +408,7 @@ int portno = 2000;
     }
     [[self switchDataLock] unlock];
     // Networking stuff to set up connection
-    int server_socket, socket_flags;
+    int server_socket = 0, socket_flags = 0;
     while(retries-- >= 0) {
         server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(server_socket < 0) {
