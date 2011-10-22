@@ -39,6 +39,7 @@
 		ADC7C195142D64980045ABD0 /* 2_green_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C194142D64980045ABD0 /* 2_green_red.xml */; };
 		ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */; };
 		ADDF2813144CED7D000EB423 /* 4_fish_with_toggle.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF2812144CED7D000EB423 /* 4_fish_with_toggle.xml */; };
+		ADDF28161452945F000EB423 /* 8_tworows.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF28151452945F000EB423 /* 8_tworows.xml */; };
 		ADE97CE1143FBFC800521DE0 /* 4_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE0143FBFC800521DE0 /* 4_steering.xml */; };
 		ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */; };
 		ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */; };
@@ -99,6 +100,7 @@
 		ADC7C194142D64980045ABD0 /* 2_green_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 2_green_red.xml; sourceTree = "<group>"; };
 		ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_scross_g_r_b_y.xml; sourceTree = "<group>"; };
 		ADDF2812144CED7D000EB423 /* 4_fish_with_toggle.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_fish_with_toggle.xml; sourceTree = "<group>"; };
+		ADDF28151452945F000EB423 /* 8_tworows.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 8_tworows.xml; sourceTree = "<group>"; };
 		ADE97CE0143FBFC800521DE0 /* 4_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_steering.xml; sourceTree = "<group>"; };
 		ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = helpDisplayViewController.h; path = ../helpDisplayViewController.h; sourceTree = "<group>"; };
 		ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = helpDisplayViewController.m; path = ../helpDisplayViewController.m; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				ADDF28151452945F000EB423 /* 8_tworows.xml */,
 				ADDF2812144CED7D000EB423 /* 4_fish_with_toggle.xml */,
 				ADE97CE0143FBFC800521DE0 /* 4_steering.xml */,
 				ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */,
@@ -325,6 +328,7 @@
 				ADE97CE1143FBFC800521DE0 /* 4_steering.xml in Resources */,
 				ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */,
 				ADDF2813144CED7D000EB423 /* 4_fish_with_toggle.xml in Resources */,
+				ADDF28161452945F000EB423 /* 8_tworows.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
