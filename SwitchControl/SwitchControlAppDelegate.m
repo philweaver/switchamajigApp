@@ -308,6 +308,29 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     [switchSequence release];
     [mempool release];
 }
+#define SWITCHAMAJIC_PACKET_LENGTH 8
+#define SWITCHAMAJIG_PACKET_BYTE_0 255
+#define SWITCHAMAJIG_CMD_SET_RELAY 0
+- (void)sendSwitchState {
+    int switchIndex = [self active_switch_index];
+    unsigned char packet[SWITCHAMAJIC_PACKET_LENGTH];
+    memset(packet, 0, sizeof(packet));
+    packet[0] = SWITCHAMAJIG_PACKET_BYTE_0;
+    packet[1] = SWITCHAMAJIG_CMD_SET_RELAY;
+    packet[2] = switch_state & 0x0f;
+    packet[3] = (switch_state >> 4) & 0x0f;
+    int retries = 1;
+    int retval;
+    do {
+        retval = send([self switch_socket], packet, sizeof(packet), 0);
+        if((retval < 0) && retries) {
+            [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
+            NSLog(@"Retrying write for sendSwitchState");
+        }
+        verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
+    } while((retval <= 0) && (retries--));
+}
+
 
 - (void)activate:(NSObject *)switches {
     int switchIndex = [self active_switch_index];
@@ -318,18 +341,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
         if([self switch_socket] > 0) {
             [[self switchStateLock] lock];
             switch_state |= switchMask;
-            char string[MAX_STRING];
-            sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-            int retries = 1;
-            int retval;
-            do {
-                retval = send([self switch_socket], string, strlen(string), 0);
-                if((retval < 0) && retries) {
-                    [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
-                    NSLog(@"Retrying write for switch activate");
-                }
-                verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
-            } while((retval <= 0) && (retries--));
+            [self sendSwitchState];
             [[self switchStateLock] unlock];
         }
     } else {
@@ -354,19 +366,10 @@ bool verify_socket_reply(int socket, const char *expected_string) {
         NSNumber *num = (NSNumber *)switches;
         int switchMask = [num integerValue];
         if([self switch_socket] > 0) {
+            [[self switchStateLock] lock];
             switch_state &= ~switchMask;
-            char string[MAX_STRING];
-            sprintf(string, "set sys output 0x%04x\r", convertFromLogicalToPhysicalSwitchMask(switch_state));
-            int retries = 1;
-            int retval;
-            do {
-                retval = send([self switch_socket], string, strlen(string), 0);
-                if((retval < 0) && retries) {
-                    [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
-                    NSLog(@"Retrying write for switch activate");
-                }
-                verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
-            } while((retval <= 0) && (retries--));
+            [self sendSwitchState];
+            [[self switchStateLock] unlock];
         }
     } else {
         // Clear the first element to cause the thread to exit
@@ -495,28 +498,19 @@ int portno = 2000;
     setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on));
 
     verify_socket_reply(server_socket, "*HELLO*"); // Accept the response if we get it, but don't require it
-    // FIXME: This combination will need changing once we're no longer using the first prototype
-    send(server_socket, "$$$", 3, 0);
-    if(!verify_socket_reply(server_socket, "CMD")) {
-        if(showMessagesOnError) {
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                              message:@"Did Not Receive cmd."  
-                                                             delegate:nil  
-                                                    cancelButtonTitle:@"OK"  
-                                                    otherButtonTitles:nil];  
-            [message show];  
-            [message release];
-        }
-        close(server_socket);
-        return;
-    }
-    send(server_socket, "\r", 1, 0);
-    sleep(1);
-    send(server_socket, "set sys output 0\r", strlen("set sys output 0\r"), 0);
-    sleep(1);
     [self setSwitch_socket:server_socket];
     //  Save active switch index
     [self setActive_switch_index:switchIndex];
+    // Turn off all switches
+    switch_state = 0;
+    unsigned char packet[SWITCHAMAJIC_PACKET_LENGTH];
+    memset(packet, 0, sizeof(packet));
+    packet[0] = SWITCHAMAJIG_PACKET_BYTE_0;
+    packet[1] = SWITCHAMAJIG_CMD_SET_RELAY;
+    packet[2] = switch_state & 0x0f;
+    packet[3] = (switch_state >> 4) & 0x0f;
+    send([self switch_socket], packet, sizeof(packet), 0);
+
     // Write the switch name and hostname to a temporary file
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
     NSString *cacheDirectory = [paths objectAtIndex:0];
