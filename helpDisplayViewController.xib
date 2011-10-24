@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1056</int>
-		<string key="IBDocument.SystemVersion">11B2118</string>
+		<string key="IBDocument.SystemVersion">11C74</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
-		<string key="IBDocument.AppKitVersion">1138.1</string>
-		<string key="IBDocument.HIToolboxVersion">566.00</string>
+		<string key="IBDocument.AppKitVersion">1138.23</string>
+		<string key="IBDocument.HIToolboxVersion">567.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 			<string key="NS.object.0">534</string>
@@ -48,7 +48,6 @@
 						<string key="NSFrame">{{84, 20}, {857, 708}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:615</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">1</int>
@@ -83,12 +82,15 @@ aXRjaGFtYWppZy4gUGxlYXNlIHZpc2l0IHd3dy5zd2l0Y2hhbWFqaWcuY29tL3N1cHBvcnQgZm9yIGRl
 dGFpbHMgb24gdGhpcyBtZXRob2QuDQ1PbmNlIHlvdXIgaVBhZCBhbmQgU3dpdGNoYW1hamlnIGFyZSBv
 biB0aGUgc2FtZSBuZXR3b3JrLCBydW4gdGhlIGFwcC4gSXQgc2hvdWxkIGZpbmQgeW91ciBTd2l0Y2hh
 bWFqaWcgd2l0aGluIGZpZnRlZW4gc2Vjb25kcy4gVGFwIHRoZSBuYW1lIHRvIGNvbm5lY3QuIFRoZW4g
-c2VsZWN0IGEgc3dpdGNoIHBhbmVsIGNvbmZpZ3VyYXRpb24gYW5kIGhhdmUgZnVuIQ0gDVdBUk5JTkc6
-IFRoZSBTd2l0Y2hhbWFqaWcgaXMgZm9yIHNtYWxsLCBiYXR0ZXJ5LXBvd2VyZWQgb25seSEgIERvIG5v
-dCBhdHRlbXB0IHRvIHVzZSB0aGUgU3dpdGNoYW1hamlnIHRvIGNvbnRyb2wgMTIwViBwb3dlciBmcm9t
-IGEgd2FsbCBzb2NrZXQuIERvIG5vdCB1c2UgdGhlIFN3aXRjaGFtYWppZyB0byBjb250cm9sIGFueSBk
-ZXZpY2UgY2FwYWJsZSBvZiBjYXVzaW5nIGluanVyeSwgc3VjaCBhcyBhIHBvd2VyIHdoZWVsY2hhaXIg
-b3Igb3RoZXIgaGVhdnkgbWFjaGluZXJ5LiANA</bytes>
+c2VsZWN0IGEgc3dpdGNoIHBhbmVsIGNvbmZpZ3VyYXRpb24gYW5kIGhhdmUgZnVuIQ0gDVJlbWVtYmVy
+IHRoYXQgdGhlIFN3aXRjaGFtYWppZyBpcyBpbnRlbmRlZCBmb3IgdG95cy4gRG9uJ3QgdXNlIGl0IHRv
+IGNvbnRyb2wgY29udHJvbCBhIGRldmljZSBjYXBhYmxlIG9mIGNhdXNpbmcgaW5qdXJ5LCBzdWNoIGFz
+IGEgcG93ZXIgd2hlZWxjaGFpciBvciBvdGhlciBoZWF2eSBtYWNoaW5lcnkuIA</bytes>
+						</object>
+						<object class="NSFont" key="IBUIFont">
+							<string key="NSName">Helvetica</string>
+							<double key="NSSize">17</double>
+							<int key="NSfFlags">16</int>
 						</object>
 						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
 							<int key="IBUIAutocapitalizationType">2</int>

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0012991455E28D00BBEE91 /* switchamajig_50.png */; };
+		AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD00129A1455E28D00BBEE91 /* switchamajig_72.png */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
@@ -40,7 +42,6 @@
 		ADC7C197142D64D40045ABD0 /* 4_scross_g_r_b_y.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */; };
 		ADDF2813144CED7D000EB423 /* 4_fish_with_toggle.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF2812144CED7D000EB423 /* 4_fish_with_toggle.xml */; };
 		ADDF28161452945F000EB423 /* 8_tworows.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF28151452945F000EB423 /* 8_tworows.xml */; };
-		ADDF2818145297F1000EB423 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = ADDF2817145297F0000EB423 /* logo.png */; };
 		ADE97CE1143FBFC800521DE0 /* 4_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE0143FBFC800521DE0 /* 4_steering.xml */; };
 		ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */; };
 		ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */; };
@@ -57,6 +58,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD0012991455E28D00BBEE91 /* switchamajig_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_50.png; sourceTree = "<group>"; };
+		AD00129A1455E28D00BBEE91 /* switchamajig_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_72.png; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -102,7 +105,6 @@
 		ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_scross_g_r_b_y.xml; sourceTree = "<group>"; };
 		ADDF2812144CED7D000EB423 /* 4_fish_with_toggle.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_fish_with_toggle.xml; sourceTree = "<group>"; };
 		ADDF28151452945F000EB423 /* 8_tworows.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 8_tworows.xml; sourceTree = "<group>"; };
-		ADDF2817145297F0000EB423 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		ADE97CE0143FBFC800521DE0 /* 4_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_steering.xml; sourceTree = "<group>"; };
 		ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = helpDisplayViewController.h; path = ../helpDisplayViewController.h; sourceTree = "<group>"; };
 		ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = helpDisplayViewController.m; path = ../helpDisplayViewController.m; sourceTree = "<group>"; };
@@ -155,7 +157,8 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
-				ADDF2817145297F0000EB423 /* logo.png */,
+				AD0012991455E28D00BBEE91 /* switchamajig_50.png */,
+				AD00129A1455E28D00BBEE91 /* switchamajig_72.png */,
 				ADDF28151452945F000EB423 /* 8_tworows.xml */,
 				ADDF2812144CED7D000EB423 /* 4_fish_with_toggle.xml */,
 				ADE97CE0143FBFC800521DE0 /* 4_steering.xml */,
@@ -332,7 +335,8 @@
 				ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */,
 				ADDF2813144CED7D000EB423 /* 4_fish_with_toggle.xml in Resources */,
 				ADDF28161452945F000EB423 /* 8_tworows.xml in Resources */,
-				ADDF2818145297F1000EB423 /* logo.png in Resources */,
+				AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */,
+				AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

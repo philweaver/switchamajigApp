@@ -11,7 +11,14 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFile</key>
-	<string>logo.png</string>
+	<string>switchamajig_72.png</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>switchamajig_72.png</string>
+		<string>switchamajig_50.png</string>
+	</array>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
 	<key>CFBundleIdentifier</key>
 	<string>YPRKWB2F6B.com.paw-solutions.Switchamajig</string>
 	<key>LSApplicationCategoryType</key>
