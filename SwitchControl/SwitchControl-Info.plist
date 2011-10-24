@@ -13,7 +13,9 @@
 	<key>CFBundleIconFile</key>
 	<string>logo.png</string>
 	<key>CFBundleIdentifier</key>
-	<string>PAW-Solutions.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>YPRKWB2F6B.com.paw-solutions.Switchamajig</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.education</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
