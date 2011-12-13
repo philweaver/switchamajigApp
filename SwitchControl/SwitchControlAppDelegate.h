@@ -28,7 +28,7 @@
 - (void)connect_to_switch:(int)switchIndex retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
 - (void)SequenceThroughSwitches:(id)switchSequence;
 - (void)sendSwitchState;
-
+- (void)display_battery_warning:(NSString *)text;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchDataLock;

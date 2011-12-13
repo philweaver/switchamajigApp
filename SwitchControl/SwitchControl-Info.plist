@@ -21,6 +21,8 @@
 	<string></string>
 	<key>CFBundleIdentifier</key>
 	<string>YPRKWB2F6B.com.paw-solutions.Switchamajig</string>
+	<key>NSHumanReadableCopyright</key>
+	<string></string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.education</string>
 	<key>CFBundleInfoDictionaryVersion</key>

@@ -112,9 +112,12 @@
 // Detect switches in area
 #define EXPECTED_PACKET_SIZE 110
 #define DEVICE_STRING_OFFSET 60
+#define BATTERY_VOLTAGE_OFFSET 14
+#define BATTERY_VOLTAGE_WARN_LIMIT 2000
 
 - (void)Background_Thread_To_Detect_Switches {
     NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
+    bool haveShownBatteryWarning = false; // Flag to show battery warning only once per session
     // Check if we have network access
     NetworkStatus internetStatus;
     int retries = 50;
@@ -216,6 +219,12 @@
         inet_ntop(switch_address.ss_family, (sockaddr_ptr->sa_family == AF_INET) ? (void*)&(((struct sockaddr_in *)sockaddr_ptr)->sin_addr) : (void*)&(((struct sockaddr_in6 *)sockaddr_ptr)->sin6_addr), ip_addr_string, sizeof(ip_addr_string));
         //printf("Received: %s from %s\n", buffer+DEVICE_STRING_OFFSET, ip_addr_string);
         NSString *switchName = [NSString stringWithCString:buffer+DEVICE_STRING_OFFSET encoding:NSASCIIStringEncoding];
+        int batteryVoltage = ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET]) * 256 + ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET + 1]);
+        if(!haveShownBatteryWarning && (batteryVoltage < BATTERY_VOLTAGE_WARN_LIMIT)) {
+            NSString *batteryWarningText = [switchName stringByAppendingString:@" needs its batteries replaced"];
+            [self performSelectorInBackground:@selector(display_battery_warning:) withObject:batteryWarningText];
+            haveShownBatteryWarning = true;
+        }
         NSString *ipAddrStr = [NSString stringWithCString:ip_addr_string encoding:NSASCIIStringEncoding];
         // Lock the switch info and then update it
         [[self switchDataLock] lock];
@@ -232,6 +241,14 @@
     close(detect_socket);
     [mempool release];
     return;
+}
+
+- (void) display_battery_warning:(NSString *)text {
+    NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
+    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Low Battery" message:text  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+    [message show];  
+    [message release];
+    [mempool release];
 }
 
 #define MAX_STRING 1024
