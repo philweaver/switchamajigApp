@@ -21,6 +21,7 @@
 
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate> {
     int switch_state;
+    struct sockaddr_in udp_socket_address;
 }
 - (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(NSObject *)switches;

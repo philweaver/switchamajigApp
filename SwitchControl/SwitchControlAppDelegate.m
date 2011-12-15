@@ -11,6 +11,8 @@
 #import "Reachability.h"
 #import "signal.h"
 
+const int switchamajig_protocol = IPPROTO_UDP;
+
 @implementation SwitchControlAppDelegate
 
 @synthesize window = _window;
@@ -325,12 +327,12 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     [switchSequence release];
     [mempool release];
 }
-#define SWITCHAMAJIC_PACKET_LENGTH 8
+#define SWITCHAMAJIG_PACKET_LENGTH 8
 #define SWITCHAMAJIG_PACKET_BYTE_0 255
 #define SWITCHAMAJIG_CMD_SET_RELAY 0
 - (void)sendSwitchState {
     int switchIndex = [self active_switch_index];
-    unsigned char packet[SWITCHAMAJIC_PACKET_LENGTH];
+    unsigned char packet[SWITCHAMAJIG_PACKET_LENGTH];
     memset(packet, 0, sizeof(packet));
     packet[0] = SWITCHAMAJIG_PACKET_BYTE_0;
     packet[1] = SWITCHAMAJIG_CMD_SET_RELAY;
@@ -338,14 +340,25 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     packet[3] = (switch_state >> 4) & 0x0f;
     int retries = 1;
     int retval;
-    do {
-        retval = send([self switch_socket], packet, sizeof(packet), 0);
-        if((retval < 0) && retries) {
-            [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
-            NSLog(@"Retrying write for sendSwitchState");
-        }
-        verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
-    } while((retval <= 0) && (retries--));
+    if(switchamajig_protocol == IPPROTO_TCP) {
+        do {
+            retval = send([self switch_socket], packet, sizeof(packet), 0);
+            if((retval < 0) && retries) {
+                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
+                NSLog(@"Retrying write for sendSwitchState (tcp)");
+            }
+            verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
+        } while((retval <= 0) && (retries--));
+    }
+    if(switchamajig_protocol == IPPROTO_UDP) {
+        do {
+            retval = sendto([self switch_socket], packet, sizeof(packet), 0, (struct sockaddr*) &udp_socket_address, sizeof(udp_socket_address));
+            if((retval < 0) && retries) {
+                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
+                NSLog(@"Retrying write for sendSwitchState (udp)");
+            }
+        } while((retval <= 0) && (retries--));
+    }
 }
 
 
@@ -430,7 +443,10 @@ int portno = 2000;
     // Networking stuff to set up connection
     int server_socket = 0, socket_flags = 0;
     while(retries-- >= 0) {
-        server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if(IPPROTO_TCP == switchamajig_protocol)
+            server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if(IPPROTO_UDP == switchamajig_protocol)
+            server_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
         if(server_socket < 0) {
             if(retries >= 0) {
                 NSLog(@"Retrying socket open");
@@ -482,31 +498,38 @@ int portno = 2000;
         socket_flags = fcntl(server_socket, F_GETFL);
         socket_flags |= O_NONBLOCK;
         fcntl(server_socket, F_SETFL, socket_flags);
-        if(connect(server_socket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
-            struct pollfd socket_poll;
-            socket_poll.fd = server_socket;
-            socket_poll.events = POLLOUT;
-            int poll_ret = poll(&socket_poll, 1, 1000);
-            if(poll_ret <= 0) {
-                close(server_socket);
-                if(retries >= 0) {
-                    NSLog(@"Retrying socket connect");
-                    continue;
+        if(switchamajig_protocol == IPPROTO_TCP) {
+            if(connect(server_socket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
+                struct pollfd socket_poll;
+                socket_poll.fd = server_socket;
+                socket_poll.events = POLLOUT;
+                int poll_ret = poll(&socket_poll, 1, 1000);
+                if(poll_ret <= 0) {
+                    close(server_socket);
+                    if(retries >= 0) {
+                        NSLog(@"Retrying socket connect");
+                        continue;
+                    }
+                    if(showMessagesOnError) {
+                        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                                          message:@"Failed to connect."  
+                                                                         delegate:nil  
+                                                                cancelButtonTitle:@"OK"  
+                                                                otherButtonTitles:nil];
+                        [message show];  
+                        [message release];
+                    }
+                    close(server_socket);
+                    return;
                 }
-                if(showMessagesOnError) {
-                    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                                      message:@"Failed to connect."  
-                                                                     delegate:nil  
-                                                            cancelButtonTitle:@"OK"  
-                                                            otherButtonTitles:nil];
-                    [message show];  
-                    [message release];
-                }
-                return;
             }
+            // Slightly ugly way of terminating loop if we establish a connection
+            break;
         }
-        // Slightly ugly way of terminating loop if we establish a connection
-        break;
+        if(switchamajig_protocol == IPPROTO_UDP) {
+            memcpy(&udp_socket_address, &sin, sizeof(udp_socket_address));
+        }
+
     }
     socket_flags &= ~O_NONBLOCK;
     fcntl(server_socket, F_SETFL, socket_flags);
@@ -514,19 +537,14 @@ int portno = 2000;
     int on;
     setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on));
 
-    verify_socket_reply(server_socket, "*HELLO*"); // Accept the response if we get it, but don't require it
+    if(switchamajig_protocol == IPPROTO_TCP)
+        verify_socket_reply(server_socket, "*HELLO*"); // Accept the response if we get it, but don't require it
     [self setSwitch_socket:server_socket];
     //  Save active switch index
     [self setActive_switch_index:switchIndex];
     // Turn off all switches
     switch_state = 0;
-    unsigned char packet[SWITCHAMAJIC_PACKET_LENGTH];
-    memset(packet, 0, sizeof(packet));
-    packet[0] = SWITCHAMAJIG_PACKET_BYTE_0;
-    packet[1] = SWITCHAMAJIG_CMD_SET_RELAY;
-    packet[2] = switch_state & 0x0f;
-    packet[3] = (switch_state >> 4) & 0x0f;
-    send([self switch_socket], packet, sizeof(packet), 0);
+    [self sendSwitchState];
 
     // Write the switch name and hostname to a temporary file
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
