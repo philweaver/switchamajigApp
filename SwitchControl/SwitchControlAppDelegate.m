@@ -142,9 +142,9 @@ const int switchamajig_protocol = IPPROTO_UDP;
     NSString *cacheDirectory = [paths objectAtIndex:0];
     NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
     NSString *twoNames = [NSString stringWithContentsOfFile:filename encoding:NSUTF8StringEncoding error:nil];
+    NSString *initialSwitchName = 0, *initialIP = 0;
     if(twoNames) {
         NSScanner *myScanner = [NSScanner scannerWithString:twoNames];
-        NSString *initialSwitchName, *initialIP;
         [myScanner scanUpToString:@":" intoString:&initialSwitchName];
         [myScanner scanString:@":" intoString:NULL];
         initialIP = [twoNames substringFromIndex:[myScanner scanLocation]];
@@ -441,12 +441,10 @@ int portno = 2000;
     }
     [[self switchDataLock] unlock];
     // Networking stuff to set up connection
+    // Connect first with TCP, regardless of what protocol we'll use in the end
     int server_socket = 0, socket_flags = 0;
-    while(retries-- >= 0) {
-        if(IPPROTO_TCP == switchamajig_protocol)
-            server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-        if(IPPROTO_UDP == switchamajig_protocol)
-            server_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    while((!server_socket) && (retries-- >= 0)) {
+        server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(server_socket < 0) {
             if(retries >= 0) {
                 NSLog(@"Retrying socket open");
@@ -495,41 +493,47 @@ int portno = 2000;
         memcpy(&sin.sin_addr.s_addr, host->h_addr, host->h_length);
         sin.sin_family = AF_INET;
         sin.sin_port = htons(portno);
+        // Save udp address in case we use UDP
+        memcpy(&udp_socket_address, &sin, sizeof(udp_socket_address));
         socket_flags = fcntl(server_socket, F_GETFL);
         socket_flags |= O_NONBLOCK;
         fcntl(server_socket, F_SETFL, socket_flags);
-        if(switchamajig_protocol == IPPROTO_TCP) {
-            if(connect(server_socket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
-                struct pollfd socket_poll;
-                socket_poll.fd = server_socket;
-                socket_poll.events = POLLOUT;
-                int poll_ret = poll(&socket_poll, 1, 1000);
-                if(poll_ret <= 0) {
-                    close(server_socket);
-                    if(retries >= 0) {
-                        NSLog(@"Retrying socket connect");
-                        continue;
-                    }
-                    if(showMessagesOnError) {
-                        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                                          message:@"Failed to connect."  
-                                                                         delegate:nil  
-                                                                cancelButtonTitle:@"OK"  
-                                                                otherButtonTitles:nil];
-                        [message show];  
-                        [message release];
-                    }
-                    close(server_socket);
-                    return;
+        if(connect(server_socket, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
+            struct pollfd socket_poll;
+            socket_poll.fd = server_socket;
+            socket_poll.events = POLLOUT;
+            int poll_ret = poll(&socket_poll, 1, 1000);
+            if(poll_ret <= 0) {
+                close(server_socket);
+                if(retries >= 0) {
+                    NSLog(@"Retrying socket connect");
+                    continue;
                 }
+                if(showMessagesOnError) {
+                    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                                      message:@"Failed to connect."  
+                                                                     delegate:nil  
+                                                            cancelButtonTitle:@"OK"  
+                                                            otherButtonTitles:nil];
+                    [message show];  
+                    [message release];
+                }
+                close(server_socket);
+                return;
             }
-            // Slightly ugly way of terminating loop if we establish a connection
-            break;
         }
-        if(switchamajig_protocol == IPPROTO_UDP) {
-            memcpy(&udp_socket_address, &sin, sizeof(udp_socket_address));
-        }
-
+    }
+    // We now have a TCP connection. If we want to use UDP, close the socket and reopen it as UDP
+    if(IPPROTO_UDP == switchamajig_protocol) {
+        close(server_socket);
+        server_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        char on = 1;
+        setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+        // Set timeout on all operations to 1 second
+        struct timeval tv;
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        setsockopt(server_socket, SOL_SOCKET, SO_SNDTIMEO, (void *)&tv, sizeof(tv));
     }
     socket_flags &= ~O_NONBLOCK;
     fcntl(server_socket, F_SETFL, socket_flags);

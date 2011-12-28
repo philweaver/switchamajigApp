@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+    <panelelement>
+        <frame>50 50 274 294</frame>
+        <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
+        <switchmask>1</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>374 50 274 294</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <switchmask>2</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>698 50 274 294</frame>
+        <rgbacolor>0.0 0.0 1.0 1.0</rgbacolor>
+        <switchmask>4</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>50 394 274 294</frame>
+        <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
+        <switchmask>8</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>374 394 274 294</frame>
+        <rgbacolor>0.0 1.0 1.0 1.0</rgbacolor>
+        <switchmask>16</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>698 394 274 294</frame>
+        <rgbacolor>1.0 0.0 1.0 1.0</rgbacolor>
+        <switchmask>32</switchmask>
+    </panelelement>
+</panel>
