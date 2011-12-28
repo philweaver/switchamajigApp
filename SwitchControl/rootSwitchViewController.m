@@ -164,7 +164,7 @@
         [SwitchStatusText setText:@"Choose A Switch"];
         [SwitchStatusActivity stopAnimating];
     } else {
-        [SwitchStatusText setText:@"Searching For Switches"];
+        [SwitchStatusText setText:@"Searching For Controllers"];
         [SwitchStatusActivity startAnimating];
     }
     
