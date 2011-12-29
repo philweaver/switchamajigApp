@@ -52,6 +52,7 @@
 #define switch_select_button_w 102
 #define switch_select_button_h 77
 #define switch_select_button_spacing 50
+#define switch_label_height 36
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -81,6 +82,8 @@
         // Create the specified button
         id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, switch_select_button_w, switch_select_button_h)];
+        // Also set rectangle for label
+        CGRect panelNameLabelRect = CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y + switch_select_button_h, switch_select_button_w, switch_label_height);
         [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)]; 
         [panelSelectionScrollView addSubview:myButton];
         current_button_y += switch_select_button_h + switch_select_button_spacing;
@@ -94,6 +97,14 @@
         UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         [myButton setImage:scaledImage forState:UIControlStateNormal];
+        // Add text label
+        UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
+        [panelNameLabel setBackgroundColor:[UIColor blackColor]];
+        [panelNameLabel setTextColor:[UIColor whiteColor]];
+        [panelNameLabel setText:[viewController switchPanelName]];
+        [panelNameLabel setTextAlignment:UITextAlignmentCenter];
+        [panelSelectionScrollView addSubview:panelNameLabel];
+        [panelNameLabel release];
         [viewController release];
         CFDictionaryAddValue(switchPanelURLDictionary, myButton, url);
     }

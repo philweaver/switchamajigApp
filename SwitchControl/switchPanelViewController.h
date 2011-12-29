@@ -24,5 +24,6 @@
 - (IBAction)onSwitchDeactivated:(id)sender;
 - (void)updateSwitchNameText;
 @property (nonatomic, retain) NSURL *urlToLoad;
+@property (nonatomic, retain) NSString *switchPanelName;
 
 @end

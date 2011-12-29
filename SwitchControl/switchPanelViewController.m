@@ -14,6 +14,7 @@
 
 @synthesize buttonToSwitchDictionary;
 @synthesize urlToLoad;
+@synthesize switchPanelName;
 /*
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -69,6 +70,14 @@
     if(xmlDoc == nil) {
         NSLog(@"XML Open Failed.");
     }
+    // Set name
+    [self setSwitchPanelName:@""];
+    NSArray *panelNameNodes = [xmlDoc nodesForXPath:@".//panel/panelname" error:&xmlError];
+    if([panelNameNodes count]) {
+        DDXMLNode *panelNameNode = [panelNameNodes objectAtIndex:0];
+        [self setSwitchPanelName:[panelNameNode stringValue]];
+    }
+    
     NSArray *elementNodes = [xmlDoc nodesForXPath:@".//panel/panelelement" error:&xmlError];
     // Display all elements of the switch panel
     DDXMLNode *element;
@@ -238,6 +247,7 @@
     // Release any retained subviews of the main view.
     CFRelease([self buttonToSwitchDictionary]);
     [urlToLoad release];
+    [switchPanelName release];
     // e.g. self.myOutlet = nil;
     [super viewDidUnload];
 

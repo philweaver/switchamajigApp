@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <panel>
+    <panelname>Go + Stop</panelname>
     <panelelement>
         <frame>50 50 437 638</frame>
         <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>

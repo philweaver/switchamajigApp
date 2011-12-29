@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <panel>
+    <panelname>Steering Car</panelname>
     <panelelement>
         <frame>412 50 200 200</frame>
         <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
