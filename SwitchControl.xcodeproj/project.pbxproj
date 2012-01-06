@@ -17,6 +17,8 @@
 		AD61F247141F13E100010895 /* DDXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F243141F13E100010895 /* DDXMLElement.m */; };
 		AD61F248141F13E100010895 /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F245141F13E100010895 /* DDXMLNode.m */; };
 		AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F24A141F140B00010895 /* NSString+DDXML.m */; };
+		AD86623414B567AB00C5860D /* configViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD86623214B567AB00C5860D /* configViewController.m */; };
+		AD86623514B567AB00C5860D /* configViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD86623314B567AB00C5860D /* configViewController.xib */; };
 		ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
 		ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF113DB539C00448025 /* Foundation.framework */; };
 		ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF313DB539C00448025 /* CoreGraphics.framework */; };
@@ -76,6 +78,9 @@
 		AD61F249141F140B00010895 /* NSString+DDXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDXML.h"; path = "kissxml/KissXML/Categories/NSString+DDXML.h"; sourceTree = "<group>"; };
 		AD61F24A141F140B00010895 /* NSString+DDXML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDXML.m"; path = "kissxml/KissXML/Categories/NSString+DDXML.m"; sourceTree = "<group>"; };
 		AD61F24C141F141900010895 /* DDXMLPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLPrivate.h; path = kissxml/KissXML/Private/DDXMLPrivate.h; sourceTree = "<group>"; };
+		AD86623114B567AB00C5860D /* configViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = configViewController.h; sourceTree = "<group>"; };
+		AD86623214B567AB00C5860D /* configViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = configViewController.m; sourceTree = "<group>"; };
+		AD86623314B567AB00C5860D /* configViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = configViewController.xib; sourceTree = "<group>"; };
 		ADB75BEB13DB539C00448025 /* SwitchControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitchControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADB75BEF13DB539C00448025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		ADB75BF113DB539C00448025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -216,6 +221,9 @@
 				ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */,
 				AD3DD729141B1DF100DB8AEB /* switchPanelViewController.h */,
 				AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */,
+				AD86623114B567AB00C5860D /* configViewController.h */,
+				AD86623214B567AB00C5860D /* configViewController.m */,
+				AD86623314B567AB00C5860D /* configViewController.xib */,
 			);
 			path = SwitchControl;
 			sourceTree = "<group>";
@@ -337,6 +345,7 @@
 				AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */,
 				AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */,
 				AD4D39A014AAEF3600ADA893 /* 6_tworows.xml in Resources */,
+				AD86623514B567AB00C5860D /* configViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -382,6 +391,7 @@
 				AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */,
 				ADC7C18D142D62970045ABD0 /* rootSwitchViewController.m in Sources */,
 				ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */,
+				AD86623414B567AB00C5860D /* configViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -22,6 +22,7 @@
 - (IBAction)launchSwitchPanel:(id)sender;
 @property (nonatomic, retain) IBOutlet UIButton *helpButton;
 - (IBAction)display_help:(id)sender;
+- (IBAction)config_pressed:(id)sender;
 @property (nonatomic, retain) IBOutlet UIScrollView *panelSelectionScrollView;
 @property (nonatomic, retain) IBOutlet UITableView *switchNameTableView;
 @property (nonatomic, retain) IBOutlet UILabel *SwitchStatusText;

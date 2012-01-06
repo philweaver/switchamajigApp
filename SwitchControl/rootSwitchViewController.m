@@ -9,6 +9,7 @@
 #import "rootSwitchViewController.h"
 #import "switchPanelViewController.h"
 #import "helpDisplayViewController.h"
+#import "configViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
@@ -160,9 +161,11 @@
     [self.navigationController pushViewController:helpViewCtrl animated:YES];
     [helpViewCtrl release];
 }
-
-- (IBAction)detect:(id)sender {
-    return;
+- (IBAction)config_pressed:(id)sender {
+    [[self navigationController] setNavigationBarHidden:NO];
+    configViewController *configViewCtrl = [configViewController alloc];
+    [self.navigationController pushViewController:configViewCtrl animated:YES];
+    [configViewCtrl release];
 }
 
 - (void) switch_names_updated:(NSNotification *) notification {
