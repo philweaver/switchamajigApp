@@ -24,6 +24,8 @@ const int switchamajig_protocol = IPPROTO_UDP;
 @synthesize active_switch_index = _active_switch_index;
 @synthesize switch_socket = _switch_socket;
 @synthesize switchMessage = _switchMessage;
+@synthesize backgroundColor = _backgroundColor;
+@synthesize foregroundColor = _foregroundColor;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -41,6 +43,9 @@ const int switchamajig_protocol = IPPROTO_UDP;
     CFDictionaryRemoveAllValues([self switchNameDictionary]);    
     CFArrayRemoveAllValues([self switchNameArray]);
 
+    // Initialize colors
+    [self setBackgroundColor:[UIColor blackColor]];
+    [self setForegroundColor:[UIColor whiteColor]];
     // Initialize the root view controller
     rootSwitchViewController *rootController = [[rootSwitchViewController alloc] initWithNibName:@"rootSwitchViewController" bundle:nil];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:rootController];
@@ -106,6 +111,8 @@ const int switchamajig_protocol = IPPROTO_UDP;
     [_switchDataLock release];
     [_switchStateLock release];
     [_switchMessage release];
+    [_backgroundColor release];
+    [_foregroundColor release];
     CFRelease([self switchNameDictionary]);
     CFRelease([self switchNameArray]);
     [super dealloc];

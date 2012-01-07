@@ -7,17 +7,20 @@
 //
 
 #import "configViewController.h"
-
+#import "SwitchControlAppDelegate.h"
 @implementation configViewController
 @synthesize ConfigTitle;
 @synthesize ConfigAppLabel;
 @synthesize BackgroundColorLabel;
+@synthesize ConfigureNetworkLabel;
+@synthesize ScanActivityIndicator;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         // Custom initialization
+        [self setUIColors];
     }
     return self;
 }
@@ -35,6 +38,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self setUIColors];
     // Require the user to prove that configuration is intentional
     UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Confirm Config"  
                                                       message:@"To prevent unintentional configuring, please type \'yes\' below to continue."  
@@ -59,14 +63,28 @@
     return NO;
 }
 - (IBAction)setBackgroundWhite:(id)sender {
-    [self.view setBackgroundColor:[UIColor whiteColor]];
-    [self.BackgroundColorLabel setTextColor:[UIColor blackColor]];
-
+    SwitchControlAppDelegate *appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
+    [appDelegate setBackgroundColor:[UIColor whiteColor]];
+    [appDelegate setForegroundColor:[UIColor blackColor]];
+    [self setUIColors];
 }
 - (IBAction)setBackgroundBlack:(id)sender {
-    [self.view setBackgroundColor:[UIColor blackColor]];
-    [self.BackgroundColorLabel setTextColor:[UIColor whiteColor]];
-    
+    SwitchControlAppDelegate *appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
+    [appDelegate setBackgroundColor:[UIColor blackColor]];
+    [appDelegate setForegroundColor:[UIColor whiteColor]];
+    [self setUIColors];
+}
+-(void)setUIColors {
+    SwitchControlAppDelegate *appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
+    UIColor *color;
+    color = [appDelegate backgroundColor];
+    [self.view setBackgroundColor:color];
+    color = [appDelegate foregroundColor];
+    [self.BackgroundColorLabel setTextColor:color];
+    [self.ConfigTitle setTextColor:color];
+    [self.ConfigAppLabel setTextColor:color];
+    [self.ConfigureNetworkLabel setTextColor:color];
+    [self.ScanActivityIndicator setColor:color];
 }
 
 - (void)viewDidUnload
@@ -74,6 +92,8 @@
     [self setConfigTitle:nil];
     [self setConfigAppLabel:nil];
     [self setBackgroundColorLabel:nil];
+    [self setConfigureNetworkLabel:nil];
+    [self setScanActivityIndicator:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -89,6 +109,8 @@
     [ConfigTitle release];
     [ConfigAppLabel release];
     [BackgroundColorLabel release];
+    [ConfigureNetworkLabel release];
+    [ScanActivityIndicator release];
     [super dealloc];
 }
 @end

@@ -39,4 +39,6 @@
 @property (nonatomic) int active_switch_index;
 @property (nonatomic) int switch_socket;
 @property (nonatomic, retain) NSString *switchMessage;
+@property (nonatomic, retain) UIColor *backgroundColor;
+@property (nonatomic, retain) UIColor *foregroundColor;
 @end

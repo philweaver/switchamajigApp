@@ -19,6 +19,8 @@
 }
 - (void) switch_names_updated:(NSNotification *) notification;
 - (void) reload_switch_name_table;
+- (void) setUIColors;
+- (void)initializeScrollPanelWithSwitchPanels;
 - (IBAction)launchSwitchPanel:(id)sender;
 @property (nonatomic, retain) IBOutlet UIButton *helpButton;
 - (IBAction)display_help:(id)sender;

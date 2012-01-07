@@ -58,11 +58,22 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    switchPanelURLDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
+    [self initializeScrollPanelWithSwitchPanels];
+}
+
+- (void)initializeScrollPanelWithSwitchPanels {
+    UIColor *bgColor = [appDelegate backgroundColor];
+    UIColor *fgColor = [appDelegate foregroundColor];
+
+    if(switchPanelURLDictionary) {
+        CFDictionaryRemoveAllValues(switchPanelURLDictionary);
+        CFRelease(switchPanelURLDictionary);
+    }
+    switchPanelURLDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     // Find all switch panel files
     NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
     NSURL *url;
@@ -99,9 +110,9 @@
         UIGraphicsEndImageContext();
         [myButton setImage:scaledImage forState:UIControlStateNormal];
         // Add text label
-        UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
-        [panelNameLabel setBackgroundColor:[UIColor blackColor]];
-        [panelNameLabel setTextColor:[UIColor whiteColor]];
+         UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
+        [panelNameLabel setBackgroundColor:bgColor];
+        [panelNameLabel setTextColor:fgColor];
         [panelNameLabel setText:[viewController switchPanelName]];
         [panelNameLabel setTextAlignment:UITextAlignmentCenter];
         [panelSelectionScrollView addSubview:panelNameLabel];
@@ -112,6 +123,7 @@
     [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, 100)];
     [panelSelectionScrollView setScrollEnabled:YES];
 }
+
 - (void)viewDidUnload
 {
     [self setSwitchNameTableView:nil];
@@ -133,8 +145,33 @@
         return YES;
     return NO;
 }
+
+-(void)setUIColors {
+    UIColor *bgColor = [appDelegate backgroundColor];
+    [self.view setBackgroundColor:bgColor];
+    [self.panelSelectionScrollView setBackgroundColor:bgColor];
+    UIColor *fgColor = [appDelegate foregroundColor];
+    [self.SwitchStatusText setTextColor:fgColor];
+    [self.SwitchStatusActivity setColor:fgColor];
+    // Deconstruct the scroll panel
+    NSArray *subviewArray = [panelSelectionScrollView subviews];
+    UIView *thisView;
+    for(thisView in subviewArray) {
+        NSArray *subviewArray2 = [thisView subviews];
+        UIView *thisView2;
+        for(thisView2 in subviewArray2) {
+            [thisView2 removeFromSuperview];
+        }
+        [thisView removeFromSuperview];
+    }
+    // Reinitialize the scroll panel
+    [self initializeScrollPanelWithSwitchPanels];
+}
+
+
 -(void) viewWillAppear:(BOOL)animated {
     [[self navigationController] setNavigationBarHidden:YES];
+    [self setUIColors];
     [self reload_switch_name_table];
 }
 

@@ -40,9 +40,11 @@
 - (void)loadView
 {
     appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
+    UIColor *bgColor = [appDelegate backgroundColor];
+    
 	CGRect cgRct = CGRectMake(0, 20, 1024, 748);
     UIView *myView = [[UIView alloc] initWithFrame:cgRct];
-    [myView setBackgroundColor:[UIColor blackColor]];
+    [myView setBackgroundColor:bgColor];
 	myView.autoresizesSubviews = YES;
     [self setButtonToSwitchDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
     
@@ -204,7 +206,7 @@
     // Show what switch we're connected to
     CGRect textRect = CGRectMake(700, 0, 324, 36);
     textToShowSwitchName = [[UILabel alloc] initWithFrame:textRect];
-    [textToShowSwitchName setBackgroundColor:[UIColor blackColor]];
+    [textToShowSwitchName setBackgroundColor:bgColor];
     [self updateSwitchNameText];
     [myView addSubview:textToShowSwitchName];
     [textToShowSwitchName release];
@@ -219,7 +221,7 @@
         [textToShowSwitchName setTextColor:[UIColor redColor]];
         [textToShowSwitchName setText:@"Not connected"];
     } else {
-        [textToShowSwitchName setTextColor:[UIColor whiteColor]];
+        [textToShowSwitchName setTextColor:[appDelegate foregroundColor]];
         NSString *switchName = (NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], [appDelegate active_switch_index]);
         NSString *switchNameText = [@"Connected to " stringByAppendingString:switchName];
         [textToShowSwitchName setText:switchNameText];
@@ -237,6 +239,7 @@
     if([self isViewLoaded]) {
         CFRelease([self buttonToSwitchDictionary]);
         [urlToLoad release];
+        [switchPanelName release];
     }
     [super dealloc];
 }
