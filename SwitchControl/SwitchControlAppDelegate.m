@@ -23,7 +23,6 @@ const int switchamajig_protocol = IPPROTO_UDP;
 @synthesize switchNameArray = _switchNameArray;
 @synthesize active_switch_index = _active_switch_index;
 @synthesize switch_socket = _switch_socket;
-@synthesize switchMessage = _switchMessage;
 @synthesize backgroundColor = _backgroundColor;
 @synthesize foregroundColor = _foregroundColor;
 
@@ -110,7 +109,6 @@ const int switchamajig_protocol = IPPROTO_UDP;
     [_window release];
     [_switchDataLock release];
     [_switchStateLock release];
-    [_switchMessage release];
     [_backgroundColor release];
     [_foregroundColor release];
     CFRelease([self switchNameDictionary]);
