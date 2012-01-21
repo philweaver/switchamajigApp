@@ -7,15 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SwitchControlAppDelegate.h"
 
 @interface configViewController : UIViewController {
+@public
+    SwitchControlAppDelegate *appDelegate;
+    NSString *switchName;
 }
--(void)setUIColors;
-
 - (void)alertView:(UIAlertView *) alertView didDismissWithButtonIndex:(NSInteger) buttonIndex;
 - (BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView;
-- (IBAction)setBackgroundWhite:(id)sender;
-- (IBAction)setBackgroundBlack:(id)sender;
+- (IBAction)Cancel:(id)sender;
 @property (retain, nonatomic) IBOutlet UILabel *ConfigTitle;
 @property (retain, nonatomic) IBOutlet UILabel *ConfigAppLabel;
 @property (retain, nonatomic) IBOutlet UILabel *BackgroundColorLabel;

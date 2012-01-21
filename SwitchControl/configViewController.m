@@ -18,10 +18,12 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+#if 0    
     if (self) {
         // Custom initialization
         [self setUIColors];
     }
+#endif
     return self;
 }
 
@@ -38,6 +40,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [ConfigTitle setText:[@"Configure " stringByAppendingString:switchName]];
+#if 0
     [self setUIColors];
     // Require the user to prove that configuration is intentional
     UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Confirm Config"  
@@ -48,6 +52,7 @@
     [message setAlertViewStyle:UIAlertViewStylePlainTextInput];
     [message show];  
     [message release];
+#endif
 }
 - (void)alertView:(UIAlertView *) alertView didDismissWithButtonIndex:(NSInteger) buttonIndex
 {
@@ -62,29 +67,8 @@
     }
     return NO;
 }
-- (IBAction)setBackgroundWhite:(id)sender {
-    SwitchControlAppDelegate *appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
-    [appDelegate setBackgroundColor:[UIColor whiteColor]];
-    [appDelegate setForegroundColor:[UIColor blackColor]];
-    [self setUIColors];
-}
-- (IBAction)setBackgroundBlack:(id)sender {
-    SwitchControlAppDelegate *appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
-    [appDelegate setBackgroundColor:[UIColor blackColor]];
-    [appDelegate setForegroundColor:[UIColor whiteColor]];
-    [self setUIColors];
-}
--(void)setUIColors {
-    SwitchControlAppDelegate *appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
-    UIColor *color;
-    color = [appDelegate backgroundColor];
-    [self.view setBackgroundColor:color];
-    color = [appDelegate foregroundColor];
-    [self.BackgroundColorLabel setTextColor:color];
-    [self.ConfigTitle setTextColor:color];
-    [self.ConfigAppLabel setTextColor:color];
-    [self.ConfigureNetworkLabel setTextColor:color];
-    [self.ScanActivityIndicator setColor:color];
+- (IBAction)Cancel:(id)sender {
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 - (void)viewDidUnload

@@ -13,6 +13,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
+@synthesize bgColorSegControl;
 @synthesize helpButton;
 @synthesize panelSelectionScrollView;
 @synthesize switchNameTableView;
@@ -28,6 +29,7 @@
     [SwitchStatusText release];
     [SwitchStatusActivity release];
     [helpButton release];
+    [bgColorSegControl release];
     [super dealloc];
 }
 
@@ -66,8 +68,8 @@
 }
 
 - (void)initializeScrollPanelWithSwitchPanels {
-    UIColor *bgColor = [appDelegate backgroundColor];
-    UIColor *fgColor = [appDelegate foregroundColor];
+    UIColor *bgColor = [UIColor blackColor];
+    UIColor *fgColor = [UIColor whiteColor];
 
     if(switchPanelURLDictionary) {
         CFDictionaryRemoveAllValues(switchPanelURLDictionary);
@@ -131,6 +133,7 @@
     [self setSwitchStatusText:nil];
     [self setSwitchStatusActivity:nil];
     [self setHelpButton:nil];
+    [self setBgColorSegControl:nil];
     [super viewDidUnload];
     CFRelease(switchPanelURLDictionary);
 
@@ -146,13 +149,7 @@
     return NO;
 }
 
--(void)setUIColors {
-    UIColor *bgColor = [appDelegate backgroundColor];
-    [self.view setBackgroundColor:bgColor];
-    [self.panelSelectionScrollView setBackgroundColor:bgColor];
-    UIColor *fgColor = [appDelegate foregroundColor];
-    [self.SwitchStatusText setTextColor:fgColor];
-    [self.SwitchStatusActivity setColor:fgColor];
+-(void)ResetScrollPanel {
     // Deconstruct the scroll panel
     NSArray *subviewArray = [panelSelectionScrollView subviews];
     UIView *thisView;
@@ -171,7 +168,6 @@
 
 -(void) viewWillAppear:(BOOL)animated {
     [[self navigationController] setNavigationBarHidden:YES];
-    [self setUIColors];
     [self reload_switch_name_table];
 }
 
@@ -199,9 +195,14 @@
     [helpViewCtrl release];
 }
 - (IBAction)config_pressed:(id)sender {
-    [[self navigationController] setNavigationBarHidden:NO];
-    configViewController *configViewCtrl = [configViewController alloc];
-    [self.navigationController pushViewController:configViewCtrl animated:YES];
+    //[[self navigationController] setNavigationBarHidden:NO];
+    configViewController *configViewCtrl = [[configViewController alloc] initWithNibName:@"configViewController" bundle:nil];
+    [configViewCtrl setModalPresentationStyle:UIModalPresentationFormSheet];
+    [configViewCtrl setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+    configViewCtrl->appDelegate = appDelegate;
+    configViewCtrl->switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], [appDelegate active_switch_index])];
+
+    [self presentModalViewController:configViewCtrl animated:YES];
     [configViewCtrl release];
 }
 
@@ -234,14 +235,24 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
     if(cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"] autorelease];
     }
     NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     cell.textLabel.text = switchName;
-    if(indexPath.row == [appDelegate active_switch_index])
+    if(indexPath.row == [appDelegate active_switch_index]) {
         cell.detailTextLabel.text = @"Connected";
-    else
+        UIButton *configButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        configButton.frame = CGRectMake(0.0, 0.0, 60, 44);
+        [configButton setTitle:[NSString stringWithCString:"Config" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+        [configButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+        [configButton addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside];
+        [configButton setEnabled:YES];
+        cell.accessoryView = configButton;
+    }
+    else {
         cell.detailTextLabel.text = @"";
+        cell.accessoryView = nil;
+    }
     return cell;
 }
 
@@ -250,4 +261,17 @@
     [appDelegate connect_to_switch:indexPath.row retries:10 showMessagesOnError:YES];
     [self reload_switch_name_table];
 }
+
+- (IBAction)bgColorSegControlIndexChanged:(id) sender {
+    int segmentIndex = [[self bgColorSegControl] selectedSegmentIndex];
+    if(segmentIndex == 0) {
+        // Set switch panel background to black
+        [appDelegate setBackgroundColor:[UIColor blackColor]];
+    } else {
+        // Set switch panel background to black
+        [appDelegate setBackgroundColor:[UIColor whiteColor]];
+    }
+    [self ResetScrollPanel];
+}
+
 @end
