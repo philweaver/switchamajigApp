@@ -11,8 +11,6 @@
 #import "Reachability.h"
 #import "signal.h"
 
-const int switchamajig_protocol = IPPROTO_UDP;
-
 @implementation SwitchControlAppDelegate
 
 @synthesize window = _window;
@@ -25,6 +23,9 @@ const int switchamajig_protocol = IPPROTO_UDP;
 @synthesize switch_socket = _switch_socket;
 @synthesize backgroundColor = _backgroundColor;
 @synthesize foregroundColor = _foregroundColor;
+@synthesize wifiDataLock = _wifiDataLock;
+@synthesize wifiNameArray = _wifiNameArray;
+@synthesize wifiNameDictionary = _wifiNameDictionary;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -59,6 +60,10 @@ const int switchamajig_protocol = IPPROTO_UDP;
     switch_state = 0;
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     [self setSwitchStateLock:[[NSLock alloc] init]];
+    [self setWifiDataLock:[[NSLock alloc] init]];
+    [self setWifiNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
+    [self setWifiNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
+
     return YES;
 }
 
@@ -113,6 +118,9 @@ const int switchamajig_protocol = IPPROTO_UDP;
     [_foregroundColor release];
     CFRelease([self switchNameDictionary]);
     CFRelease([self switchNameArray]);
+    [_wifiDataLock release];
+    CFRelease([self wifiNameDictionary]);
+    CFRelease([self wifiNameArray]);
     [super dealloc];
 }
 
@@ -157,7 +165,7 @@ const int switchamajig_protocol = IPPROTO_UDP;
         CFArrayAppendValue([self switchNameArray], initialSwitchName);
         CFDictionaryAddValue([self switchNameDictionary], initialSwitchName, initialIP);
         [[self switchDataLock] unlock];
-        [self connect_to_switch:0 retries:0 showMessagesOnError:NO];
+        [self connect_to_switch:0 protocol:switch_control_protocol retries:0 showMessagesOnError:NO];
     }
     if([self active_switch_index] < 0) {
         CFDictionaryRemoveAllValues([self switchNameDictionary]);
@@ -345,21 +353,21 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     packet[3] = (switch_state >> 4) & 0x0f;
     int retries = 1;
     int retval;
-    if(switchamajig_protocol == IPPROTO_TCP) {
+    if(switch_control_protocol == IPPROTO_TCP) {
         do {
             retval = send([self switch_socket], packet, sizeof(packet), 0);
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
+                [self connect_to_switch:switchIndex protocol:switch_control_protocol retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for sendSwitchState (tcp)");
             }
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
         } while((retval <= 0) && (retries--));
     }
-    if(switchamajig_protocol == IPPROTO_UDP) {
+    if(switch_control_protocol == IPPROTO_UDP) {
         do {
             retval = sendto([self switch_socket], packet, sizeof(packet), 0, (struct sockaddr*) &udp_socket_address, sizeof(udp_socket_address));
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex retries:5 showMessagesOnError:NO];
+                [self connect_to_switch:switchIndex protocol:switch_control_protocol retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for sendSwitchState (udp)");
             }
         } while((retval <= 0) && (retries--));
@@ -424,7 +432,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
 
 int portno = 2000;
 // Initialize connection with remote switch
-- (void)connect_to_switch:(int)switchIndex retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError
+- (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError
 {
     // Close any connections to switch that are active
     if([self switch_socket] > 0)
@@ -529,7 +537,7 @@ int portno = 2000;
         }
     }
     // We now have a TCP connection. If we want to use UDP, close the socket and reopen it as UDP
-    if(IPPROTO_UDP == switchamajig_protocol) {
+    if(IPPROTO_UDP == protocol) {
         close(server_socket);
         server_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
         char on = 1;
@@ -546,7 +554,7 @@ int portno = 2000;
     int on;
     setsockopt(server_socket, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on));
 
-    if(switchamajig_protocol == IPPROTO_TCP)
+    if(IPPROTO_TCP == protocol)
         verify_socket_reply(server_socket, "*HELLO*"); // Accept the response if we get it, but don't require it
     [self setSwitch_socket:server_socket];
     //  Save active switch index
@@ -564,5 +572,21 @@ int portno = 2000;
     return;
 }
 
+// Provide options for walking in 
+- (void)Background_Thread_To_Detect_Wifi {
+    [[self wifiDataLock] lock];
+    CFDictionaryRemoveAllValues([self wifiNameDictionary]);    
+    CFArrayRemoveAllValues([self wifiNameArray]);
+    CFArrayAppendValue([self wifiNameArray], @"Manually Enter Network");
+    NSNumber *networkChannelNumber = [NSNumber numberWithInt:0];
+    CFDictionaryAddValue([self wifiNameDictionary], (NSString *) CFArrayGetValueAtIndex([self wifiNameArray], 0), networkChannelNumber);
+    [[self wifiDataLock] unlock];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_complete" object:nil];
+    
+    // Open TCP socket
+    [self connect_to_switch:[self active_switch_index] protocol:switch_control_protocol retries:5 showMessagesOnError:NO];
+    
+}
 
 @end

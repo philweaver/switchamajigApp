@@ -15,6 +15,10 @@
 #import "sys/poll.h"
 #import "arpa/inet.h"
 #import "errno.h"
+
+#define switch_control_protocol IPPROTO_UDP
+
+
 @class singleSwitchView;
 @class twoSwitchView;
 @class rootSwitchViewController;
@@ -26,10 +30,11 @@
 - (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(NSObject *)switches;
 - (void)deactivate:(NSObject *)switches;
-- (void)connect_to_switch:(int)switchIndex retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
+- (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
 - (void)SequenceThroughSwitches:(id)switchSequence;
 - (void)sendSwitchState;
 - (void)display_battery_warning:(NSString *)text;
+- (void)Background_Thread_To_Detect_Wifi;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchDataLock;
@@ -40,4 +45,10 @@
 @property (nonatomic) int switch_socket;
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
+
+// Information for WiFi network detection
+@property (retain) NSLock *wifiDataLock;
+@property (nonatomic) CFMutableDictionaryRef wifiNameDictionary;
+@property (nonatomic) CFMutableArrayRef wifiNameArray;
+
 @end

@@ -14,16 +14,34 @@
 @synthesize BackgroundColorLabel;
 @synthesize ConfigureNetworkLabel;
 @synthesize ScanActivityIndicator;
+@synthesize wifiNameTable;
+
+- (void)dealloc {
+    [ConfigTitle release];
+    [ConfigAppLabel release];
+    [BackgroundColorLabel release];
+    [ConfigureNetworkLabel release];
+    [ScanActivityIndicator release];
+    [wifiNameTable release];
+    [super dealloc];
+}
+
+- (void)viewDidUnload
+{
+    [self setConfigTitle:nil];
+    [self setConfigAppLabel:nil];
+    [self setBackgroundColorLabel:nil];
+    [self setConfigureNetworkLabel:nil];
+    [self setScanActivityIndicator:nil];
+    [self setWifiNameTable:nil];
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
+}
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-#if 0    
-    if (self) {
-        // Custom initialization
-        [self setUIColors];
-    }
-#endif
     return self;
 }
 
@@ -41,6 +59,10 @@
 {
     [super viewDidLoad];
     [ConfigTitle setText:[@"Configure " stringByAppendingString:switchName]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_updated:) name:@"wifi_list_was_updated" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_complete:) name:@"wifi_list_complete" object:nil];
+    [appDelegate performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
+    [ScanActivityIndicator startAnimating];
 #if 0
     [self setUIColors];
     // Require the user to prove that configuration is intentional
@@ -71,30 +93,58 @@
     [self dismissModalViewControllerAnimated:YES];
 }
 
-- (void)viewDidUnload
-{
-    [self setConfigTitle:nil];
-    [self setConfigAppLabel:nil];
-    [self setBackgroundColorLabel:nil];
-    [self setConfigureNetworkLabel:nil];
-    [self setScanActivityIndicator:nil];
-    [super viewDidUnload];
-    // Release any retained subviews of the main view.
-    // e.g. self.myOutlet = nil;
-}
-
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
 	return YES;
 }
 
-- (void)dealloc {
-    [ConfigTitle release];
-    [ConfigAppLabel release];
-    [BackgroundColorLabel release];
-    [ConfigureNetworkLabel release];
-    [ScanActivityIndicator release];
-    [super dealloc];
+- (void) wifi_list_updated:(NSNotification *) notification {
+    [self performSelectorOnMainThread:@selector(reload_wifi_list_table) withObject:nil waitUntilDone:NO];
 }
+- (void) reload_wifi_list_table {
+    [[appDelegate wifiDataLock] lock];
+    [wifiNameTable reloadData];
+#if 0
+    if(CFDictionaryGetCount([appDelegate switchNameDictionary])) {
+        [SwitchStatusText setText:@"Choose A Switch"];
+        [SwitchStatusActivity stopAnimating];
+    } else {
+        [SwitchStatusText setText:@"Searching For Controllers"];
+        [SwitchStatusActivity startAnimating];
+    }
+#endif
+    [[appDelegate wifiDataLock] unlock];
+}
+- (void) wifi_list_complete:(NSNotification *) notification {
+    [self performSelectorOnMainThread:@selector(wifi_list_complete_main) withObject:nil waitUntilDone:NO];
+}
+- (void) wifi_list_complete_main {
+    [ScanActivityIndicator stopAnimating];
+    [ScanActivityIndicator setHidesWhenStopped:YES];
+    [ConfigureNetworkLabel setText:@"Choose a Network Below to Move Switchamajig to a New Network"];
+}
+
+// Code to support table displaying the names of the switches discovered during detect
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return CFDictionaryGetCount([appDelegate wifiNameDictionary]);
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
+    if(cell == nil) {
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"] autorelease];
+    }
+    cell.textLabel.text = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate wifiNameArray], indexPath.row)];
+    return cell;
+}
+
+// Support for connecting to a switch when its name is selected from the table
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+}
+
 @end
