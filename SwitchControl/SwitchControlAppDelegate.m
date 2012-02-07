@@ -165,11 +165,13 @@
         CFArrayAppendValue([self switchNameArray], initialSwitchName);
         CFDictionaryAddValue([self switchNameDictionary], initialSwitchName, initialIP);
         [[self switchDataLock] unlock];
-        [self connect_to_switch:0 protocol:switch_control_protocol retries:0 showMessagesOnError:NO];
+        [self connect_to_switch:0 protocol:switch_control_protocol_normal retries:0 showMessagesOnError:NO];
     }
     if([self active_switch_index] < 0) {
         CFDictionaryRemoveAllValues([self switchNameDictionary]);
         CFArrayRemoveAllValues([self switchNameArray]);
+    } else {
+        [self sendSwitchState];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
 
@@ -353,21 +355,21 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     packet[3] = (switch_state >> 4) & 0x0f;
     int retries = 1;
     int retval;
-    if(switch_control_protocol == IPPROTO_TCP) {
+    if(switch_connection_protocol == IPPROTO_TCP) {
         do {
             retval = send([self switch_socket], packet, sizeof(packet), 0);
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex protocol:switch_control_protocol retries:5 showMessagesOnError:NO];
+                [self connect_to_switch:switchIndex protocol:switch_connection_protocol retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for sendSwitchState (tcp)");
             }
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
         } while((retval <= 0) && (retries--));
     }
-    if(switch_control_protocol == IPPROTO_UDP) {
+    if(switch_connection_protocol == IPPROTO_UDP) {
         do {
             retval = sendto([self switch_socket], packet, sizeof(packet), 0, (struct sockaddr*) &udp_socket_address, sizeof(udp_socket_address));
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex protocol:switch_control_protocol retries:5 showMessagesOnError:NO];
+                [self connect_to_switch:switchIndex protocol:switch_connection_protocol retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for sendSwitchState (udp)");
             }
         } while((retval <= 0) && (retries--));
@@ -561,7 +563,6 @@ int portno = 2000;
     [self setActive_switch_index:switchIndex];
     // Turn off all switches
     switch_state = 0;
-    [self sendSwitchState];
 
     // Write the switch name and hostname to a temporary file
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -569,6 +570,7 @@ int portno = 2000;
     NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
     NSString *twoNames = [switchName stringByAppendingFormat:@":%@", ipAddr];
     [twoNames writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:nil];
+    switch_connection_protocol = protocol;
     return;
 }
 
@@ -577,15 +579,55 @@ int portno = 2000;
     [[self wifiDataLock] lock];
     CFDictionaryRemoveAllValues([self wifiNameDictionary]);    
     CFArrayRemoveAllValues([self wifiNameArray]);
+    [[self wifiDataLock] unlock];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
+   
+    // Open TCP socket
+    [self connect_to_switch:[self active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
+    if(![self switch_socket]) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                          message:@"Can't open connection to Switchamajig Controller."  
+                                                         delegate:nil  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+        return;
+    }
+    if(!switchamajig1_enter_command_mode([self switch_socket])) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                          message:@"Unable to communicate with Switchamajig Controller (cmd mode)."  
+                                                         delegate:nil  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+        return;
+    }
+    usleep(500000);
+    if(!switchamajig1_scan_wifi([self switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                          message:@"Unable to communicate with Switchamajig Controller (scan)."  
+                                                         delegate:nil  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+        return;
+    }
+    [[self wifiDataLock] lock];
     CFArrayAppendValue([self wifiNameArray], @"Manually Enter Network");
-    NSNumber *networkChannelNumber = [NSNumber numberWithInt:0];
-    CFDictionaryAddValue([self wifiNameDictionary], (NSString *) CFArrayGetValueAtIndex([self wifiNameArray], 0), networkChannelNumber);
+    NSNumber *ManualEntryIndex = [NSNumber numberWithInt:-1];
+    CFDictionaryAddValue([self wifiNameDictionary], (NSString *) CFArrayGetValueAtIndex([self wifiNameArray], 0), ManualEntryIndex);
+    for(int i=0; i < num_avail_wifi; ++i) {
+        NSString *networkName = [NSString stringWithCString:availableNetworks[i].ssid encoding:NSUTF8StringEncoding];
+        CFArrayAppendValue([self wifiNameArray], networkName);
+        NSNumber *wifiNetIndex = [NSNumber numberWithInt:i];
+        CFDictionaryAddValue([self wifiNameDictionary], networkName, wifiNetIndex);
+    }
     [[self wifiDataLock] unlock];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_complete" object:nil];
-    
-    // Open TCP socket
-    [self connect_to_switch:[self active_switch_index] protocol:switch_control_protocol retries:5 showMessagesOnError:NO];
     
 }
 

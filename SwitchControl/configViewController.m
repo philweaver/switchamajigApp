@@ -105,15 +105,13 @@
 - (void) reload_wifi_list_table {
     [[appDelegate wifiDataLock] lock];
     [wifiNameTable reloadData];
-#if 0
-    if(CFDictionaryGetCount([appDelegate switchNameDictionary])) {
-        [SwitchStatusText setText:@"Choose A Switch"];
-        [SwitchStatusActivity stopAnimating];
+    if(CFArrayGetCount([appDelegate wifiNameArray])) {
+        [ConfigureNetworkLabel setText:@"Choose A Network"];
+        [ScanActivityIndicator stopAnimating];
     } else {
-        [SwitchStatusText setText:@"Searching For Controllers"];
-        [SwitchStatusActivity startAnimating];
+        [ConfigureNetworkLabel setText:@"Searching For WiFi Networks"];
+        [ScanActivityIndicator startAnimating];
     }
-#endif
     [[appDelegate wifiDataLock] unlock];
 }
 - (void) wifi_list_complete:(NSNotification *) notification {
@@ -131,7 +129,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return CFDictionaryGetCount([appDelegate wifiNameDictionary]);
+    return CFArrayGetCount([appDelegate wifiNameArray]);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
