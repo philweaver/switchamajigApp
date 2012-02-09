@@ -48,6 +48,9 @@
     [[[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:0] sendActionsForControlEvents:UIControlEventTouchUpInside];
     switchPanelViewController *panel = (switchPanelViewController *) [nav_controller visibleViewController];
     STAssertTrue([panel isKindOfClass:[switchPanelViewController class]], @"Switch panel did not display");
+    // Make sure panel loads a view
+    UIView *panelView = [panel view];
+    panelView = panelView;
     // Check that the back button exists
     STAssertFalse([panel->backButton isEnabled], @"Back button is enabled in switch panel");
     [panel->allowNavButton sendActionsForControlEvents:UIControlEventTouchUpInside];
