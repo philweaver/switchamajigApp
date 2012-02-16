@@ -23,9 +23,6 @@
 @synthesize switch_socket = _switch_socket;
 @synthesize backgroundColor = _backgroundColor;
 @synthesize foregroundColor = _foregroundColor;
-@synthesize wifiDataLock = _wifiDataLock;
-@synthesize wifiNameArray = _wifiNameArray;
-@synthesize wifiNameDictionary = _wifiNameDictionary;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -60,9 +57,6 @@
     switch_state = 0;
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     [self setSwitchStateLock:[[NSLock alloc] init]];
-    [self setWifiDataLock:[[NSLock alloc] init]];
-    [self setWifiNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
-    [self setWifiNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
 
     return YES;
 }
@@ -118,9 +112,6 @@
     [_foregroundColor release];
     CFRelease([self switchNameDictionary]);
     CFRelease([self switchNameArray]);
-    [_wifiDataLock release];
-    CFRelease([self wifiNameDictionary]);
-    CFRelease([self wifiNameArray]);
     [super dealloc];
 }
 
@@ -168,8 +159,10 @@
         [self connect_to_switch:0 protocol:switch_control_protocol_normal retries:0 showMessagesOnError:NO];
     }
     if([self active_switch_index] < 0) {
+        [[self switchDataLock] lock];
         CFDictionaryRemoveAllValues([self switchNameDictionary]);
         CFArrayRemoveAllValues([self switchNameArray]);
+        [[self switchDataLock] unlock];
     } else {
         [self sendSwitchState];
     }
@@ -493,6 +486,7 @@ int portno = 2000;
                 continue;
             }
             close(server_socket);
+            server_socket = 0;
             if(showMessagesOnError) {
                 UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
                                                                   message:@"Hostname not found."  
@@ -520,6 +514,7 @@ int portno = 2000;
             int poll_ret = poll(&socket_poll, 1, 1000);
             if(poll_ret <= 0) {
                 close(server_socket);
+                server_socket = 0;
                 if(retries >= 0) {
                     NSLog(@"Retrying socket connect");
                     continue;
@@ -572,63 +567,6 @@ int portno = 2000;
     [twoNames writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:nil];
     switch_connection_protocol = protocol;
     return;
-}
-
-// Provide options for walking in 
-- (void)Background_Thread_To_Detect_Wifi {
-    [[self wifiDataLock] lock];
-    CFDictionaryRemoveAllValues([self wifiNameDictionary]);    
-    CFArrayRemoveAllValues([self wifiNameArray]);
-    [[self wifiDataLock] unlock];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
-   
-    // Open TCP socket
-    [self connect_to_switch:[self active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
-    if(![self switch_socket]) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                          message:@"Can't open connection to Switchamajig Controller."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];
-        [message show];  
-        [message release];
-        return;
-    }
-    if(!switchamajig1_enter_command_mode([self switch_socket])) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                          message:@"Unable to communicate with Switchamajig Controller (cmd mode)."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];
-        [message show];  
-        [message release];
-        return;
-    }
-    usleep(500000);
-    if(!switchamajig1_scan_wifi([self switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                          message:@"Unable to communicate with Switchamajig Controller (scan)."  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];
-        [message show];  
-        [message release];
-        return;
-    }
-    [[self wifiDataLock] lock];
-    CFArrayAppendValue([self wifiNameArray], @"Manually Enter Network");
-    NSNumber *ManualEntryIndex = [NSNumber numberWithInt:-1];
-    CFDictionaryAddValue([self wifiNameDictionary], (NSString *) CFArrayGetValueAtIndex([self wifiNameArray], 0), ManualEntryIndex);
-    for(int i=0; i < num_avail_wifi; ++i) {
-        NSString *networkName = [NSString stringWithCString:availableNetworks[i].ssid encoding:NSUTF8StringEncoding];
-        CFArrayAppendValue([self wifiNameArray], networkName);
-        NSNumber *wifiNetIndex = [NSNumber numberWithInt:i];
-        CFDictionaryAddValue([self wifiNameDictionary], networkName, wifiNetIndex);
-    }
-    [[self wifiDataLock] unlock];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_complete" object:nil];
-    
 }
 
 @end

@@ -15,6 +15,10 @@
 @synthesize ConfigureNetworkLabel;
 @synthesize ScanActivityIndicator;
 @synthesize wifiNameTable;
+@synthesize wifiDataLock = _wifiDataLock;
+@synthesize wifiNameArray = _wifiNameArray;
+@synthesize CancelButton;
+@synthesize wifiNameDictionary = _wifiNameDictionary;
 
 - (void)dealloc {
     [ConfigTitle release];
@@ -23,6 +27,7 @@
     [ConfigureNetworkLabel release];
     [ScanActivityIndicator release];
     [wifiNameTable release];
+    [CancelButton release];
     [super dealloc];
 }
 
@@ -34,6 +39,11 @@
     [self setConfigureNetworkLabel:nil];
     [self setScanActivityIndicator:nil];
     [self setWifiNameTable:nil];
+    [_wifiDataLock release];
+    CFRelease([self wifiNameDictionary]);
+    CFRelease([self wifiNameArray]);
+
+    [self setCancelButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -58,38 +68,95 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    nowEnteringPassphrase = NO;
+    nowConfirmingConfig = NO;
+    [self setWifiDataLock:[[NSLock alloc] init]];
+    [self setWifiNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
+    [self setWifiNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
+
     [ConfigTitle setText:[@"Configure " stringByAppendingString:switchName]];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_updated:) name:@"wifi_list_was_updated" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_complete:) name:@"wifi_list_complete" object:nil];
-    [appDelegate performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
+    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
     [ScanActivityIndicator startAnimating];
-#if 0
-    [self setUIColors];
-    // Require the user to prove that configuration is intentional
-    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Confirm Config"  
-                                                      message:@"To prevent unintentional configuring, please type \'yes\' below to continue."  
-                                                     delegate:self  
-                                            cancelButtonTitle:@"Cancel"  
-                                            otherButtonTitles:@"Continue",nil];
-    [message setAlertViewStyle:UIAlertViewStylePlainTextInput];
-    [message show];  
-    [message release];
-#endif
 }
+
 - (void)alertView:(UIAlertView *) alertView didDismissWithButtonIndex:(NSInteger) buttonIndex
 {
+    // Button index 0 is always cancel
     if(buttonIndex == 0) {
-        [self.navigationController popViewControllerAnimated:YES];
+        nowEnteringPassphrase = NO;
+        nowConfirmingConfig = NO;
+        return;
+    }
+    if(nowEnteringPassphrase) {
+        // Save away passphrase
+        strncpy(availableNetworks[networkIndex].passphrase, [[[alertView textFieldAtIndex:0] text] cStringUsingEncoding:NSUTF8StringEncoding], sizeof(availableNetworks[networkIndex].passphrase));
+        // Require the user to prove that configuration is intentional
+        NSString *passphraseRequest = @"Selecting network ";
+        NSString *messageText = [passphraseRequest stringByAppendingString:networkName];
+        nowEnteringPassphrase = NO;
+        nowConfirmingConfig = YES;
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:messageText  
+                                                          message:@"Controller will now attempt to move from its current network to the new one. If it fails, it will set up a \'Switchamajig\' network. The iPad must be on the same network in order to communicate with the Controller. Please type \'yes\' below to continue."  
+                                                         delegate:self  
+                                                cancelButtonTitle:@"Cancel"  
+                                                otherButtonTitles:@"Continue",nil];
+        [message setAlertViewStyle:UIAlertViewStylePlainTextInput];
+        [message show];  
+        [message release];
+        return;
+    }
+    if(nowConfirmingConfig) {
+        bool status = switchamajig1_set_netinfo([appDelegate switch_socket], &availableNetworks[networkIndex]);
+        if(status)
+            status = switchamajig1_save([appDelegate switch_socket]);
+        if(status)
+            status = switchamajig1_exit_command_mode([appDelegate switch_socket]);
+        if(status)
+            status = switchamajig1_write_eeprom([appDelegate switch_socket], 0, 0);
+        if(status)
+            status = switchamajig1_reset([appDelegate switch_socket]);
+
+        if(!status) {
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                              message:@"Failed to set new network name."  
+                                                             delegate:self  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];
+            [message show];  
+            [message release];
+        }
+        nowConfirmingConfig = NO;
     }
 }
+
+// Only disable continue button when confirming that configuration is intentional
 - (BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
-    NSString *configEnableText = [[alertView textFieldAtIndex:0] text];
-    if([configEnableText length] && [configEnableText caseInsensitiveCompare:@"yes"] == NSOrderedSame) {
-        return YES;
+    if(nowConfirmingConfig) {
+        NSString *configEnableText = [[alertView textFieldAtIndex:0] text];
+        if([configEnableText length] && [configEnableText caseInsensitiveCompare:@"yes"] == NSOrderedSame) {
+            return YES;
+        }
+        return NO;
     }
-    return NO;
+    return YES;
 }
+
+// As much done as cancel
 - (IBAction)Cancel:(id)sender {
+    // We may have changed the name or network settings of this device, so close our connection to it and
+    // clear our information about switches from our dictionary
+    [[appDelegate switchDataLock] lock];
+    CFDictionaryRemoveAllValues([appDelegate switchNameDictionary]);
+    CFArrayRemoveAllValues([appDelegate switchNameArray]);
+    [appDelegate setActive_switch_index:-1];
+    if([appDelegate switch_socket]) {
+        close([appDelegate switch_socket]);
+        [appDelegate setSwitch_socket:0];
+    }
+    [[appDelegate switchDataLock] unlock];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -103,16 +170,16 @@
     [self performSelectorOnMainThread:@selector(reload_wifi_list_table) withObject:nil waitUntilDone:NO];
 }
 - (void) reload_wifi_list_table {
-    [[appDelegate wifiDataLock] lock];
+    [[self wifiDataLock] lock];
     [wifiNameTable reloadData];
-    if(CFArrayGetCount([appDelegate wifiNameArray])) {
+    if(CFArrayGetCount([self wifiNameArray])) {
         [ConfigureNetworkLabel setText:@"Choose A Network"];
         [ScanActivityIndicator stopAnimating];
     } else {
         [ConfigureNetworkLabel setText:@"Searching For WiFi Networks"];
         [ScanActivityIndicator startAnimating];
     }
-    [[appDelegate wifiDataLock] unlock];
+    [[self wifiDataLock] unlock];
 }
 - (void) wifi_list_complete:(NSNotification *) notification {
     [self performSelectorOnMainThread:@selector(wifi_list_complete_main) withObject:nil waitUntilDone:NO];
@@ -129,7 +196,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return CFArrayGetCount([appDelegate wifiNameArray]);
+    return CFArrayGetCount([self wifiNameArray]);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -137,12 +204,116 @@
     if(cell == nil) {
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"] autorelease];
     }
-    cell.textLabel.text = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate wifiNameArray], indexPath.row)];
+    cell.textLabel.text = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([self wifiNameArray], indexPath.row)];
     return cell;
 }
 
 // Support for connecting to a switch when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [[self wifiDataLock] lock];
+    networkName = (NSString*)CFArrayGetValueAtIndex([self wifiNameArray], indexPath.row);
+    NSNumber *wifiIndex;
+    if(!CFDictionaryGetValueIfPresent([self wifiNameDictionary], networkName, (const void **) &wifiIndex)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        [[self wifiDataLock] unlock];
+        return;
+    }
+    [[self wifiDataLock] unlock];
+    // Range-check networkIndex
+    networkIndex = [wifiIndex intValue];
+    if((networkIndex < 0) || (networkIndex >= num_avail_wifi)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"App error!"  
+                                                          message:@"NetworkIndex out of range (code bug)."  
+                                                         delegate:[[self navigationController] visibleViewController]  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+        return;
+    }
+    // Handle standard selection
+    NSString *passphraseRequest = @"Please enter the network passphrase (if any) for network ";
+    NSString *messageText = [passphraseRequest stringByAppendingString:networkName];
+
+    if(networkIndex >= 0) {
+        nowEnteringPassphrase = YES;
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Passphrase"  
+                                                          message:messageText  
+                                                         delegate:self  
+                                                cancelButtonTitle:@"Cancel"  
+                                                otherButtonTitles:@"Continue",nil];
+        [message setAlertViewStyle:UIAlertViewStyleSecureTextInput];
+        [message show];  
+        [message release];
+    }
+}
+
+// Provide options for walking in 
+- (void)Background_Thread_To_Detect_Wifi {
+    [[self CancelButton] setEnabled:NO];
+    [[self wifiDataLock] lock];
+    CFDictionaryRemoveAllValues([self wifiNameDictionary]);    
+    CFArrayRemoveAllValues([self wifiNameArray]);
+    [[self wifiDataLock] unlock];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
+    
+    // Open TCP socket
+    //[appDelegate connect_to_switch:[appDelegate active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
+    if(![appDelegate switch_socket]) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                          message:@"Can't open connection to Switchamajig Controller."  
+                                                         delegate:self  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+        return;
+    }
+    sleep(2);
+    if(!switchamajig1_enter_command_mode([appDelegate switch_socket])) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                          message:@"Unable to communicate with Switchamajig Controller (cmd mode)."  
+                                                         delegate:self  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+        [[self CancelButton] setEnabled:YES];  
+        return;
+    }
+    sleep(2);
+    if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                          message:@"Unable to communicate with Switchamajig Controller (scan)."  
+                                                         delegate:self  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+        [[self CancelButton] setEnabled:YES];  
+        return;
+    }
+    [[self wifiDataLock] lock];
+    // Not supporting manually entering networks
+    //CFArrayAppendValue([self wifiNameArray], @"Manually Enter Network");
+    //NSNumber *ManualEntryIndex = [NSNumber numberWithInt:-1];
+    //CFDictionaryAddValue([self wifiNameDictionary], (NSString *) CFArrayGetValueAtIndex([self wifiNameArray], 0), ManualEntryIndex);
+    for(int i=0; i < num_avail_wifi; ++i) {
+        NSString *networkName1 = [NSString stringWithCString:availableNetworks[i].ssid encoding:NSUTF8StringEncoding];
+        CFArrayAppendValue([self wifiNameArray], networkName1);
+        NSNumber *wifiNetIndex = [NSNumber numberWithInt:i];
+        CFDictionaryAddValue([self wifiNameDictionary], networkName1, wifiNetIndex);
+    }
+    [[self wifiDataLock] unlock];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_complete" object:nil];
+    [[self CancelButton] setEnabled:YES];  
+}
+
+// Select a new switch name
+- (IBAction)ChangeName:(id)sender {
 }
 
 @end

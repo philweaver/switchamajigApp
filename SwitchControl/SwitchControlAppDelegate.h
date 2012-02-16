@@ -15,21 +15,17 @@
 #import "sys/poll.h"
 #import "arpa/inet.h"
 #import "errno.h"
-#import "socket_switchamajig1_cfg.hpp"
 
-#define switch_control_protocol_normal IPPROTO_UDP
+#define switch_control_protocol_normal IPPROTO_TCP
 
 
 @class singleSwitchView;
 @class twoSwitchView;
 @class rootSwitchViewController;
-#define MAX_AVAIL_NETWORKS 20
 
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate> {
     int switch_state;
     struct sockaddr_in udp_socket_address;
-    int num_avail_wifi; 
-    struct switchamajig1_network_info availableNetworks[MAX_AVAIL_NETWORKS];
     int switch_connection_protocol;
 }
 - (void)Background_Thread_To_Detect_Switches;
@@ -39,7 +35,6 @@
 - (void)SequenceThroughSwitches:(id)switchSequence;
 - (void)sendSwitchState;
 - (void)display_battery_warning:(NSString *)text;
-- (void)Background_Thread_To_Detect_Wifi;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchDataLock;
@@ -51,10 +46,6 @@
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
 
-// Information for WiFi network detection
-@property (retain) NSLock *wifiDataLock;
-@property (nonatomic) CFMutableDictionaryRef wifiNameDictionary;
-@property (nonatomic) CFMutableArrayRef wifiNameArray;
 
 
 @end

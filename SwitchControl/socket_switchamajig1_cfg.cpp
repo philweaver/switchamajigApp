@@ -33,8 +33,10 @@ bool write_string_and_expect_response(SWITCHAMAJIG1_HANDLE hSerial, const char *
 bool set_timeouts(SWITCHAMAJIG1_HANDLE hSerial, int timeout);
 bool get_tag_after_sending_string(SWITCHAMAJIG1_HANDLE hSerial, const char *stringToSend, const char *tag, char *stringRead, int max_str_len);
 
-static int timeout = 500000;
-static bool debug = false;
+// 5 seconds
+#define DEFAULT_TIMEOUT 5000000
+static int timeout = DEFAULT_TIMEOUT;
+static bool debug = true;
 
 int read_until_timeout(int socket, char *buffer, int bufflen) {
 	int bufflen_start = bufflen;
@@ -98,7 +100,7 @@ bool write_string_and_expect_response(SWITCHAMAJIG1_HANDLE socket, const char *s
 }
 
 bool set_default_timeouts(SWITCHAMAJIG1_HANDLE hSerial) {
-    timeout = 500000;
+    timeout = DEFAULT_TIMEOUT; 
 	return true;
 }
 
@@ -183,7 +185,7 @@ bool switchamajig1_reset(SWITCHAMAJIG1_HANDLE hSerial) {
 bool switchamajig1_enter_command_mode(SWITCHAMAJIG1_HANDLE hSerial) {
 	char recv_buffer[1024];
 	int bytes;
-	if(write(hSerial, "$$$\r\n", 5) < 0) {
+	if(write(hSerial, "$$$\r", 4) < 0) {
 		if(debug)
 			perror("enter_command_mode: Write File error");
 		return false;
@@ -320,20 +322,27 @@ bool get_channel(SWITCHAMAJIG1_HANDLE hSerial, int *channel) {
 		return false;
 	return true;
 }
-
+#define MIN_LEN_FOR_SCAN 30
 bool switchamajig1_scan_wifi(SWITCHAMAJIG1_HANDLE hSerial, int *pNum_wifi_scan_results, struct switchamajig1_network_info *wifi_scan_results_array, int max_array_length) {
-	set_timeouts(hSerial, 8000000); // 8 seconds
+	set_timeouts(hSerial, 60000000); // 60 seconds
 	int bytes;
     
-	if(write(hSerial, "scan\r\n", 5) < 0) {
+	if(write(hSerial, "scan\r\n\0", 6) < 0) {
 		debug_printf("switchamajig1_scan_wifi: Write File error on scan.\n");
 		return false;
 	}
 	char recv_buffer[4096];
-	bytes = read_until_timeout(hSerial, recv_buffer, sizeof(recv_buffer));
+    // Do one wait with a long timeout for enough bytes to make sure we get a response
+	bytes = read_until_timeout(hSerial, recv_buffer, MIN_LEN_FOR_SCAN);
+    set_default_timeouts(hSerial);
 	debug_printf("switchamajig1_scan_wifi: %d bytes received\n", bytes);
 	if(bytes <= 0)
 		return false;
+    // Read the rest with a short timeout
+    int bytes2 = read_until_timeout(hSerial, recv_buffer + bytes, sizeof(recv_buffer)-bytes);
+    if(bytes2 < 0)
+        return false;
+    bytes += bytes2;
 	recv_buffer[bytes] = 0;
 	debug_printf("switchamajig1_scan_wifi: Received %s\n", recv_buffer);
 	if(!set_default_timeouts(hSerial)){
@@ -379,6 +388,7 @@ bool switchamajig1_scan_wifi(SWITCHAMAJIG1_HANDLE hSerial, int *pNum_wifi_scan_r
 
 bool switchamajig1_set_netinfo(SWITCHAMAJIG1_HANDLE hSerial, struct switchamajig1_network_info *netinfo) {
 	char command[256];
+	set_timeouts(hSerial, 5000000); // 5 seconds
 	if(!write_string_and_expect_response(hSerial, "set ip dhcp 1\r", "AOK")) {
 		debug_printf("switchamajig1_set_netinfo: set dhcp failed.\n");
 		return false;
@@ -389,7 +399,7 @@ bool switchamajig1_set_netinfo(SWITCHAMAJIG1_HANDLE hSerial, struct switchamajig
 	}
 	sprintf(command, "set wlan ssid %s\r", netinfo->ssid);
 	if(!write_string_and_expect_response(hSerial, command, "AOK")) {
-		debug_printf("switchamajig1_set_netinfo: set wlan failed.\n");
+		debug_printf("switchamajig1_set_netinfo: set ssid failed.\n");
 		return false;
 	}
 	sprintf(command, "set wlan chan %d\r", netinfo->channel);
