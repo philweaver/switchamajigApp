@@ -30,6 +30,7 @@
 @property (nonatomic, retain) IBOutlet UILabel *SwitchStatusText;
 @property (nonatomic, retain) IBOutlet UIActivityIndicatorView *SwitchStatusActivity;
 - (IBAction)bgColorSegControlIndexChanged:(id) sender;
+@property (retain, nonatomic) IBOutlet UILabel *bgColorLabel;
 @property (retain, nonatomic) IBOutlet UISegmentedControl *bgColorSegControl;
 
 @end

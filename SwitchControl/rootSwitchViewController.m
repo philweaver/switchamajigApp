@@ -13,6 +13,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
+@synthesize bgColorLabel;
 @synthesize bgColorSegControl;
 @synthesize helpButton;
 @synthesize panelSelectionScrollView;
@@ -30,6 +31,7 @@
     [SwitchStatusActivity release];
     [helpButton release];
     [bgColorSegControl release];
+    [bgColorLabel release];
     [super dealloc];
 }
 
@@ -61,6 +63,9 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 
+    // Make background color selector disappear
+    [bgColorLabel setHidden:YES];
+    [bgColorSegControl setHidden:YES];
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
@@ -134,6 +139,7 @@
     [self setSwitchStatusActivity:nil];
     [self setHelpButton:nil];
     [self setBgColorSegControl:nil];
+    [self setBgColorLabel:nil];
     [super viewDidUnload];
     CFRelease(switchPanelURLDictionary);
 
