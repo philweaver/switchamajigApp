@@ -16,6 +16,7 @@
     UILabel *SwitchStatusText;
     UIActivityIndicatorView *SwitchStatusActivity;
     UIButton *helpButton;
+    BOOL isConfigAvailable;
 }
 - (void) switch_names_updated:(NSNotification *) notification;
 - (void) reload_switch_name_table;

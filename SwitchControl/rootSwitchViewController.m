@@ -66,6 +66,8 @@
     // Make background color selector disappear
     [bgColorLabel setHidden:YES];
     [bgColorSegControl setHidden:YES];
+    // Determine if we will enable config - need flexible alert views
+    isConfigAvailable = [UIAlertView instancesRespondToSelector:@selector(setAlertViewStyle:)];
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
@@ -247,13 +249,15 @@
     cell.textLabel.text = switchName;
     if(indexPath.row == [appDelegate active_switch_index]) {
         cell.detailTextLabel.text = @"Connected";
-        UIButton *configButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        configButton.frame = CGRectMake(0.0, 0.0, 60, 44);
-        [configButton setTitle:[NSString stringWithCString:"Config" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-        [configButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-        [configButton addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside];
-        [configButton setEnabled:YES];
-        cell.accessoryView = configButton;
+        if(isConfigAvailable) {
+            UIButton *configButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            configButton.frame = CGRectMake(0.0, 0.0, 60, 44);
+            [configButton setTitle:[NSString stringWithCString:"Config" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+            [configButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+            [configButton addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside];
+            [configButton setEnabled:YES];
+            cell.accessoryView = configButton;
+        }
     }
     else {
         cell.detailTextLabel.text = @"";
