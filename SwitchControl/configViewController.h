@@ -12,7 +12,7 @@
 
 #define MAX_AVAIL_NETWORKS 20
 
-@interface configViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
+@interface configViewController : UIViewController <UITableViewDataSource, UITableViewDelegate,UIPickerViewDataSource, UIPickerViewDelegate> {
 @public
     SwitchControlAppDelegate *appDelegate;
     NSString *switchName;
@@ -32,10 +32,14 @@
 - (void) wifi_list_complete_main;
 - (void)Background_Thread_To_Detect_Wifi;
 - (IBAction)ChangeName:(id)sender;
+- (IBAction)ChangeNetwork:(id)sender;
+- (IBAction)NetworkNameChanged:(id)sender;
 
-@property (retain, nonatomic) IBOutlet UILabel *ConfigTitle;
-@property (retain, nonatomic) IBOutlet UILabel *ConfigAppLabel;
-@property (retain, nonatomic) IBOutlet UILabel *BackgroundColorLabel;
+// Picker support
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)thePickerView;
+- (NSInteger)pickerView:(UIPickerView *)thePickerView numberOfRowsInComponent:(NSInteger)component;
+- (NSString *)pickerView:(UIPickerView *)thePickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component;
+
 @property (retain, nonatomic) IBOutlet UILabel *ConfigureNetworkLabel;
 @property (retain, nonatomic) IBOutlet UIActivityIndicatorView *ScanActivityIndicator;
 @property (retain, nonatomic) IBOutlet UITableView *wifiNameTable;
@@ -44,5 +48,9 @@
 @property (nonatomic) CFMutableDictionaryRef wifiNameDictionary;
 @property (nonatomic) CFMutableArrayRef wifiNameArray;
 @property (retain, nonatomic) IBOutlet UIButton *CancelButton;
+@property (retain, nonatomic) IBOutlet UIPickerView *datePicker;
+@property (retain, nonatomic) IBOutlet UITextField *SwitchamajigNameText;
+@property (retain, nonatomic) IBOutlet UITextField *NetworkNameText;
+@property (retain, nonatomic) IBOutlet UIButton *ConfigureNetworkButton;
 
 @end

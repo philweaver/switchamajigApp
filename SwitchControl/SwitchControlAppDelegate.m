@@ -21,6 +21,7 @@
 @synthesize switchNameArray = _switchNameArray;
 @synthesize active_switch_index = _active_switch_index;
 @synthesize switch_socket = _switch_socket;
+@synthesize switch_connection_protocol = _switch_connection_protocol;
 @synthesize backgroundColor = _backgroundColor;
 @synthesize foregroundColor = _foregroundColor;
 
@@ -348,21 +349,21 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     packet[3] = (switch_state >> 4) & 0x0f;
     int retries = 1;
     int retval;
-    if(switch_connection_protocol == IPPROTO_TCP) {
+    if([self switch_connection_protocol] == IPPROTO_TCP) {
         do {
             retval = send([self switch_socket], packet, sizeof(packet), 0);
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex protocol:switch_connection_protocol retries:5 showMessagesOnError:NO];
+                [self connect_to_switch:switchIndex protocol:[self switch_connection_protocol] retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for sendSwitchState (tcp)");
             }
             verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
         } while((retval <= 0) && (retries--));
     }
-    if(switch_connection_protocol == IPPROTO_UDP) {
+    if([self switch_connection_protocol] == IPPROTO_UDP) {
         do {
             retval = sendto([self switch_socket], packet, sizeof(packet), 0, (struct sockaddr*) &udp_socket_address, sizeof(udp_socket_address));
             if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex protocol:switch_connection_protocol retries:5 showMessagesOnError:NO];
+                [self connect_to_switch:switchIndex protocol:[self switch_connection_protocol] retries:5 showMessagesOnError:NO];
                 NSLog(@"Retrying write for sendSwitchState (udp)");
             }
         } while((retval <= 0) && (retries--));
@@ -565,7 +566,7 @@ int portno = 2000;
     NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
     NSString *twoNames = [switchName stringByAppendingFormat:@":%@", ipAddr];
     [twoNames writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:nil];
-    switch_connection_protocol = protocol;
+    [self setSwitch_connection_protocol:protocol];
     return;
 }
 

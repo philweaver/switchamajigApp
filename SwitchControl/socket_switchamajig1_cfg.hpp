@@ -40,7 +40,7 @@ bool switchamajig1_scan_wifi(SWITCHAMAJIG1_HANDLE switchamajig_handle, int *pNum
 bool switchamajig1_enter_command_mode(SWITCHAMAJIG1_HANDLE switchamajig_handle);
 bool switchamajig1_exit_command_mode(SWITCHAMAJIG1_HANDLE switchamajig_handle);
 bool switchamajig1_get_name(SWITCHAMAJIG1_HANDLE switchamajig_handle, char *switchamajig_name, int switchamajig_name_max_len);
-bool switchamajig1_set_name(SWITCHAMAJIG1_HANDLE switchamajig_handle, char *name);
+bool switchamajig1_set_name(SWITCHAMAJIG1_HANDLE switchamajig_handle, const char *name);
 bool switchamajig1_get_netinfo(SWITCHAMAJIG1_HANDLE switchamajig_handle, struct switchamajig1_network_info *netinfo);
 bool switchamajig1_set_netinfo(SWITCHAMAJIG1_HANDLE switchamajig_handle, struct switchamajig1_network_info *netinfo);
 bool switchamajig1_save(SWITCHAMAJIG1_HANDLE switchamajig_handle);

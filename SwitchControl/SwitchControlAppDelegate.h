@@ -26,7 +26,6 @@
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate> {
     int switch_state;
     struct sockaddr_in udp_socket_address;
-    int switch_connection_protocol;
 }
 - (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(NSObject *)switches;
@@ -43,6 +42,7 @@
 @property (nonatomic) CFMutableArrayRef switchNameArray;
 @property (nonatomic) int active_switch_index;
 @property (nonatomic) int switch_socket;
+@property (nonatomic) int switch_connection_protocol;
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
 

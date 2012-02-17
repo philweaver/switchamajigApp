@@ -110,7 +110,7 @@ bool set_timeouts(SWITCHAMAJIG1_HANDLE hSerial, int newtimeout) {
 }
 
 
-bool switchamajig1_set_name(SWITCHAMAJIG1_HANDLE hSerial, char *name) {
+bool switchamajig1_set_name(SWITCHAMAJIG1_HANDLE hSerial, const char *name) {
 	char command[DEVICE_STRING_LEN];
 	sprintf(command, "set opt device %s\r", name);
 	if(!write_string_and_expect_response(hSerial, command, "AOK")) {
@@ -182,15 +182,15 @@ bool switchamajig1_reset(SWITCHAMAJIG1_HANDLE hSerial) {
 	return true;
 }
 
-bool switchamajig1_enter_command_mode(SWITCHAMAJIG1_HANDLE hSerial) {
+bool switchamajig1_enter_command_mode(SWITCHAMAJIG1_HANDLE socket) {
 	char recv_buffer[1024];
 	int bytes;
-	if(write(hSerial, "$$$\r", 4) < 0) {
-		if(debug)
-			perror("enter_command_mode: Write File error");
-		return false;
-	}
-	bytes = read_until_timeout(hSerial, recv_buffer, sizeof(recv_buffer));
+    bytes = send(socket, "$$$\r", 4, 0);
+    if(bytes < 0) {
+        perror("enter_command_mode: send");
+        return false;
+    }
+	bytes = read_until_timeout(socket, recv_buffer, sizeof(recv_buffer));
 	if(bytes < 0) {
 		if(debug)
 			perror("enter_command_mode: Read File error");
@@ -208,7 +208,7 @@ bool switchamajig1_enter_command_mode(SWITCHAMAJIG1_HANDLE hSerial) {
 	if(!strstr(recv_buffer, "$$$"))
 		return false; // Something's gone wrong.
 	// Try to get a command prompt
-	if(!write_string_and_expect_response(hSerial, "\r", ">")) {
+	if(!write_string_and_expect_response(socket, "\r", ">")) {
 		debug_printf("enter_command_mode: No command prompt.\n");
 		return false;
 	}

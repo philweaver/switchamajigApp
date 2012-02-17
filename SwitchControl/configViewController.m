@@ -9,33 +9,32 @@
 #import "configViewController.h"
 #import "SwitchControlAppDelegate.h"
 @implementation configViewController
-@synthesize ConfigTitle;
-@synthesize ConfigAppLabel;
-@synthesize BackgroundColorLabel;
 @synthesize ConfigureNetworkLabel;
 @synthesize ScanActivityIndicator;
 @synthesize wifiNameTable;
 @synthesize wifiDataLock = _wifiDataLock;
 @synthesize wifiNameArray = _wifiNameArray;
 @synthesize CancelButton;
+@synthesize datePicker;
+@synthesize SwitchamajigNameText;
+@synthesize NetworkNameText;
+@synthesize ConfigureNetworkButton;
 @synthesize wifiNameDictionary = _wifiNameDictionary;
 
 - (void)dealloc {
-    [ConfigTitle release];
-    [ConfigAppLabel release];
-    [BackgroundColorLabel release];
     [ConfigureNetworkLabel release];
     [ScanActivityIndicator release];
     [wifiNameTable release];
     [CancelButton release];
+    [datePicker release];
+    [SwitchamajigNameText release];
+    [NetworkNameText release];
+    [ConfigureNetworkButton release];
     [super dealloc];
 }
 
 - (void)viewDidUnload
 {
-    [self setConfigTitle:nil];
-    [self setConfigAppLabel:nil];
-    [self setBackgroundColorLabel:nil];
     [self setConfigureNetworkLabel:nil];
     [self setScanActivityIndicator:nil];
     [self setWifiNameTable:nil];
@@ -44,6 +43,10 @@
     CFRelease([self wifiNameArray]);
 
     [self setCancelButton:nil];
+    [self setDatePicker:nil];
+    [self setSwitchamajigNameText:nil];
+    [self setNetworkNameText:nil];
+    [self setConfigureNetworkButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -74,11 +77,27 @@
     [self setWifiNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
     [self setWifiNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
 
-    [ConfigTitle setText:[@"Configure " stringByAppendingString:switchName]];
+    [SwitchamajigNameText setText:switchName];
+    [ConfigureNetworkButton setEnabled:NO];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_updated:) name:@"wifi_list_was_updated" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_complete:) name:@"wifi_list_complete" object:nil];
-    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
-    [ScanActivityIndicator startAnimating];
+    // Open TCP socket
+    if(![appDelegate switch_socket] || ([appDelegate switch_connection_protocol] != IPPROTO_TCP)) {
+        [appDelegate connect_to_switch:[appDelegate active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
+        if(![appDelegate switch_socket]) {
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config Error"  
+                                                              message:@"Unable to configure Switchamajig (connect)."  
+                                                             delegate:self  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];
+            [message show];  
+            [message release];
+            [self performSelectorOnMainThread:@selector(Cancel:) withObject:nil waitUntilDone:NO];
+            return;
+        }
+    }
+//    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
+//    [ScanActivityIndicator startAnimating];
 }
 
 - (void)alertView:(UIAlertView *) alertView didDismissWithButtonIndex:(NSInteger) buttonIndex
@@ -87,6 +106,7 @@
     if(buttonIndex == 0) {
         nowEnteringPassphrase = NO;
         nowConfirmingConfig = NO;
+        [self performSelectorOnMainThread:@selector(Cancel:) withObject:nil waitUntilDone:NO];
         return;
     }
     if(nowEnteringPassphrase) {
@@ -143,7 +163,6 @@
     return YES;
 }
 
-// As much done as cancel
 - (IBAction)Cancel:(id)sender {
     // We may have changed the name or network settings of this device, so close our connection to it and
     // clear our information about switches from our dictionary
@@ -252,6 +271,7 @@
 
 // Provide options for walking in 
 - (void)Background_Thread_To_Detect_Wifi {
+    NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
     [[self CancelButton] setEnabled:NO];
     [[self wifiDataLock] lock];
     CFDictionaryRemoveAllValues([self wifiNameDictionary]);    
@@ -259,40 +279,29 @@
     [[self wifiDataLock] unlock];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
     
-    // Open TCP socket
-    //[appDelegate connect_to_switch:[appDelegate active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
-    if(![appDelegate switch_socket]) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                          message:@"Can't open connection to Switchamajig Controller."  
-                                                         delegate:self  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];
-        [message show];  
-        [message release];
-        return;
-    }
-    sleep(2);
     if(!switchamajig1_enter_command_mode([appDelegate switch_socket])) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                          message:@"Unable to communicate with Switchamajig Controller (cmd mode)."  
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config Error"  
+                                                          message:@"Unable to configure Switchamajig (cmd)"  
                                                          delegate:self  
                                                 cancelButtonTitle:@"OK"  
                                                 otherButtonTitles:nil];
         [message show];  
         [message release];
         [[self CancelButton] setEnabled:YES];  
+        [mempool release];
         return;
     }
     sleep(2);
     if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                          message:@"Unable to communicate with Switchamajig Controller (scan)."  
+                                                          message:@"Find any wifi networks (scan)."  
                                                          delegate:self  
                                                 cancelButtonTitle:@"OK"  
                                                 otherButtonTitles:nil];
         [message show];  
         [message release];
         [[self CancelButton] setEnabled:YES];  
+        [mempool release];
         return;
     }
     [[self wifiDataLock] lock];
@@ -310,10 +319,57 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_complete" object:nil];
     [[self CancelButton] setEnabled:YES];  
+    [mempool release];
+    return;
 }
+
+// Picker support
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)thePickerView {
+    return 1;
+}
+#define NUM_WIFI_CHANNELS 13
+- (NSInteger)pickerView:(UIPickerView *)thePickerView numberOfRowsInComponent:(NSInteger)component {
+    return NUM_WIFI_CHANNELS;
+}
+
+- (NSString *)pickerView:(UIPickerView *)thePickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+    NSString *myString = [NSString stringWithFormat:@"%ld",(long)row+1];
+    return myString;
+}
+
 
 // Select a new switch name
 - (IBAction)ChangeName:(id)sender {
+    // Replace spaces with dollar signs
+    NSString *nameWithDollars = [[SwitchamajigNameText text] stringByReplacingOccurrencesOfString:@" " withString:@"$"];
+    const char *newName = [nameWithDollars UTF8String];
+    
+    bool status = switchamajig1_enter_command_mode([appDelegate switch_socket]);
+    if(status)
+        status = switchamajig1_set_name([appDelegate switch_socket], newName);
+    if(status)
+        status = switchamajig1_save([appDelegate switch_socket]);
+    if(!status) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Name Change Failed"  
+                                                          message:@"Failed to change name."  
+                                                         delegate:self  
+                                                cancelButtonTitle:@"OK"  
+                                                otherButtonTitles:nil];
+        [message show];  
+        [message release];
+    }
+    // Clear the last switch info file
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cacheDirectory = [paths objectAtIndex:0];
+    NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
+    [[NSFileManager defaultManager] removeItemAtPath:filename error:nil];
+    [self Cancel:nil];
+}
+
+- (IBAction)ChangeNetwork:(id)sender {
+}
+
+- (IBAction)NetworkNameChanged:(id)sender {
 }
 
 @end
