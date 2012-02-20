@@ -20,20 +20,17 @@
     struct switchamajig1_network_info availableNetworks[MAX_AVAIL_NETWORKS];
     BOOL nowEnteringPassphrase;
     BOOL nowConfirmingConfig;
-    int networkIndex;
-    NSString *networkName; // Network to be joined
 }
 - (void)alertView:(UIAlertView *) alertView didDismissWithButtonIndex:(NSInteger) buttonIndex;
 - (BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView;
 - (IBAction)Cancel:(id)sender;
 - (void) wifi_list_updated:(NSNotification *) notification;
 - (void) reload_wifi_list_table;
-- (void) wifi_list_complete:(NSNotification *) notification;
-- (void) wifi_list_complete_main;
 - (void)Background_Thread_To_Detect_Wifi;
 - (IBAction)ChangeName:(id)sender;
 - (IBAction)ChangeNetwork:(id)sender;
 - (IBAction)NetworkNameChanged:(id)sender;
+- (IBAction)ScanForNetworks:(id)sender;
 
 // Picker support
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)thePickerView;
@@ -52,5 +49,6 @@
 @property (retain, nonatomic) IBOutlet UITextField *SwitchamajigNameText;
 @property (retain, nonatomic) IBOutlet UITextField *NetworkNameText;
 @property (retain, nonatomic) IBOutlet UIButton *ConfigureNetworkButton;
+@property (retain, nonatomic) IBOutlet UIButton *ScanNetworkButton;
 
 @end

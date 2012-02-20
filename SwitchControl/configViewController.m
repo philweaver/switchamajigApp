@@ -19,6 +19,7 @@
 @synthesize SwitchamajigNameText;
 @synthesize NetworkNameText;
 @synthesize ConfigureNetworkButton;
+@synthesize ScanNetworkButton;
 @synthesize wifiNameDictionary = _wifiNameDictionary;
 
 - (void)dealloc {
@@ -30,6 +31,7 @@
     [SwitchamajigNameText release];
     [NetworkNameText release];
     [ConfigureNetworkButton release];
+    [ScanNetworkButton release];
     [super dealloc];
 }
 
@@ -47,6 +49,7 @@
     [self setSwitchamajigNameText:nil];
     [self setNetworkNameText:nil];
     [self setConfigureNetworkButton:nil];
+    [self setScanNetworkButton:nil];
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -79,8 +82,9 @@
 
     [SwitchamajigNameText setText:switchName];
     [ConfigureNetworkButton setEnabled:NO];
+    [ScanActivityIndicator stopAnimating];
+    [ScanActivityIndicator setHidesWhenStopped:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_updated:) name:@"wifi_list_was_updated" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_complete:) name:@"wifi_list_complete" object:nil];
     // Open TCP socket
     if(![appDelegate switch_socket] || ([appDelegate switch_connection_protocol] != IPPROTO_TCP)) {
         [appDelegate connect_to_switch:[appDelegate active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
@@ -96,8 +100,6 @@
             return;
         }
     }
-//    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
-//    [ScanActivityIndicator startAnimating];
 }
 
 - (void)alertView:(UIAlertView *) alertView didDismissWithButtonIndex:(NSInteger) buttonIndex
@@ -110,8 +112,18 @@
         return;
     }
     if(nowEnteringPassphrase) {
-        // Save away passphrase
-        strncpy(availableNetworks[networkIndex].passphrase, [[[alertView textFieldAtIndex:0] text] cStringUsingEncoding:NSUTF8StringEncoding], sizeof(availableNetworks[networkIndex].passphrase));
+        nowEnteringPassphrase = NO;
+        // Stuff the new network info
+        struct switchamajig1_network_info newInfo;
+        newInfo.channel = (int) [datePicker selectedRowInComponent:0] + 1;
+        NSString *nameWithDollars = [[NetworkNameText text] stringByReplacingOccurrencesOfString:@" " withString:@"$"];
+        strncpy(newInfo.ssid, [nameWithDollars UTF8String], sizeof(newInfo.ssid));
+        NSString *phraseWithDollars = [[[alertView textFieldAtIndex:0] text] stringByReplacingOccurrencesOfString:@" " withString:@"$"];
+        if(![phraseWithDollars length])
+            strncpy(newInfo.passphrase, "none", sizeof(newInfo.passphrase));
+        else
+            strncpy(newInfo.passphrase, [phraseWithDollars cStringUsingEncoding:NSUTF8StringEncoding], sizeof(newInfo.passphrase));
+#if 0
         // Require the user to prove that configuration is intentional
         NSString *passphraseRequest = @"Selecting network ";
         NSString *messageText = [passphraseRequest stringByAppendingString:networkName];
@@ -128,7 +140,11 @@
         return;
     }
     if(nowConfirmingConfig) {
-        bool status = switchamajig1_set_netinfo([appDelegate switch_socket], &availableNetworks[networkIndex]);
+        nowConfirmingConfig = NO;
+#endif
+        bool status = switchamajig1_enter_command_mode([appDelegate switch_socket]);
+        if(status)
+            status = switchamajig1_set_netinfo([appDelegate switch_socket], &newInfo);
         if(status)
             status = switchamajig1_save([appDelegate switch_socket]);
         if(status)
@@ -147,7 +163,7 @@
             [message show];  
             [message release];
         }
-        nowConfirmingConfig = NO;
+        [self performSelectorOnMainThread:@selector(Cancel:) withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -193,20 +209,10 @@
     [wifiNameTable reloadData];
     if(CFArrayGetCount([self wifiNameArray])) {
         [ConfigureNetworkLabel setText:@"Choose A Network"];
-        [ScanActivityIndicator stopAnimating];
     } else {
-        [ConfigureNetworkLabel setText:@"Searching For WiFi Networks"];
-        [ScanActivityIndicator startAnimating];
+        [ConfigureNetworkLabel setText:@"Re-scan For Networks"];
     }
     [[self wifiDataLock] unlock];
-}
-- (void) wifi_list_complete:(NSNotification *) notification {
-    [self performSelectorOnMainThread:@selector(wifi_list_complete_main) withObject:nil waitUntilDone:NO];
-}
-- (void) wifi_list_complete_main {
-    [ScanActivityIndicator stopAnimating];
-    [ScanActivityIndicator setHidesWhenStopped:YES];
-    [ConfigureNetworkLabel setText:@"Choose a Network Below to Move Switchamajig to a New Network"];
 }
 
 // Code to support table displaying the names of the switches discovered during detect
@@ -230,7 +236,7 @@
 // Support for connecting to a switch when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [[self wifiDataLock] lock];
-    networkName = (NSString*)CFArrayGetValueAtIndex([self wifiNameArray], indexPath.row);
+    NSString *networkName = (NSString*)CFArrayGetValueAtIndex([self wifiNameArray], indexPath.row);
     NSNumber *wifiIndex;
     if(!CFDictionaryGetValueIfPresent([self wifiNameDictionary], networkName, (const void **) &wifiIndex)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
@@ -241,7 +247,7 @@
     }
     [[self wifiDataLock] unlock];
     // Range-check networkIndex
-    networkIndex = [wifiIndex intValue];
+    int networkIndex = [wifiIndex intValue];
     if((networkIndex < 0) || (networkIndex >= num_avail_wifi)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"App error!"  
                                                           message:@"NetworkIndex out of range (code bug)."  
@@ -252,27 +258,14 @@
         [message release];
         return;
     }
-    // Handle standard selection
-    NSString *passphraseRequest = @"Please enter the network passphrase (if any) for network ";
-    NSString *messageText = [passphraseRequest stringByAppendingString:networkName];
-
-    if(networkIndex >= 0) {
-        nowEnteringPassphrase = YES;
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Passphrase"  
-                                                          message:messageText  
-                                                         delegate:self  
-                                                cancelButtonTitle:@"Cancel"  
-                                                otherButtonTitles:@"Continue",nil];
-        [message setAlertViewStyle:UIAlertViewStyleSecureTextInput];
-        [message show];  
-        [message release];
-    }
+    [NetworkNameText setText:networkName];
+    [datePicker selectRow:(availableNetworks[networkIndex].channel - 1) inComponent:0 animated:YES];
+    [ConfigureNetworkButton setEnabled:YES];
 }
 
 // Provide options for walking in 
 - (void)Background_Thread_To_Detect_Wifi {
     NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
-    [[self CancelButton] setEnabled:NO];
     [[self wifiDataLock] lock];
     CFDictionaryRemoveAllValues([self wifiNameDictionary]);    
     CFArrayRemoveAllValues([self wifiNameArray]);
@@ -282,7 +275,7 @@
     if(!switchamajig1_enter_command_mode([appDelegate switch_socket])) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config Error"  
                                                           message:@"Unable to configure Switchamajig (cmd)"  
-                                                         delegate:self  
+                                                         delegate:nil  
                                                 cancelButtonTitle:@"OK"  
                                                 otherButtonTitles:nil];
         [message show];  
@@ -290,25 +283,29 @@
         [[self CancelButton] setEnabled:YES];  
         [mempool release];
         return;
-    }
-    sleep(2);
-    if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                          message:@"Find any wifi networks (scan)."  
-                                                         delegate:self  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];
-        [message show];  
-        [message release];
-        [[self CancelButton] setEnabled:YES];  
-        [mempool release];
-        return;
+    } else {
+        sleep(2);
+        if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                              message:@"Found no wifi networks (scan)."  
+                                                             delegate:nil  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];
+            [message show];  
+            [message release];
+        } else if(!strcmp(availableNetworks[0].ssid, "Ch")) {
+            // Mysterious failure when reply from controller is garbled
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
+                                                              message:@"Found no wifi networks (Ch)."  
+                                                             delegate:nil  
+                                                    cancelButtonTitle:@"OK"  
+                                                    otherButtonTitles:nil];
+            [message show];  
+            [message release];
+            num_avail_wifi = 0;
+        }
     }
     [[self wifiDataLock] lock];
-    // Not supporting manually entering networks
-    //CFArrayAppendValue([self wifiNameArray], @"Manually Enter Network");
-    //NSNumber *ManualEntryIndex = [NSNumber numberWithInt:-1];
-    //CFDictionaryAddValue([self wifiNameDictionary], (NSString *) CFArrayGetValueAtIndex([self wifiNameArray], 0), ManualEntryIndex);
     for(int i=0; i < num_avail_wifi; ++i) {
         NSString *networkName1 = [NSString stringWithCString:availableNetworks[i].ssid encoding:NSUTF8StringEncoding];
         CFArrayAppendValue([self wifiNameArray], networkName1);
@@ -318,7 +315,10 @@
     [[self wifiDataLock] unlock];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_complete" object:nil];
-    [[self CancelButton] setEnabled:YES];  
+    [[self ScanNetworkButton] setEnabled:YES];  
+    [[self CancelButton] setEnabled:YES];
+    [[self ScanNetworkButton] setTitle:@"Re-scan for Networks" forState:UIControlStateNormal];
+    [[self ScanActivityIndicator] stopAnimating];
     [mempool release];
     return;
 }
@@ -367,9 +367,37 @@
 }
 
 - (IBAction)ChangeNetwork:(id)sender {
+    // Replace spaces with dollar signs
+    NSString *newNetworkName = [NetworkNameText text];
+    // Ask user for passphrase
+    NSString *passphraseRequest = @"Enter the network passphrase (if any) for ";
+    NSString *messageText = [passphraseRequest stringByAppendingString:newNetworkName];
+    nowEnteringPassphrase = YES;
+    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Passphrase"  
+                                                      message:messageText  
+                                                     delegate:self  
+                                            cancelButtonTitle:@"Cancel"  
+                                            otherButtonTitles:@"Choose Network",nil];
+    [message setAlertViewStyle:UIAlertViewStyleSecureTextInput];
+    [message show];  
+    [message release];
 }
 
 - (IBAction)NetworkNameChanged:(id)sender {
+    if([[NetworkNameText text] length])
+        [ConfigureNetworkButton setEnabled:YES];
+    else
+        [ConfigureNetworkButton setEnabled:NO];
+}
+
+- (IBAction)ScanForNetworks:(id)sender {
+    [ScanNetworkButton setTitle:@"Scanning" forState:UIControlStateNormal];
+    [ScanNetworkButton setEnabled:NO];
+    [CancelButton setEnabled:NO];
+    [NetworkNameText setText:@""];
+    [ConfigureNetworkLabel setEnabled:NO];
+    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
+    [ScanActivityIndicator startAnimating];
 }
 
 @end
