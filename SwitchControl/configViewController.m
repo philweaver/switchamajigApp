@@ -86,7 +86,7 @@
     [ScanActivityIndicator setHidesWhenStopped:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_updated:) name:@"wifi_list_was_updated" object:nil];
     // Open TCP socket
-    if(![appDelegate switch_socket] || ([appDelegate switch_connection_protocol] != IPPROTO_TCP)) {
+    if(![appDelegate switch_socket] || ([appDelegate current_switch_connection_protocol] != IPPROTO_TCP)) {
         [appDelegate connect_to_switch:[appDelegate active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
         if(![appDelegate switch_socket]) {
             UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config Error"  

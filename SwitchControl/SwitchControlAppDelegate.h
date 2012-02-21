@@ -16,9 +16,6 @@
 #import "arpa/inet.h"
 #import "errno.h"
 
-#define switch_control_protocol_normal IPPROTO_TCP
-
-
 @class singleSwitchView;
 @class twoSwitchView;
 @class rootSwitchViewController;
@@ -42,7 +39,8 @@
 @property (nonatomic) CFMutableArrayRef switchNameArray;
 @property (nonatomic) int active_switch_index;
 @property (nonatomic) int switch_socket;
-@property (nonatomic) int switch_connection_protocol;
+@property (nonatomic) int settings_switch_connection_protocol;
+@property (nonatomic) int current_switch_connection_protocol;
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
 

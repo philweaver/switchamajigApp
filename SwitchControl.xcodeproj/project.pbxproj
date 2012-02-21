@@ -17,6 +17,7 @@
 		AD61F247141F13E100010895 /* DDXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F243141F13E100010895 /* DDXMLElement.m */; };
 		AD61F248141F13E100010895 /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F245141F13E100010895 /* DDXMLNode.m */; };
 		AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F24A141F140B00010895 /* NSString+DDXML.m */; };
+		AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AD762F3A14F31BB700812CF8 /* Settings.bundle */; };
 		AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */; };
 		AD86623414B567AB00C5860D /* configViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD86623214B567AB00C5860D /* configViewController.m */; };
 		AD86623514B567AB00C5860D /* configViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD86623314B567AB00C5860D /* configViewController.xib */; };
@@ -79,6 +80,7 @@
 		AD61F249141F140B00010895 /* NSString+DDXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDXML.h"; path = "kissxml/KissXML/Categories/NSString+DDXML.h"; sourceTree = "<group>"; };
 		AD61F24A141F140B00010895 /* NSString+DDXML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDXML.m"; path = "kissxml/KissXML/Categories/NSString+DDXML.m"; sourceTree = "<group>"; };
 		AD61F24C141F141900010895 /* DDXMLPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLPrivate.h; path = kissxml/KissXML/Private/DDXMLPrivate.h; sourceTree = "<group>"; };
+		AD762F3A14F31BB700812CF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_switchamajig1_cfg.cpp; sourceTree = "<group>"; };
 		AD83006214E068C6007E5773 /* socket_switchamajig1_cfg.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = socket_switchamajig1_cfg.hpp; sourceTree = "<group>"; };
 		AD86623114B567AB00C5860D /* configViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = configViewController.h; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				ADB75BF713DB539C00448025 /* SwitchControl-Info.plist */,
+				AD762F3A14F31BB700812CF8 /* Settings.bundle */,
 				ADB75BF813DB539C00448025 /* InfoPlist.strings */,
 				ADB75BFB13DB539C00448025 /* main.m */,
 				ADB75BFD13DB539C00448025 /* SwitchControl-Prefix.pch */,
@@ -352,6 +355,7 @@
 				AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */,
 				AD4D39A014AAEF3600ADA893 /* 6_tworows.xml in Resources */,
 				AD86623514B567AB00C5860D /* configViewController.xib in Resources */,
+				AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

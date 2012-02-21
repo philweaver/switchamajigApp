@@ -346,7 +346,6 @@ bool get_channel(SWITCHAMAJIG1_HANDLE hSerial, int *channel) {
 }
 #define MIN_LEN_FOR_SCAN 30
 bool switchamajig1_scan_wifi(SWITCHAMAJIG1_HANDLE hSerial, int *pNum_wifi_scan_results, struct switchamajig1_network_info *wifi_scan_results_array, int max_array_length) {
-	set_timeouts(hSerial, 60000000); // 60 seconds
 	int bytes;
     
 	if(write(hSerial, "scan\r\n\0", 6) < 0) {
@@ -355,7 +354,7 @@ bool switchamajig1_scan_wifi(SWITCHAMAJIG1_HANDLE hSerial, int *pNum_wifi_scan_r
 	}
 	char recv_buffer[4096];
     // Do one wait with a long timeout for enough bytes to make sure we get a response
-	bytes = read_with_two_timeouts(hSerial, recv_buffer, sizeof(recv_buffer), DEFAULT_TIMEOUT, MIN_LEN_FOR_SCAN, SHORT_TIMEOUT);
+	bytes = read_with_two_timeouts(hSerial, recv_buffer, sizeof(recv_buffer), 15000000, MIN_LEN_FOR_SCAN, SHORT_TIMEOUT);
 	recv_buffer[bytes] = 0;
 	debug_printf("switchamajig1_scan_wifi: Received %s\n", recv_buffer);
 	char num_wifi_scan_results_string[10];
