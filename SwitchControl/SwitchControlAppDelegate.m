@@ -65,7 +65,7 @@
     switch_state = 0;
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     [self setSwitchStateLock:[[NSLock alloc] init]];
-
+    [self performSelectorInBackground:@selector(Background_Thread_To_Transmit) withObject:nil];
     return YES;
 }
 
@@ -575,6 +575,21 @@ int portno = 2000;
     [twoNames writeToFile:filename atomically:NO encoding:NSUTF8StringEncoding error:nil];
     [self setCurrent_switch_connection_protocol:protocol];
     return;
+}
+
+// Thread to keep resending switch state to controller in case packets are lost
+- (void)Background_Thread_To_Transmit {
+    NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
+    // Exit if we're not using UDP
+    if([self settings_switch_connection_protocol] != IPPROTO_UDP)
+        return;
+    while(1) {
+        usleep(500000); // Run every half second
+        // Update as long as we're in a UDP connection (which means we're not configuring)
+        if(([self switch_socket] > 0) && ([self current_switch_connection_protocol] == IPPROTO_UDP))
+            [self sendSwitchState]; 
+    }
+    [mempool release];
 }
 
 @end
