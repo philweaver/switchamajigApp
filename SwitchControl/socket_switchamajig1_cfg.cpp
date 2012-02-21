@@ -32,9 +32,11 @@ int read_until_timeout(int hSerial, char *buffer, int bufflen);
 bool write_string_and_expect_response(SWITCHAMAJIG1_HANDLE hSerial, const char *stringToSend, const char *expectedString);
 bool set_timeouts(SWITCHAMAJIG1_HANDLE hSerial, int timeout);
 bool get_tag_after_sending_string(SWITCHAMAJIG1_HANDLE hSerial, const char *stringToSend, const char *tag, char *stringRead, int max_str_len);
-
+int read_with_two_timeouts(int socket, char *buffer, int bufflen, int timeout1, int min_data_for_timeout1, int timeout2);
 // 5 seconds
 #define DEFAULT_TIMEOUT 5000000
+// 0.1 second
+#define SHORT_TIMEOUT 100000
 static int timeout = DEFAULT_TIMEOUT;
 static bool debug = true;
 
@@ -67,10 +69,31 @@ int read_until_timeout(int socket, char *buffer, int bufflen) {
 	return bufflen_start; // Filled buffer
 }
 
+// Read with timeout1 until we get a minimum amt of data, and then read up to bufflen with the second timeout
+int read_with_two_timeouts(int socket, char *buffer, int bufflen, int timeout1, int min_data_for_timeout1, int timeout2) {
+    int savetimeout = timeout;
+    timeout = timeout1;
+    int bytesRead = read_until_timeout(socket, buffer, min_data_for_timeout1);
+    if(bytesRead < min_data_for_timeout1) {
+        timeout = savetimeout;
+        return bytesRead;
+    }
+    timeout = timeout2;
+    int bytesRead2 = read_until_timeout(socket, buffer+bytesRead, bufflen-bytesRead);
+    timeout = savetimeout;
+    if(bytesRead2 < 0)
+        return bytesRead2;
+    return bytesRead + bytesRead2;
+}
 
 bool write_string_and_expect_response(SWITCHAMAJIG1_HANDLE socket, const char *stringToSend, const char *expectedString) {
 	int bytes;
 	char buffer[4096];
+    // Absorb extra bytes
+    read_with_two_timeouts(socket, buffer, sizeof(buffer), SHORT_TIMEOUT, 1, SHORT_TIMEOUT);
+
+    // Expect to get the command echoed, and then the expected string
+    int minlen = strlen(stringToSend) + strlen(expectedString);
 	memset(buffer, 0, sizeof(buffer));
     int bytesSent = 0;
     while(strlen(stringToSend) > bytesSent > 0) {
@@ -81,7 +104,7 @@ bool write_string_and_expect_response(SWITCHAMAJIG1_HANDLE socket, const char *s
         }
         bytesSent += bytes;
     }
-	bytes = read_until_timeout(socket, buffer, sizeof(buffer));
+	bytes = read_with_two_timeouts(socket, buffer, sizeof(buffer), DEFAULT_TIMEOUT, minlen, SHORT_TIMEOUT);
 	if(bytes < 0) {
 		debug_printf("write_string_and_expect_response: read failed.\n");
 		return false;
@@ -185,12 +208,14 @@ bool switchamajig1_reset(SWITCHAMAJIG1_HANDLE hSerial) {
 bool switchamajig1_enter_command_mode(SWITCHAMAJIG1_HANDLE socket) {
 	char recv_buffer[1024];
 	int bytes;
+    // Absorb extra bytes
+    read_with_two_timeouts(socket, recv_buffer, sizeof(recv_buffer), SHORT_TIMEOUT, 1, SHORT_TIMEOUT);
     bytes = send(socket, "$$$\r", 4, 0);
     if(bytes < 0) {
         perror("enter_command_mode: send");
         return false;
     }
-	bytes = read_until_timeout(socket, recv_buffer, sizeof(recv_buffer));
+	bytes = read_with_two_timeouts(socket, recv_buffer, sizeof(recv_buffer), DEFAULT_TIMEOUT, 3, SHORT_TIMEOUT);
 	if(bytes < 0) {
 		if(debug)
 			perror("enter_command_mode: Read File error");
@@ -202,10 +227,7 @@ bool switchamajig1_enter_command_mode(SWITCHAMAJIG1_HANDLE socket) {
 	recv_buffer[bytes] = 0;
 	debug_printf("enter_command_mode: Received %s\n", recv_buffer);
 	// Expected response
-	if(strstr(recv_buffer, "CMD"))
-		return true;
-	// If we're seeing echoes of the command, we're probably already in command mode
-	if(!strstr(recv_buffer, "$$$"))
+	if(!strstr(recv_buffer, "CMD") && !strstr(recv_buffer, "$$$"))
 		return false; // Something's gone wrong.
 	// Try to get a command prompt
 	if(!write_string_and_expect_response(socket, "\r", ">")) {
@@ -333,22 +355,9 @@ bool switchamajig1_scan_wifi(SWITCHAMAJIG1_HANDLE hSerial, int *pNum_wifi_scan_r
 	}
 	char recv_buffer[4096];
     // Do one wait with a long timeout for enough bytes to make sure we get a response
-	bytes = read_until_timeout(hSerial, recv_buffer, MIN_LEN_FOR_SCAN);
-    set_default_timeouts(hSerial);
-	debug_printf("switchamajig1_scan_wifi: %d bytes received\n", bytes);
-	if(bytes <= 0)
-		return false;
-    // Read the rest with a short timeout
-    int bytes2 = read_until_timeout(hSerial, recv_buffer + bytes, sizeof(recv_buffer)-bytes);
-    if(bytes2 < 0)
-        return false;
-    bytes += bytes2;
+	bytes = read_with_two_timeouts(hSerial, recv_buffer, sizeof(recv_buffer), DEFAULT_TIMEOUT, MIN_LEN_FOR_SCAN, SHORT_TIMEOUT);
 	recv_buffer[bytes] = 0;
 	debug_printf("switchamajig1_scan_wifi: Received %s\n", recv_buffer);
-	if(!set_default_timeouts(hSerial)){
-		debug_printf("switchamajig1_scan_wifi: set_default_timeouts failed.\n");
-		return false;
-	}
 	char num_wifi_scan_results_string[10];
 	if(!get_tag_in_buffer(recv_buffer, "SCAN:Found", num_wifi_scan_results_string, sizeof(num_wifi_scan_results_string))){
 		debug_printf("switchamajig1_scan_wifi: Can't find num_wifi_scan_results_string.\n");

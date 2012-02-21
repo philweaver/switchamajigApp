@@ -280,9 +280,6 @@
                                                 otherButtonTitles:nil];
         [message show];  
         [message release];
-        [[self CancelButton] setEnabled:YES];  
-        [mempool release];
-        return;
     } else {
         sleep(2);
         if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
@@ -314,11 +311,12 @@
     }
     [[self wifiDataLock] unlock];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_complete" object:nil];
     [[self ScanNetworkButton] setEnabled:YES];  
     [[self CancelButton] setEnabled:YES];
     [[self ScanNetworkButton] setTitle:@"Re-scan for Networks" forState:UIControlStateNormal];
     [[self ScanActivityIndicator] stopAnimating];
+    [SwitchamajigNameText setEnabled:NO];
+    [NetworkNameText setEnabled:NO];
     [mempool release];
     return;
 }
@@ -363,7 +361,7 @@
     NSString *cacheDirectory = [paths objectAtIndex:0];
     NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
     [[NSFileManager defaultManager] removeItemAtPath:filename error:nil];
-    [self Cancel:nil];
+    [self performSelectorOnMainThread:@selector(Cancel:) withObject:nil waitUntilDone:NO];
 }
 
 - (IBAction)ChangeNetwork:(id)sender {
@@ -396,6 +394,8 @@
     [CancelButton setEnabled:NO];
     [NetworkNameText setText:@""];
     [ConfigureNetworkLabel setEnabled:NO];
+    [SwitchamajigNameText setEnabled:NO];
+    [NetworkNameText setEnabled:NO];
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
     [ScanActivityIndicator startAnimating];
 }
