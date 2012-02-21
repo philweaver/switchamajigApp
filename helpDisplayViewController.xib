@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1056</int>
+		<int key="IBDocument.SystemTarget">1280</int>
 		<string key="IBDocument.SystemVersion">11C74</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1617</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
 		<string key="IBDocument.AppKitVersion">1138.23</string>
 		<string key="IBDocument.HIToolboxVersion">567.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">534</string>
+			<string key="NS.object.0">933</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -21,11 +21,8 @@
 			<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 		</object>
 		<object class="NSMutableDictionary" key="IBDocument.Metadata">
-			<bool key="EncodedWithXMLCoder">YES</bool>
-			<object class="NSArray" key="dict.sortedKeys" id="0">
-				<bool key="EncodedWithXMLCoder">YES</bool>
-			</object>
-			<reference key="dict.values" ref="0"/>
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -45,9 +42,10 @@
 					<object class="IBUITextView" id="963159706">
 						<reference key="NSNextResponder" ref="766721923"/>
 						<int key="NSvFlags">274</int>
-						<string key="NSFrame">{{84, 20}, {857, 708}}</string>
+						<string key="NSFrame">{{63, 20}, {898, 708}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
 						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:615</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">1</int>
@@ -58,43 +56,60 @@
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 						<bool key="IBUIShowsHorizontalScrollIndicator">NO</bool>
 						<object class="NSMutableString" key="IBUIText">
-							<bytes key="NS.bytes">VGhpcyBhcHAgaXMgaW50ZW5kZWQgZm9yIHVzZSB3aXRoIGEgU3dpdGNoYW1hamlnIGNvbnRyb2xsZXIg
+							<bytes key="NS.bytes">VGhpcyBhcHAgaXMgaW50ZW5kZWQgZm9yIHVzZSB3aXRoIGEgU3dpdGNoYW1hamlnIENvbnRyb2xsZXIg
 ZnJvbSBQQVcgU29sdXRpb25zIExMQyAod3d3LnN3aXRjaGFtYWppZy5jb20uKSBUaGUgaVBhZCBzY3Jl
 ZW4gZGlzcGxheXMgc3dpdGNoZXMgdGhhdCBlbmFibGUgcGVvcGxlIHdpdGggZGlzYWJpbGl0aWVzIChv
 ciBhbnlvbmUgZWxzZSwgZm9yIHRoYXQgbWF0dGVyKSB0byBwbGF5IHdpdGggdG95cyBhbmQgdXNlIHNt
-YWxsIGVsZWN0cm9uaWMgZGV2aWNlcy4gIFlvdSBuZWVkIGEgU3dpdGNoYW1hamlnIGNvbnRyb2xsZXIg
+YWxsIGVsZWN0cm9uaWMgZGV2aWNlcy4gIFlvdSBuZWVkIGEgU3dpdGNoYW1hamlnIENvbnRyb2xsZXIg
 dG8gY29ubmVjdCB0byB0aGUgdGhpbmdzIHlvdSB3YW50IHRvIGNvbnRyb2wsIG9yIHRoaXMgYXBwIGlz
-buKAmXQgbXVjaCB1c2UuDQ1Bc3N1bWluZyB5b3UgaGF2ZSBhIFN3aXRjaGFtYWppZyAoYW5kIHlvdSBo
-YXZlIGJhdHRlcmllcyBpbiBpdCkgeW91IG5lZWQgdGhlIGlQYWQgdG8gY29ubmVjdCB0byBpdC4gVGhl
-cmUgYXJlIHRocmVlIHdheXMgeW91IGNhbiBkbyB0aGlzLiANDTEg4oCTIENvbm5lY3QgdGhlIFN3aXRj
-aGFtYWppZyB0byB5b3VyIGhvbWUgbmV0d29yayB3aXRoIFdQUy4gSWYgeW91IGhhdmUgYSBob21lIFdp
-RmkgbmV0d29yaywgbG9vayBhdCB5b3VyIFdpRmkgcm91dGVyIGZvciBhIGJ1dHRvbiBtYXJrZWQg4oCc
-V1BTLuKAnSBJZiB5b3UgaGF2ZSBvbmUsIHlvdeKAmXJlIHNlY29uZHMgYXdheSBmcm9tIGJlaW5nIHNl
-dCB1cC4gUHJlc3MgdGhlIFdQUyBidXR0b24gb24gdGhlIHdpcmVsZXNzIHJvdXRlciBhbmQgaG9sZCBk
-b3duIHRoZSBidXR0b24gb24gdGhlIFN3aXRjaGFtYWppZyBmb3IgdGVuIHNlY29uZHMuIFdoZW4gdGhl
-IGluZGljYXRvciBsaWdodCB0dXJucyB5ZWxsb3csIHlvdeKAmXJlIGRvbmUuDQ0yIOKAkyBDb25uZWN0
-IGRpcmVjdGx5IHRvIHRoZSBTd2l0Y2hhbWFqaWcuIFF1aXQgdGhpcyBhcHAgKGFmdGVyIHlvdeKAmXJl
-IGRvbmUgcmVhZGluZyB0aGlzKSBvcGVuIFNldHRpbmdzIGFuZCBjaG9vc2UgV2lGaS4gT24gdGhlIGxp
-c3Qgb2Ygd2lyZWxlc3MgbmV0d29ya3MsIHNlbGVjdCDigJxTd2l0Y2hhbWFqaWcu4oCdIFRoZSBjb25u
-ZWN0aW9uIHdpbGwgYmUgbW9yZSByZWxpYWJsZSBpZiB5b3UgY2hvb3NlIHRvIGF1dG8tam9pbiB0aGUg
-bmV0d29yay4gDQ0zIOKAkyBVc2UgdGhlIFVTQiBpbnRlcmZhY2UgdG8gY29uZmlndXJlIHRoZSBTd2l0
-Y2hhbWFqaWcuIFBsZWFzZSB2aXNpdCB3d3cuc3dpdGNoYW1hamlnLmNvbS9TdXBwb3J0Lmh0bWwgZm9y
-IGRldGFpbHMgb24gdGhpcyBtZXRob2QuDQ1PbmNlIHlvdXIgaVBhZCBhbmQgU3dpdGNoYW1hamlnIGFy
-ZSBvbiB0aGUgc2FtZSBuZXR3b3JrLCBydW4gdGhlIGFwcC4gSXQgc2hvdWxkIGZpbmQgeW91ciBTd2l0
-Y2hhbWFqaWcgd2l0aGluIGZpZnRlZW4gc2Vjb25kcy4gVGFwIHRoZSBuYW1lIHRvIGNvbm5lY3QuIFRo
-ZW4gc2VsZWN0IGEgc3dpdGNoIHBhbmVsIGNvbmZpZ3VyYXRpb24gYW5kIGhhdmUgZnVuIQ0gDVJlbWVt
-YmVyIHRoYXQgdGhlIFN3aXRjaGFtYWppZyBpcyBpbnRlbmRlZCBmb3IgdG95cy4gRG9uJ3QgdXNlIGl0
-IHRvIGNvbnRyb2wgY29udHJvbCBhIGRldmljZSBjYXBhYmxlIG9mIGNhdXNpbmcgaW5qdXJ5LCBzdWNo
-IGFzIGEgcG93ZXIgd2hlZWxjaGFpciBvciBvdGhlciBoZWF2eSBtYWNoaW5lcnkuIA</bytes>
+buKAmXQgbXVjaCB1c2UuDQ1Bc3N1bWluZyB5b3UgaGF2ZSBhIFN3aXRjaGFtYWppZyBDb250cm9sbGVy
+IChhbmQgeW91IGhhdmUgYmF0dGVyaWVzIGluIGl0KSB5b3UgbmVlZCB0aGUgaVBhZCB0byBjb25uZWN0
+IHRvIGl0LiBUaGVyZSBhcmUgdGhyZWUgd2F5cyB5b3UgY2FuIGRvIHRoaXMuIA0NMSDigJMgQ29ubmVj
+dCBkaXJlY3RseSB0byB0aGUgU3dpdGNoYW1hamlnLiBRdWl0IHRoaXMgYXBwIChhZnRlciB5b3XigJly
+ZSBkb25lIHJlYWRpbmcgdGhpcykgb3BlbiBTZXR0aW5ncyBhbmQgY2hvb3NlIFdpRmkuIE9uIHRoZSBs
+aXN0IG9mIHdpcmVsZXNzIG5ldHdvcmtzLCBzZWxlY3Qg4oCcU3dpdGNoYW1hamlnLuKAnSBUaGUgY29u
+bmVjdGlvbiB3aWxsIGJlIG1vcmUgcmVsaWFibGUgaWYgeW91IGNob29zZSB0byBhdXRvLWpvaW4gdGhl
+IG5ldHdvcmsuIA0NMiDigJMgQ29ubmVjdCB0aGUgU3dpdGNoYW1hamlnIHRvIHlvdXIgaG9tZSBuZXR3
+b3JrIHdpdGggV1BTLiBJZiB5b3UgaGF2ZSBhIGhvbWUgV2lGaSBuZXR3b3JrLCBsb29rIGF0IHlvdXIg
+V2lGaSByb3V0ZXIgZm9yIGEgYnV0dG9uIG1hcmtlZCDigJxXUFMu4oCdIElmIHlvdSBoYXZlIG9uZSwg
+eW914oCZcmUgc2Vjb25kcyBhd2F5IGZyb20gYmVpbmcgc2V0IHVwLiBQcmVzcyB0aGUgV1BTIGJ1dHRv
+biBvbiB0aGUgd2lyZWxlc3Mgcm91dGVyIGFuZCBob2xkIGRvd24gdGhlIGJ1dHRvbiBvbiB0aGUgU3dp
+dGNoYW1hamlnIGZvciB0ZW4gc2Vjb25kcy4gV2hlbiB0aGUgaW5kaWNhdG9yIGxpZ2h0IHR1cm5zIHll
+bGxvdywgeW914oCZcmUgZG9uZS4NDTMg4oCTIElmIHlvdSdyZSBydW5uaW5nIGlPUyA1LjAgb3IgYWJv
+dmUsIHlvdSBjYW4gY29uZmlndXJlIHRoZSBTd2l0Y2hhbWFqaWcgZnJvbSB0aGlzIGFwcC4gQ29ubmVj
+dCB0byBpdCB3aXRoIGVpdGhlciBtZXRob2QgKDEpIG9yICgyKSBhYm92ZSwgYW5kIHNlbGVjdCAiQ29u
+ZmlnLiIgWW91IGNhbiB0aGVuIGVudGVyIHRoZSBuZXR3b3JrIG5hbWUgYW5kIGNoYW5uZWwgbnVtYmVy
+ICh0aGVyZSBpcyBhbHNvIGEgc2NhbiBmZWF0dXJlIHRoYXQgdHJpZXMgdG8gZW50ZXIgdGhlbSBmb3Ig
+eW91LikgT25jZSB5b3UgcHJlc3MgdGhlIGJ1dHRvbiB0byBzd2l0Y2ggdG8gYSBuZXcgbmV0d29yaywg
+dGhpcyBhcHAgd2lsbCBsb3NlIGNvbnRhY3Qgd2l0aCB0aGUgU3dpdGNoYW1hamlnIHVudGlsIHlvdSBt
+b3ZlIHRoZSBpUGFkIHRvIHRoZSBzYW1lIG5ldHdvcmsgYXMgdGhlIFN3aXRjaGFtYWppZy4gSWYgdGhl
+IFN3aXRjaGFtYWppZyBmYWlscyB0byBjb25uZWN0IHRvIHRoZSBuZXcgbmV0d29yaywgaXQgd2lsbCBp
+bnN0ZWFkIGFjY2VwdCBkaXJlY3QgY29ubmVjdGlvbnMgYXMgZGVzY3JpYmVkIGFib3ZlIGluICgxKS4N
+DU9uY2UgeW91ciBpUGFkIGFuZCBTd2l0Y2hhbWFqaWcgYXJlIG9uIHRoZSBzYW1lIG5ldHdvcmssIHJ1
+biB0aGUgYXBwLiBJdCBzaG91bGQgZmluZCB5b3VyIFN3aXRjaGFtYWppZyB3aXRoaW4gZmlmdGVlbiBz
+ZWNvbmRzLiBUYXAgdGhlIG5hbWUgdG8gY29ubmVjdC4gVGhlbiBzZWxlY3QgYSBzd2l0Y2ggcGFuZWwg
+Y29uZmlndXJhdGlvbiBhbmQgaGF2ZSBmdW4hDQ1Zb3UgY2FuIHVzZSBlaXRoZXIgVURQIChkZWZhdWx0
+KSBvciBUQ1AgKGF2YWlsYWJsZSBpbiBzZXR0aW5ncykgdG8gY29ubmVjdCB0byBTd2l0Y2hhbWFqaWcu
+IA0NUmVtZW1iZXIgdGhhdCB0aGUgU3dpdGNoYW1hamlnIGlzIGludGVuZGVkIGZvciB0b3lzIGFuZCBv
+dGhlciBzbWFsbCBkZXZpY2VzLiBEb24ndCB1c2UgaXQgdG8gY29udHJvbCBjb250cm9sIGEgZGV2aWNl
+IGNhcGFibGUgb2YgY2F1c2luZyBpbmp1cnksIHN1Y2ggYXMgYSBwb3dlciB3aGVlbGNoYWlyIG9yIG90
+aGVyIGhlYXZ5IG1hY2hpbmVyeS4gRm9yIHRoZSBzYWtlIG9mIHNhZmV0eSwgYXNzdW1lIHRoYXQgYW55
+IHN3aXRjaCBwb3J0IGNvdWxkIHR1cm4gb24gb3Igb2ZmIGF0IGFueSB0aW1lLg</bytes>
+						</object>
+						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
+							<int key="IBUIAutocapitalizationType">2</int>
+							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+						</object>
+						<object class="IBUIFontDescription" key="IBUIFontDescription">
+							<string key="name">Helvetica</string>
+							<string key="family">Helvetica</string>
+							<int key="traits">0</int>
+							<double key="pointSize">17</double>
 						</object>
 						<object class="NSFont" key="IBUIFont">
 							<string key="NSName">Helvetica</string>
 							<double key="NSSize">17</double>
 							<int key="NSfFlags">16</int>
-						</object>
-						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
-							<int key="IBUIAutocapitalizationType">2</int>
-							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						</object>
 					</object>
 				</object>
@@ -134,7 +149,9 @@ IGFzIGEgcG93ZXIgd2hlZWxjaGFpciBvciBvdGhlciBoZWF2eSBtYWNoaW5lcnkuIA</bytes>
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="IBObjectRecord">
 						<int key="objectID">0</int>
-						<reference key="object" ref="0"/>
+						<object class="NSArray" key="object" id="0">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
 						<reference key="children" ref="1000"/>
 						<nil key="parent"/>
 					</object>
@@ -221,6 +238,6 @@ IGFzIGEgcG93ZXIgd2hlZWxjaGFpciBvciBvdGhlciBoZWF2eSBtYWNoaW5lcnkuIA</bytes>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-		<string key="IBCocoaTouchPluginVersion">534</string>
+		<string key="IBCocoaTouchPluginVersion">933</string>
 	</data>
 </archive>

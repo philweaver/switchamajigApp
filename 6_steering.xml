@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+    <panelname>Steering Plus</panelname>
+    <panelelement>
+        <frame>412 50 200 200</frame>
+        <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
+        <switchmask>1</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>412 488 200 200</frame>
+        <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
+        <switchmask>2</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>162 150 200 200</frame>
+        <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
+        <switchmask>5</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>662 150 200 200</frame>
+        <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
+        <switchmask>9</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>162 400 200 200</frame>
+        <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
+        <switchmask>6</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>662 400 200 200</frame>
+        <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
+        <switchmask>10</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>0 50 112 638</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <switchmask>16</switchmask>
+    </panelelement>
+    <panelelement>
+        <frame>912 50 112 638</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <switchmask>32</switchmask>
+    </panelelement>
+</panel>
