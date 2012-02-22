@@ -9,7 +9,6 @@
 #import "configViewController.h"
 #import "SwitchControlAppDelegate.h"
 @implementation configViewController
-@synthesize ConfigureNetworkLabel;
 @synthesize ScanActivityIndicator;
 @synthesize wifiNameTable;
 @synthesize wifiDataLock = _wifiDataLock;
@@ -23,7 +22,6 @@
 @synthesize wifiNameDictionary = _wifiNameDictionary;
 
 - (void)dealloc {
-    [ConfigureNetworkLabel release];
     [ScanActivityIndicator release];
     [wifiNameTable release];
     [CancelButton release];
@@ -32,12 +30,14 @@
     [NetworkNameText release];
     [ConfigureNetworkButton release];
     [ScanNetworkButton release];
+    [_wifiDataLock release];
+    CFRelease([self wifiNameDictionary]);
+    CFRelease([self wifiNameArray]);
     [super dealloc];
 }
 
 - (void)viewDidUnload
 {
-    [self setConfigureNetworkLabel:nil];
     [self setScanActivityIndicator:nil];
     [self setWifiNameTable:nil];
     [_wifiDataLock release];
@@ -76,7 +76,9 @@
     [super viewDidLoad];
     nowEnteringPassphrase = NO;
     nowConfirmingConfig = NO;
-    [self setWifiDataLock:[[NSLock alloc] init]];
+    NSLock *theLock = [[NSLock alloc] init];
+    [self setWifiDataLock:theLock];
+    [theLock release];
     [self setWifiNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
     [self setWifiNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
 
@@ -207,11 +209,6 @@
 - (void) reload_wifi_list_table {
     [[self wifiDataLock] lock];
     [wifiNameTable reloadData];
-    if(CFArrayGetCount([self wifiNameArray])) {
-        [ConfigureNetworkLabel setText:@"Choose A Network"];
-    } else {
-        [ConfigureNetworkLabel setText:@"Re-scan For Networks"];
-    }
     [[self wifiDataLock] unlock];
 }
 
@@ -271,34 +268,16 @@
     CFArrayRemoveAllValues([self wifiNameArray]);
     [[self wifiDataLock] unlock];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
-    
     if(!switchamajig1_enter_command_mode([appDelegate switch_socket])) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config Error"  
-                                                          message:@"Unable to configure Switchamajig (cmd)"  
-                                                         delegate:nil  
-                                                cancelButtonTitle:@"OK"  
-                                                otherButtonTitles:nil];
-        [message show];  
-        [message release];
-    } else {
+        [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Unable to configure Switchamajig (cmd)" waitUntilDone:NO];
+    } 
+    else {
         sleep(2);
         if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                              message:@"Found no wifi networks (scan)."  
-                                                             delegate:nil  
-                                                    cancelButtonTitle:@"OK"  
-                                                    otherButtonTitles:nil];
-            [message show];  
-            [message release];
+            [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Found no wifi networks (scan)." waitUntilDone:NO];
         } else if(!strcmp(availableNetworks[0].ssid, "Ch")) {
             // Mysterious failure when reply from controller is garbled
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
-                                                              message:@"Found no wifi networks (Ch)."  
-                                                             delegate:nil  
-                                                    cancelButtonTitle:@"OK"  
-                                                    otherButtonTitles:nil];
-            [message show];  
-            [message release];
+            [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Found no wifi networks (Ch)." waitUntilDone:NO];
             num_avail_wifi = 0;
         }
     }
@@ -311,12 +290,7 @@
     }
     [[self wifiDataLock] unlock];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
-    [[self ScanNetworkButton] setEnabled:YES];  
-    [[self CancelButton] setEnabled:YES];
-    [[self ScanNetworkButton] setTitle:@"Re-scan for Networks" forState:UIControlStateNormal];
-    [[self ScanActivityIndicator] stopAnimating];
-    [SwitchamajigNameText setEnabled:NO];
-    [NetworkNameText setEnabled:NO];
+    [self performSelectorOnMainThread:@selector(EnableUIAfterScan) withObject:nil waitUntilDone:NO];
     [mempool release];
     return;
 }
@@ -393,11 +367,28 @@
     [ScanNetworkButton setEnabled:NO];
     [CancelButton setEnabled:NO];
     [NetworkNameText setText:@""];
-    [ConfigureNetworkLabel setEnabled:NO];
     [SwitchamajigNameText setEnabled:NO];
     [NetworkNameText setEnabled:NO];
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Wifi) withObject:nil];
     [ScanActivityIndicator startAnimating];
 }
 
+- (void)EnableUIAfterScan {
+    [[self ScanNetworkButton] setTitle:@"Re-scan for Networks" forState:UIControlStateNormal];
+    [[self ScanNetworkButton] setEnabled:YES];  
+    [[self CancelButton] setEnabled:YES];
+    [NetworkNameText setEnabled:YES];
+    [[self ScanActivityIndicator] stopAnimating];
+    [SwitchamajigNameText setEnabled:YES];
+}
+
+- (void)ShowScanAlert:(id)alertMessage {
+    UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Scan error!"  
+                                                      message:alertMessage  
+                                                     delegate:nil  
+                                            cancelButtonTitle:@"OK"  
+                                            otherButtonTitles:nil];
+    [message show];  
+    [message release];
+}
 @end

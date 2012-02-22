@@ -31,13 +31,13 @@
 - (IBAction)ChangeNetwork:(id)sender;
 - (IBAction)NetworkNameChanged:(id)sender;
 - (IBAction)ScanForNetworks:(id)sender;
-
+- (void)EnableUIAfterScan;
+- (void)ShowScanAlert:(id)alertMessage;
 // Picker support
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)thePickerView;
 - (NSInteger)pickerView:(UIPickerView *)thePickerView numberOfRowsInComponent:(NSInteger)component;
 - (NSString *)pickerView:(UIPickerView *)thePickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component;
 
-@property (retain, nonatomic) IBOutlet UILabel *ConfigureNetworkLabel;
 @property (retain, nonatomic) IBOutlet UIActivityIndicatorView *ScanActivityIndicator;
 @property (retain, nonatomic) IBOutlet UITableView *wifiNameTable;
 // Information for WiFi network detection

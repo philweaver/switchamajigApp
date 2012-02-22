@@ -38,7 +38,9 @@
     sigpipeaction.sa_handler = SIG_IGN;
     sigaction(SIGPIPE, &sigpipeaction, NULL);
     // Initialize the list of switches and the lock that keeps it threadsafe
-    [self setSwitchDataLock:[[NSLock alloc] init]];
+    NSLock *theLock = [[NSLock alloc] init];
+    [self setSwitchDataLock:theLock];
+    [theLock release];
     [self setSwitchNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
     [self setSwitchNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
     CFDictionaryRemoveAllValues([self switchNameDictionary]);    
@@ -64,7 +66,9 @@
     [self setSwitch_socket:-1];
     switch_state = 0;
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
-    [self setSwitchStateLock:[[NSLock alloc] init]];
+    theLock = [[NSLock alloc] init];
+    [self setSwitchStateLock:theLock];
+    [theLock release];    
     [self performSelectorInBackground:@selector(Background_Thread_To_Transmit) withObject:nil];
     return YES;
 }
@@ -494,7 +498,6 @@ int portno = 2000;
                 continue;
             }
             close(server_socket);
-            server_socket = 0;
             if(showMessagesOnError) {
                 UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
                                                                   message:@"Hostname not found."  
