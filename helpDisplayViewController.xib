@@ -2,10 +2,10 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1280</int>
-		<string key="IBDocument.SystemVersion">11C74</string>
+		<string key="IBDocument.SystemVersion">11D50b</string>
 		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
-		<string key="IBDocument.AppKitVersion">1138.23</string>
-		<string key="IBDocument.HIToolboxVersion">567.00</string>
+		<string key="IBDocument.AppKitVersion">1138.32</string>
+		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 			<string key="NS.object.0">933</string>
@@ -45,7 +45,6 @@
 						<string key="NSFrame">{{63, 20}, {898, 708}}</string>
 						<reference key="NSSuperview" ref="766721923"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:615</string>
 						<object class="NSColor" key="IBUIBackgroundColor">
 							<int key="NSColorSpace">1</int>
@@ -91,10 +90,10 @@ ZWNvbmRzLiBUYXAgdGhlIG5hbWUgdG8gY29ubmVjdC4gVGhlbiBzZWxlY3QgYSBzd2l0Y2ggcGFuZWwg
 Y29uZmlndXJhdGlvbiBhbmQgaGF2ZSBmdW4hDQ1Zb3UgY2FuIHVzZSBlaXRoZXIgVURQIChkZWZhdWx0
 KSBvciBUQ1AgKGF2YWlsYWJsZSBpbiBzZXR0aW5ncykgdG8gY29ubmVjdCB0byBTd2l0Y2hhbWFqaWcu
 IA0NUmVtZW1iZXIgdGhhdCB0aGUgU3dpdGNoYW1hamlnIGlzIGludGVuZGVkIGZvciB0b3lzIGFuZCBv
-dGhlciBzbWFsbCBkZXZpY2VzLiBEb24ndCB1c2UgaXQgdG8gY29udHJvbCBjb250cm9sIGEgZGV2aWNl
-IGNhcGFibGUgb2YgY2F1c2luZyBpbmp1cnksIHN1Y2ggYXMgYSBwb3dlciB3aGVlbGNoYWlyIG9yIG90
-aGVyIGhlYXZ5IG1hY2hpbmVyeS4gRm9yIHRoZSBzYWtlIG9mIHNhZmV0eSwgYXNzdW1lIHRoYXQgYW55
-IHN3aXRjaCBwb3J0IGNvdWxkIHR1cm4gb24gb3Igb2ZmIGF0IGFueSB0aW1lLg</bytes>
+dGhlciBzbWFsbCBkZXZpY2VzLiBEb24ndCB1c2UgaXQgdG8gY29udHJvbCBhIGRldmljZSBjYXBhYmxl
+IG9mIGNhdXNpbmcgaW5qdXJ5LCBzdWNoIGFzIGEgcG93ZXIgd2hlZWxjaGFpciBvciBvdGhlciBoZWF2
+eSBtYWNoaW5lcnkuIEZvciB0aGUgc2FrZSBvZiBzYWZldHksIGFzc3VtZSB0aGF0IGFueSBzd2l0Y2gg
+cG9ydCBjb3VsZCB0dXJuIG9uIG9yIG9mZiBhdCBhbnkgdGltZS4</bytes>
 						</object>
 						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
 							<int key="IBUIAutocapitalizationType">2</int>
