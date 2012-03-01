@@ -168,7 +168,11 @@
         CFArrayAppendValue([self switchNameArray], initialSwitchName);
         CFDictionaryAddValue([self switchNameDictionary], initialSwitchName, initialIP);
         [[self switchDataLock] unlock];
-        [self connect_to_switch:0 protocol:[self settings_switch_connection_protocol] retries:0 showMessagesOnError:NO];
+        // Connect via TCP to confirm that we have a connection
+        [self connect_to_switch:0 protocol:IPPROTO_TCP retries:0 showMessagesOnError:NO];
+        // Assuming TCP succeeded, reconnect again if we don't want TCP
+        if(([self active_switch_index] >= 0) && ([self settings_switch_connection_protocol] != IPPROTO_TCP))
+            [self connect_to_switch:0 protocol:[self settings_switch_connection_protocol] retries:0 showMessagesOnError:NO];
     }
     if([self active_switch_index] < 0) {
         [[self switchDataLock] lock];
@@ -464,6 +468,36 @@ int portno = 2000;
     // Connect first with TCP, regardless of what protocol we'll use in the end
     int server_socket = 0, socket_flags = 0;
     while((!server_socket) && (retries-- >= 0)) {
+        // Handle the network address
+        char ip_addr_string[2*INET6_ADDRSTRLEN];
+        [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
+        struct hostent *host = gethostbyname(ip_addr_string);
+        if(!host) {
+            if(retries >= 0) {
+                NSLog(@"Retrying hostname not found");
+                continue;
+            }
+            if(showMessagesOnError) {
+                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
+                                                                  message:@"Hostname not found."  
+                                                                 delegate:nil  
+                                                        cancelButtonTitle:@"OK"  
+                                                        otherButtonTitles:nil];  
+                [message show];  
+                [message release];
+            }
+            return;
+        }
+        struct sockaddr_in sin;
+        memcpy(&sin.sin_addr.s_addr, host->h_addr, host->h_length);
+        sin.sin_family = AF_INET;
+        sin.sin_port = htons(portno);
+        // Save udp address in case we use UDP
+        memcpy(&udp_socket_address, &sin, sizeof(udp_socket_address));
+        // If we're using UDP, bail out of this loop
+        if(IPPROTO_UDP == protocol)
+            break;
+
         server_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
         if(server_socket < 0) {
             if(retries >= 0) {
@@ -489,32 +523,6 @@ int portno = 2000;
         tv.tv_usec = 0;
         setsockopt(server_socket, SOL_SOCKET, SO_SNDTIMEO, (void *)&tv, sizeof(tv));
         setsockopt(server_socket, SOL_SOCKET, SO_RCVTIMEO, (void *)&tv, sizeof(tv));
-        char ip_addr_string[2*INET6_ADDRSTRLEN];
-        [ipAddr getCString:ip_addr_string maxLength:sizeof(ip_addr_string) encoding:[NSString defaultCStringEncoding]];
-        struct hostent *host = gethostbyname(ip_addr_string);
-        if(!host) {
-            if(retries >= 0) {
-                NSLog(@"Retrying hostname not found");
-                continue;
-            }
-            close(server_socket);
-            if(showMessagesOnError) {
-                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Socket error!"  
-                                                                  message:@"Hostname not found."  
-                                                                 delegate:nil  
-                                                        cancelButtonTitle:@"OK"  
-                                                        otherButtonTitles:nil];  
-                [message show];  
-                [message release];
-            }
-            return;
-        }
-        struct sockaddr_in sin;
-        memcpy(&sin.sin_addr.s_addr, host->h_addr, host->h_length);
-        sin.sin_family = AF_INET;
-        sin.sin_port = htons(portno);
-        // Save udp address in case we use UDP
-        memcpy(&udp_socket_address, &sin, sizeof(udp_socket_address));
         socket_flags = fcntl(server_socket, F_GETFL);
         socket_flags |= O_NONBLOCK;
         fcntl(server_socket, F_SETFL, socket_flags);
@@ -546,7 +554,6 @@ int portno = 2000;
     }
     // We now have a TCP connection. If we want to use UDP, close the socket and reopen it as UDP
     if(IPPROTO_UDP == protocol) {
-        close(server_socket);
         server_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
         char on = 1;
         setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
