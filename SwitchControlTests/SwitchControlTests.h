@@ -10,6 +10,7 @@
 #import "SwitchControlAppDelegate.h"
 #import "rootSwitchViewController.h"
 #import "switchPanelViewController.h"
+#import "configViewController.h"
 @interface SwitchControlTests : SenTestCase {
     SwitchControlAppDelegate *app_delegate;
     UINavigationController *nav_controller;
