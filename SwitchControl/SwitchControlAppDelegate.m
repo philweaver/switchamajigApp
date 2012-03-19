@@ -591,8 +591,10 @@ int portno = 2000;
 - (void)Background_Thread_To_Transmit {
     NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
     // Exit if we're not using UDP
-    if([self settings_switch_connection_protocol] != IPPROTO_UDP)
+    if([self settings_switch_connection_protocol] != IPPROTO_UDP) {
+        [mempool release];
         return;
+    }
     while(1) {
         usleep(500000); // Run every half second
         // Update as long as we're in a UDP connection (which means we're not configuring)
