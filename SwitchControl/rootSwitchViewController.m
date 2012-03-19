@@ -13,6 +13,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
+@synthesize ConfigButton;
 @synthesize bgColorLabel;
 @synthesize bgColorSegControl;
 @synthesize helpButton;
@@ -32,6 +33,7 @@
     [helpButton release];
     [bgColorSegControl release];
     [bgColorLabel release];
+    [ConfigButton release];
     [super dealloc];
 }
 
@@ -66,6 +68,8 @@
     // Make background color selector disappear
     [bgColorLabel setHidden:YES];
     [bgColorSegControl setHidden:YES];
+    // Initially the config button is not visible
+    [ConfigButton setHidden:YES];
     // Determine if we will enable config - need flexible alert views
     isConfigAvailable = [UIAlertView instancesRespondToSelector:@selector(setAlertViewStyle:)];
     // Make nav bar disappear
@@ -219,6 +223,8 @@
 }
 - (void) reload_switch_name_table {
     [[appDelegate switchDataLock] lock];
+    // Hide the config button if we aren't connected
+    [[self ConfigButton] setHidden:YES];
     [switchNameTableView reloadData];
     if(CFDictionaryGetCount([appDelegate switchNameDictionary])) {
         [SwitchStatusText setText:@"Choose A Switch"];
@@ -243,20 +249,15 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
     if(cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"] autorelease];
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"] autorelease];
     }
     NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     cell.textLabel.text = switchName;
     if(indexPath.row == [appDelegate active_switch_index]) {
         cell.detailTextLabel.text = @"Connected";
         if(isConfigAvailable) {
-            UIButton *configButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-            configButton.frame = CGRectMake(0.0, 0.0, 60, 44);
-            [configButton setTitle:[NSString stringWithCString:"Config" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-            [configButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-            [configButton addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside];
-            [configButton setEnabled:YES];
-            cell.accessoryView = configButton;
+            [[self ConfigButton] setHidden:NO];
+            [[self ConfigButton] setEnabled:YES];
         }
     }
     else {

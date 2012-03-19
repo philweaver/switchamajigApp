@@ -112,13 +112,12 @@
     // Connect as UDP
     [self test_003_UDPConnect];
     // Confirm presence of config button for iOS >= 5.0, absence of config button for lower versions
-    NSIndexPath *iPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    id configButton = [[[rootViewController switchNameTableView] cellForRowAtIndexPath:iPath] accessoryView];
+    UIButton *configButton = [rootViewController ConfigButton];
     if(SYSTEM_VERSION_LESS_THAN(@"5.0")) {
-        STAssertTrue(configButton == nil, @"Config Button Detected for iOS < 5.0");
+        STAssertTrue([configButton isHidden], @"Config Button Visible for iOS < 5.0");
         return;
     }
-    STAssertTrue(configButton != nil, @"Config Button Not Detected for iOS >= 5.0");
+    STAssertFalse([configButton isHidden], @"Config Button Not Visible for iOS >= 5.0");
     [rootViewController config_pressed:nil];
     // Confirm that the config window appeared
     configViewController *configVC = (configViewController *) [nav_controller visibleViewController];

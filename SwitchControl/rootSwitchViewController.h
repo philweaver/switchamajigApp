@@ -33,5 +33,6 @@
 - (IBAction)bgColorSegControlIndexChanged:(id) sender;
 @property (retain, nonatomic) IBOutlet UILabel *bgColorLabel;
 @property (retain, nonatomic) IBOutlet UISegmentedControl *bgColorSegControl;
+@property (retain, nonatomic) IBOutlet UIButton *ConfigButton;
 
 @end

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
-		<int key="IBDocument.SystemTarget">1280</int>
+		<int key="IBDocument.SystemTarget">1296</int>
 		<string key="IBDocument.SystemVersion">11D50b</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1938</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
 		<string key="IBDocument.AppKitVersion">1138.32</string>
 		<string key="IBDocument.HIToolboxVersion">568.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">933</string>
+			<string key="NS.object.0">1179</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -78,22 +78,20 @@ bGxvdywgeW914oCZcmUgZG9uZS4NDTMg4oCTIElmIHlvdSdyZSBydW5uaW5nIGlPUyA1LjAgb3IgYWJv
 dmUsIHlvdSBjYW4gY29uZmlndXJlIHRoZSBTd2l0Y2hhbWFqaWcgZnJvbSB0aGlzIGFwcC4gQ29ubmVj
 dCB0byBpdCB3aXRoIGVpdGhlciBtZXRob2QgKDEpIG9yICgyKSBhYm92ZSwgYW5kIHNlbGVjdCAiQ29u
 ZmlnLiIgWW91IGNhbiB0aGVuIGVudGVyIHRoZSBuZXR3b3JrIG5hbWUgYW5kIGNoYW5uZWwgbnVtYmVy
-ICh0aGVyZSBpcyBhbHNvIGEgc2NhbiBmZWF0dXJlIHRoYXQgdHJpZXMgdG8gZW50ZXIgdGhlbSBmb3Ig
-eW91LikgT25jZSB5b3UgcHJlc3MgdGhlIGJ1dHRvbiB0byBzd2l0Y2ggdG8gYSBuZXcgbmV0d29yaywg
-dGhpcyBhcHAgd2lsbCBsb3NlIGNvbnRhY3Qgd2l0aCB0aGUgU3dpdGNoYW1hamlnIHVudGlsIHlvdSBt
-b3ZlIHRoZSBpUGFkIHRvIHRoZSBzYW1lIG5ldHdvcmsgYXMgdGhlIFN3aXRjaGFtYWppZy4gSWYgdGhl
-IFN3aXRjaGFtYWppZyBmYWlscyB0byBjb25uZWN0IHRvIHRoZSBuZXcgbmV0d29yaywgaXQgd2lsbCBp
-bnN0ZWFkIGFjY2VwdCBkaXJlY3QgY29ubmVjdGlvbnMgYXMgZGVzY3JpYmVkIGFib3ZlIGluICgxKS4N
-DU9uY2UgeW91ciBpUGFkIGFuZCBTd2l0Y2hhbWFqaWcgYXJlIG9uIHRoZSBzYW1lIG5ldHdvcmssIHJ1
-biB0aGUgYXBwLiBJdCBzaG91bGQgZmluZCB5b3VyIFN3aXRjaGFtYWppZyB3aXRoaW4gZmlmdGVlbiBz
-ZWNvbmRzLiBUYXAgdGhlIG5hbWUgdG8gY29ubmVjdC4gVGhlbiBzZWxlY3QgYSBzd2l0Y2ggcGFuZWwg
-Y29uZmlndXJhdGlvbiBhbmQgaGF2ZSBmdW4hDQ1Zb3UgY2FuIHVzZSBlaXRoZXIgVURQIChkZWZhdWx0
-KSBvciBUQ1AgKGF2YWlsYWJsZSBpbiBzZXR0aW5ncykgdG8gY29ubmVjdCB0byBTd2l0Y2hhbWFqaWcu
-IA0NUmVtZW1iZXIgdGhhdCB0aGUgU3dpdGNoYW1hamlnIGlzIGludGVuZGVkIGZvciB0b3lzIGFuZCBv
-dGhlciBzbWFsbCBkZXZpY2VzLiBEb24ndCB1c2UgaXQgdG8gY29udHJvbCBhIGRldmljZSBjYXBhYmxl
-IG9mIGNhdXNpbmcgaW5qdXJ5LCBzdWNoIGFzIGEgcG93ZXIgd2hlZWxjaGFpciBvciBvdGhlciBoZWF2
-eSBtYWNoaW5lcnkuIEZvciB0aGUgc2FrZSBvZiBzYWZldHksIGFzc3VtZSB0aGF0IGFueSBzd2l0Y2gg
-cG9ydCBjb3VsZCB0dXJuIG9uIG9yIG9mZiBhdCBhbnkgdGltZS4</bytes>
+LiBPbmNlIHlvdSBwcmVzcyB0aGUgYnV0dG9uIHRvIHN3aXRjaCB0byBhIG5ldyBuZXR3b3JrLCB0aGlz
+IGFwcCB3aWxsIGxvc2UgY29udGFjdCB3aXRoIHRoZSBTd2l0Y2hhbWFqaWcgdW50aWwgeW91IG1vdmUg
+dGhlIGlQYWQgdG8gdGhlIHNhbWUgbmV0d29yayBhcyB0aGUgU3dpdGNoYW1hamlnLiBJZiB0aGUgU3dp
+dGNoYW1hamlnIGZhaWxzIHRvIGNvbm5lY3QgdG8gdGhlIG5ldyBuZXR3b3JrLCBpdCB3aWxsIGluc3Rl
+YWQgYWNjZXB0IGRpcmVjdCBjb25uZWN0aW9ucyBhcyBkZXNjcmliZWQgYWJvdmUgaW4gKDEpLg0NT25j
+ZSB5b3VyIGlQYWQgYW5kIFN3aXRjaGFtYWppZyBhcmUgb24gdGhlIHNhbWUgbmV0d29yaywgcnVuIHRo
+ZSBhcHAuIEl0IHNob3VsZCBmaW5kIHlvdXIgU3dpdGNoYW1hamlnIHdpdGhpbiBmaWZ0ZWVuIHNlY29u
+ZHMuIFRhcCB0aGUgbmFtZSB0byBjb25uZWN0LiBUaGVuIHNlbGVjdCBhIHN3aXRjaCBwYW5lbCBjb25m
+aWd1cmF0aW9uIGFuZCBoYXZlIGZ1biENDVJlbWVtYmVyIHRoYXQgdGhlIFN3aXRjaGFtYWppZyBpcyBp
+bnRlbmRlZCBmb3IgdG95cyBhbmQgb3RoZXIgc21hbGwgZGV2aWNlcy4gRG9uJ3QgdXNlIGl0IHRvIGNv
+bnRyb2wgYSBkZXZpY2UgY2FwYWJsZSBvZiBjYXVzaW5nIGluanVyeSwgc3VjaCBhcyBhIHBvd2VyIHdo
+ZWVsY2hhaXIgb3Igb3RoZXIgaGVhdnkgbWFjaGluZXJ5LiBGb3IgdGhlIHNha2Ugb2Ygc2FmZXR5LCBh
+c3N1bWUgdGhhdCBhbnkgc3dpdGNoIHBvcnQgY291bGQgdHVybiBvbiBvciBvZmYgYXQgYW55IHRpbWUu
+A</bytes>
 						</object>
 						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
 							<int key="IBUIAutocapitalizationType">2</int>
@@ -192,7 +190,7 @@ cG9ydCBjb3VsZCB0dXJuIG9uIG9yIG9mZiBhdCBhbnkgdGltZS4</bytes>
 					<string>2.IBPluginDependency</string>
 					<string>6.IBPluginDependency</string>
 				</object>
-				<object class="NSMutableArray" key="dict.values">
+				<object class="NSArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<string>helpDisplayViewController</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -231,12 +229,16 @@ cG9ydCBjb3VsZCB0dXJuIG9uIG9yIG9mZiBhdCBhbnkgdGltZS4</bytes>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBIPadFramework</string>
+		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
+			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.iPhoneOS</string>
+			<real value="1296" key="NS.object.0"/>
+		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaTouchPlugin.InterfaceBuilder3</string>
 			<integer value="3100" key="NS.object.0"/>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-		<string key="IBCocoaTouchPluginVersion">933</string>
+		<string key="IBCocoaTouchPluginVersion">1179</string>
 	</data>
 </archive>
