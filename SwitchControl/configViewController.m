@@ -102,6 +102,9 @@
             return;
         }
     }
+    // Scanning almost never works
+    [ScanNetworkButton setHidden:YES];
+    [wifiNameTable setHidden:YES];
 }
 
 - (void)alertView:(UIAlertView *) alertView didDismissWithButtonIndex:(NSInteger) buttonIndex
