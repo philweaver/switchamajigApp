@@ -133,6 +133,8 @@
 #define BATTERY_VOLTAGE_OFFSET 14
 #define BATTERY_VOLTAGE_WARN_LIMIT 2000
 
+#define ITACH_MAX_PACKET_SIZE 1024
+
 - (void)Background_Thread_To_Detect_Switches {
     NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
     bool haveShownBatteryWarning = false; // Flag to show battery warning only once per session
@@ -184,6 +186,7 @@
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
 
+    // Open socket to detect Switchamajig Controllers with Roving Modules
     int detect_socket;
     detect_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if(socket < 0) {
@@ -206,8 +209,37 @@
         [mempool release];
         return;
     }
+    
+    // Open socket to detect iTach-based Controllers
+    int iTach_detect_socket;
+    iTach_detect_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if(socket < 0) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error opening UDP socket (iTach)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        [mempool release];
+        return;
+    }
+    memset(&sockin_addr, 0, sizeof(sockin_addr));
+    sockin_addr.sin_family = AF_INET;
+    sockin_addr.sin_port = htons(9131);
+    sockin_addr.sin_addr.s_addr = INADDR_ANY;
+    struct ip_mreq mreq;
+    inet_pton(AF_INET, "239.255.250.250", &(mreq.imr_multiaddr.s_addr));
+    mreq.imr_interface.s_addr = INADDR_ANY;
+    setsockopt (iTach_detect_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
+    if(bind(iTach_detect_socket, (struct sockaddr *) &sockin_addr, sizeof(sockin_addr)) < 0) {
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error binding UDP socket (iTach)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+        [message show];  
+        [message release];
+        close(detect_socket);
+        [mempool release];
+        return;
+    }
+    
     // Now loop and listen for switches
     char buffer[2*EXPECTED_PACKET_SIZE+1];
+    char itach_buffer[ITACH_MAX_PACKET_SIZE];
     while(1) {
         struct sockaddr_storage switch_address;
         socklen_t addr_len = sizeof(switch_address);
@@ -236,32 +268,78 @@
         }
         //if(numbytes)
         //    printf("numbytes=%d\n", numbytes);
-        if(numbytes != EXPECTED_PACKET_SIZE)
-            continue;
-        // Get the IP address in string format
-        char ip_addr_string[INET6_ADDRSTRLEN];
-        struct sockaddr *sockaddr_ptr = (struct sockaddr *) &switch_address;
+        if(numbytes == EXPECTED_PACKET_SIZE) {
+            // Get the IP address in string format
+            char ip_addr_string[INET6_ADDRSTRLEN];
+            struct sockaddr *sockaddr_ptr = (struct sockaddr *) &switch_address;
+            
+            inet_ntop(switch_address.ss_family, (sockaddr_ptr->sa_family == AF_INET) ? (void*)&(((struct sockaddr_in *)sockaddr_ptr)->sin_addr) : (void*)&(((struct sockaddr_in6 *)sockaddr_ptr)->sin6_addr), ip_addr_string, sizeof(ip_addr_string));
+            //printf("Received: %s from %s\n", buffer+DEVICE_STRING_OFFSET, ip_addr_string);
+            NSString *switchName = [NSString stringWithCString:buffer+DEVICE_STRING_OFFSET encoding:NSASCIIStringEncoding];
+            int batteryVoltage = ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET]) * 256 + ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET + 1]);
+            if(!haveShownBatteryWarning && (batteryVoltage < BATTERY_VOLTAGE_WARN_LIMIT)) {
+                NSString *batteryWarningText = [switchName stringByAppendingString:@" needs its batteries replaced"];
+                [self performSelectorInBackground:@selector(display_battery_warning:) withObject:batteryWarningText];
+                haveShownBatteryWarning = true;
+            }
+            NSString *ipAddrStr = [NSString stringWithCString:ip_addr_string encoding:NSASCIIStringEncoding];
+            // Lock the switch info and then update it
+            [[self switchDataLock] lock];
+            if(CFDictionaryContainsKey((CFDictionaryRef) [self switchNameDictionary], switchName)) {
+                CFDictionaryRemoveValue([self switchNameDictionary], switchName);
+            } else {
+                CFArrayAppendValue([self switchNameArray], switchName);
+            }
+            CFDictionaryAddValue([self switchNameDictionary], switchName, ipAddrStr);
+            [[self switchDataLock] unlock];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
+        }
+        // Listen for iTach devices
+        numbytes = recvfrom(iTach_detect_socket, itach_buffer, ITACH_MAX_PACKET_SIZE, MSG_PEEK | MSG_DONTWAIT, (struct sockaddr *) &switch_address, &addr_len);
+        if((numbytes < 0) && (errno == EWOULDBLOCK))
+            numbytes = 0;
+        if(numbytes < 0) {
+            //printf("Error numbytes=%d\n", numbytes);
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error checking for data (iTach)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+            [message show];  
+            [message release];
+            close(detect_socket);
+            [mempool release];
+            return;
+        }
+        // Switch to blocking and receive any data that's available.
+        numbytes = (numbytes) ? (recvfrom(iTach_detect_socket, itach_buffer, ITACH_MAX_PACKET_SIZE, 0, (struct sockaddr *) &switch_address, &addr_len)) : 0;
+        if(numbytes < 0){
+            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error on recvfrom (iTach)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
+            [message show];  
+            [message release];
+            close(detect_socket);
+            [mempool release];
+            return;
+        }
+        if(numbytes)
+            printf("numbytes=%d\n", numbytes);
+        if(numbytes > 0) {
+            // Get the IP address in string format
+            char ip_addr_string[INET6_ADDRSTRLEN];
+            struct sockaddr *sockaddr_ptr = (struct sockaddr *) &switch_address;
+            
+            inet_ntop(switch_address.ss_family, (sockaddr_ptr->sa_family == AF_INET) ? (void*)&(((struct sockaddr_in *)sockaddr_ptr)->sin_addr) : (void*)&(((struct sockaddr_in6 *)sockaddr_ptr)->sin6_addr), ip_addr_string, sizeof(ip_addr_string));
+            printf("Received: %s from %s\n", itach_buffer, ip_addr_string);
+            NSString *switchName = @"iTach";
+            NSString *ipAddrStr = [NSString stringWithCString:ip_addr_string encoding:NSASCIIStringEncoding];
+            // Lock the switch info and then update it
+            [[self switchDataLock] lock];
+            if(CFDictionaryContainsKey((CFDictionaryRef) [self switchNameDictionary], switchName)) {
+                CFDictionaryRemoveValue([self switchNameDictionary], switchName);
+            } else {
+                CFArrayAppendValue([self switchNameArray], switchName);
+            }
+            CFDictionaryAddValue([self switchNameDictionary], switchName, ipAddrStr);
+            [[self switchDataLock] unlock];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
+        }
         
-        inet_ntop(switch_address.ss_family, (sockaddr_ptr->sa_family == AF_INET) ? (void*)&(((struct sockaddr_in *)sockaddr_ptr)->sin_addr) : (void*)&(((struct sockaddr_in6 *)sockaddr_ptr)->sin6_addr), ip_addr_string, sizeof(ip_addr_string));
-        //printf("Received: %s from %s\n", buffer+DEVICE_STRING_OFFSET, ip_addr_string);
-        NSString *switchName = [NSString stringWithCString:buffer+DEVICE_STRING_OFFSET encoding:NSASCIIStringEncoding];
-        int batteryVoltage = ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET]) * 256 + ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET + 1]);
-        if(!haveShownBatteryWarning && (batteryVoltage < BATTERY_VOLTAGE_WARN_LIMIT)) {
-            NSString *batteryWarningText = [switchName stringByAppendingString:@" needs its batteries replaced"];
-            [self performSelectorInBackground:@selector(display_battery_warning:) withObject:batteryWarningText];
-            haveShownBatteryWarning = true;
-        }
-        NSString *ipAddrStr = [NSString stringWithCString:ip_addr_string encoding:NSASCIIStringEncoding];
-        // Lock the switch info and then update it
-        [[self switchDataLock] lock];
-        if(CFDictionaryContainsKey((CFDictionaryRef) [self switchNameDictionary], switchName)) {
-            CFDictionaryRemoveValue([self switchNameDictionary], switchName);
-        } else {
-            CFArrayAppendValue([self switchNameArray], switchName);
-        }
-        CFDictionaryAddValue([self switchNameDictionary], switchName, ipAddrStr);
-        [[self switchDataLock] unlock];
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
     }
     // This code is unreachable now, but if we ever allow the above loop to exit, we'll need these lines to do it gracefully
     close(detect_socket);
@@ -354,7 +432,18 @@ bool verify_socket_reply(int socket, const char *expected_string) {
 #define SWITCHAMAJIG_PACKET_LENGTH 8
 #define SWITCHAMAJIG_PACKET_BYTE_0 255
 #define SWITCHAMAJIG_CMD_SET_RELAY 0
+#define ITACH_MAX_STRING_LENGTH 255
 - (void)sendSwitchState {
+    if([self current_switch_connection_protocol] == PROTOCOL_ITACH) {
+        // Set state of three relays
+        char itach_packet[ITACH_MAX_STRING_LENGTH];
+        sprintf(itach_packet, "setstate,1:1,%d\r\n", switch_state & 0x01);
+        send([self switch_socket], itach_packet, strlen(itach_packet), 0);
+        sprintf(itach_packet, "setstate,1:2,%d\r\n", (switch_state & 0x02)>>1);
+        send([self switch_socket], itach_packet, strlen(itach_packet), 0);
+        sprintf(itach_packet, "setstate,1:3,%d\r\n", (switch_state & 0x04)>>2);
+        send([self switch_socket], itach_packet, strlen(itach_packet), 0);
+    }
     int switchIndex = [self active_switch_index];
     unsigned char packet[SWITCHAMAJIG_PACKET_LENGTH];
     memset(packet, 0, sizeof(packet));
@@ -441,7 +530,6 @@ bool verify_socket_reply(int socket, const char *expected_string) {
     }
 }
 
-int portno = 2000;
 // Initialize connection with remote switch
 - (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError
 {
@@ -453,6 +541,11 @@ int portno = 2000;
     // Get name of switch
     [[self switchDataLock] lock];
     NSString *switchName = (NSString*)CFArrayGetValueAtIndex([self switchNameArray], switchIndex);
+    int portno = ROVING_PORTNUM;
+    if([switchName isEqualToString:@"iTach"]) {
+        portno = ITACH_PORTNUM;
+        protocol = PROTOCOL_ITACH; // Override protocol
+    }
     char mystring[1024];
     [switchName getCString:mystring maxLength:1024 encoding:[NSString defaultCStringEncoding]];
     NSString *ipAddr;

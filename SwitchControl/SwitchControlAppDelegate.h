@@ -19,7 +19,9 @@
 @class singleSwitchView;
 @class twoSwitchView;
 @class rootSwitchViewController;
-
+#define PROTOCOL_ITACH (IPPROTO_TCP + IPPROTO_UDP + 1)
+#define ROVING_PORTNUM 2000
+#define ITACH_PORTNUM 4998
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate> {
     int switch_state;
     struct sockaddr_in udp_socket_address;
