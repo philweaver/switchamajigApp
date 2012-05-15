@@ -13,6 +13,7 @@
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
 		AD4D39A014AAEF3600ADA893 /* 6_tworows.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */; };
+		AD554844154F318A008C246D /* ir_5_basic.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD554843154F318A008C246D /* ir_5_basic.xml */; };
 		AD61F246141F13E100010895 /* DDXMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F241141F13E100010895 /* DDXMLDocument.m */; };
 		AD61F247141F13E100010895 /* DDXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F243141F13E100010895 /* DDXMLElement.m */; };
 		AD61F248141F13E100010895 /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F245141F13E100010895 /* DDXMLNode.m */; };
@@ -71,6 +72,7 @@
 		AD3DD729141B1DF100DB8AEB /* switchPanelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = switchPanelViewController.h; sourceTree = "<group>"; };
 		AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = switchPanelViewController.m; sourceTree = "<group>"; };
 		AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 6_tworows.xml; sourceTree = "<group>"; };
+		AD554843154F318A008C246D /* ir_5_basic.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ir_5_basic.xml; sourceTree = "<group>"; };
 		AD61F23F141F13E100010895 /* DDXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXML.h; path = kissxml/KissXML/DDXML.h; sourceTree = "<group>"; };
 		AD61F240141F13E100010895 /* DDXMLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLDocument.h; path = kissxml/KissXML/DDXMLDocument.h; sourceTree = "<group>"; };
 		AD61F241141F13E100010895 /* DDXMLDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDXMLDocument.m; path = kissxml/KissXML/DDXMLDocument.m; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 				AD0012991455E28D00BBEE91 /* switchamajig_50.png */,
 				AD00129A1455E28D00BBEE91 /* switchamajig_72.png */,
 				AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */,
+				AD554843154F318A008C246D /* ir_5_basic.xml */,
 				ADDF2812144CED7D000EB423 /* 4_fish_with_toggle.xml */,
 				ADE97CE0143FBFC800521DE0 /* 4_steering.xml */,
 				ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */,
@@ -360,6 +363,7 @@
 				AD86623514B567AB00C5860D /* configViewController.xib in Resources */,
 				AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */,
 				AD762F3E14F3650E00812CF8 /* 6_steering.xml in Resources */,
+				AD554844154F318A008C246D /* ir_5_basic.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
