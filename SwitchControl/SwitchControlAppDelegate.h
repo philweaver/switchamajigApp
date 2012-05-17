@@ -19,12 +19,13 @@
 @class singleSwitchView;
 @class twoSwitchView;
 @class rootSwitchViewController;
-#define PROTOCOL_ITACH (IPPROTO_TCP + IPPROTO_UDP + 1)
+#define PROTOCOL_SQ (IPPROTO_TCP + IPPROTO_UDP + 1)
 #define ROVING_PORTNUM 2000
-#define ITACH_PORTNUM 4998
-@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate> {
+#define SQ_PORTNUM 80
+@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate> {
     int switch_state;
     struct sockaddr_in udp_socket_address;
+    NSNetServiceBrowser *netServiceBrowser;
 }
 - (void)Background_Thread_To_Detect_Switches;
 - (void)Background_Thread_To_Transmit;
@@ -47,6 +48,22 @@
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
 
+// NSNetServiceBrowserDelegate
+- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindDomain:(NSString *)domainName moreComing:(BOOL)moreDomainsComing;
+- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing;
+- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didNotSearch:(NSDictionary *)errorInfo;
+- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didRemoveDomain:(NSString *)domainName moreComing:(BOOL)moreDomainsComing;
+- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didRemoveService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing;
+- (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)netServiceBrowser;
+- (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)netServiceBrowser;
 
-
+// NSNetServiceDelegate
+- (void)netService:(NSNetService *)sender didNotPublish:(NSDictionary *)errorDict;
+- (void)netService:(NSNetService *)sender didNotResolve:(NSDictionary *)errorDict;
+- (void)netService:(NSNetService *)sender didUpdateTXTRecordData:(NSData *)data;
+- (void)netServiceDidPublish:(NSNetService *)sender;
+- (void)netServiceDidResolveAddress:(NSNetService *)sender;
+- (void)netServiceDidStop:(NSNetService *)sender;
+- (void)netServiceWillPublish:(NSNetService *)sender;
+- (void)netServiceWillResolve:(NSNetService *)sender;
 @end
