@@ -9,15 +9,12 @@
 /* Begin PBXBuildFile section */
 		AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0012991455E28D00BBEE91 /* switchamajig_50.png */; };
 		AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD00129A1455E28D00BBEE91 /* switchamajig_72.png */; };
+		AD17D5EE1573521E0080A828 /* libKissXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD17D5ED1573521E0080A828 /* libKissXML.a */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
 		AD4D39A014AAEF3600ADA893 /* 6_tworows.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */; };
 		AD554844154F318A008C246D /* ir_5_basic.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD554843154F318A008C246D /* ir_5_basic.xml */; };
-		AD61F246141F13E100010895 /* DDXMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F241141F13E100010895 /* DDXMLDocument.m */; };
-		AD61F247141F13E100010895 /* DDXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F243141F13E100010895 /* DDXMLElement.m */; };
-		AD61F248141F13E100010895 /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F245141F13E100010895 /* DDXMLNode.m */; };
-		AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */ = {isa = PBXBuildFile; fileRef = AD61F24A141F140B00010895 /* NSString+DDXML.m */; };
 		AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AD762F3A14F31BB700812CF8 /* Settings.bundle */; };
 		AD762F3E14F3650E00812CF8 /* 6_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD762F3D14F3650D00812CF8 /* 6_steering.xml */; };
 		AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */; };
@@ -66,6 +63,7 @@
 /* Begin PBXFileReference section */
 		AD0012991455E28D00BBEE91 /* switchamajig_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_50.png; sourceTree = "<group>"; };
 		AD00129A1455E28D00BBEE91 /* switchamajig_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_72.png; sourceTree = "<group>"; };
+		AD17D5ED1573521E0080A828 /* libKissXML.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libKissXML.a; path = "../KissXML/build/Release-iphoneos/libKissXML.a"; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -73,16 +71,6 @@
 		AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = switchPanelViewController.m; sourceTree = "<group>"; };
 		AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 6_tworows.xml; sourceTree = "<group>"; };
 		AD554843154F318A008C246D /* ir_5_basic.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ir_5_basic.xml; sourceTree = "<group>"; };
-		AD61F23F141F13E100010895 /* DDXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXML.h; path = kissxml/KissXML/DDXML.h; sourceTree = "<group>"; };
-		AD61F240141F13E100010895 /* DDXMLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLDocument.h; path = kissxml/KissXML/DDXMLDocument.h; sourceTree = "<group>"; };
-		AD61F241141F13E100010895 /* DDXMLDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDXMLDocument.m; path = kissxml/KissXML/DDXMLDocument.m; sourceTree = "<group>"; };
-		AD61F242141F13E100010895 /* DDXMLElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLElement.h; path = kissxml/KissXML/DDXMLElement.h; sourceTree = "<group>"; };
-		AD61F243141F13E100010895 /* DDXMLElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDXMLElement.m; path = kissxml/KissXML/DDXMLElement.m; sourceTree = "<group>"; };
-		AD61F244141F13E100010895 /* DDXMLNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLNode.h; path = kissxml/KissXML/DDXMLNode.h; sourceTree = "<group>"; };
-		AD61F245141F13E100010895 /* DDXMLNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DDXMLNode.m; path = kissxml/KissXML/DDXMLNode.m; sourceTree = "<group>"; };
-		AD61F249141F140B00010895 /* NSString+DDXML.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+DDXML.h"; path = "kissxml/KissXML/Categories/NSString+DDXML.h"; sourceTree = "<group>"; };
-		AD61F24A141F140B00010895 /* NSString+DDXML.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+DDXML.m"; path = "kissxml/KissXML/Categories/NSString+DDXML.m"; sourceTree = "<group>"; };
-		AD61F24C141F141900010895 /* DDXMLPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DDXMLPrivate.h; path = kissxml/KissXML/Private/DDXMLPrivate.h; sourceTree = "<group>"; };
 		AD762F3A14F31BB700812CF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		AD762F3D14F3650D00812CF8 /* 6_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 6_steering.xml; sourceTree = "<group>"; };
 		AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_switchamajig1_cfg.cpp; sourceTree = "<group>"; };
@@ -130,6 +118,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD17D5EE1573521E0080A828 /* libKissXML.a in Frameworks */,
 				ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */,
 				ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */,
 				ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */,
@@ -151,26 +140,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AD61F23D141F13BA00010895 /* KissXML */ = {
-			isa = PBXGroup;
-			children = (
-				AD61F24C141F141900010895 /* DDXMLPrivate.h */,
-				AD61F249141F140B00010895 /* NSString+DDXML.h */,
-				AD61F24A141F140B00010895 /* NSString+DDXML.m */,
-				AD61F23F141F13E100010895 /* DDXML.h */,
-				AD61F240141F13E100010895 /* DDXMLDocument.h */,
-				AD61F241141F13E100010895 /* DDXMLDocument.m */,
-				AD61F242141F13E100010895 /* DDXMLElement.h */,
-				AD61F243141F13E100010895 /* DDXMLElement.m */,
-				AD61F244141F13E100010895 /* DDXMLNode.h */,
-				AD61F245141F13E100010895 /* DDXMLNode.m */,
-			);
-			name = KissXML;
-			sourceTree = "<group>";
-		};
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				AD17D5ED1573521E0080A828 /* libKissXML.a */,
 				AD762F3D14F3650D00812CF8 /* 6_steering.xml */,
 				AD0012991455E28D00BBEE91 /* switchamajig_50.png */,
 				AD00129A1455E28D00BBEE91 /* switchamajig_72.png */,
@@ -220,7 +193,6 @@
 				ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */,
 				ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */,
 				ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */,
-				AD61F23D141F13BA00010895 /* KissXML */,
 				AD3DD723141ACA0800DB8AEB /* Reachability.h */,
 				AD3DD724141ACA0900DB8AEB /* Reachability.m */,
 				ADB75BFE13DB539C00448025 /* SwitchControlAppDelegate.h */,
@@ -403,10 +375,6 @@
 				ADB75C0013DB539C00448025 /* SwitchControlAppDelegate.m in Sources */,
 				AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */,
 				AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */,
-				AD61F246141F13E100010895 /* DDXMLDocument.m in Sources */,
-				AD61F247141F13E100010895 /* DDXMLElement.m in Sources */,
-				AD61F248141F13E100010895 /* DDXMLNode.m in Sources */,
-				AD61F24B141F140B00010895 /* NSString+DDXML.m in Sources */,
 				ADC7C18D142D62970045ABD0 /* rootSwitchViewController.m in Sources */,
 				ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */,
 				AD86623414B567AB00C5860D /* configViewController.m in Sources */,
@@ -525,6 +493,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 2;
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "$(BUILT_PRODUCTS_DIR)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -539,6 +508,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 2;
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "$(BUILT_PRODUCTS_DIR)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
