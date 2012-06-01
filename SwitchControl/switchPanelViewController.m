@@ -8,7 +8,7 @@
 
 #import "switchPanelViewController.h"
 #import "stdio.h"
-#import "DDXMLDocument.h"
+#import "../../KissXML/KissXML/DDXMLDocument.h"
 
 @implementation switchPanelViewController
 
