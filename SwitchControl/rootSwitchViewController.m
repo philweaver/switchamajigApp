@@ -23,18 +23,7 @@
 @synthesize SwitchStatusActivity;
 
 - (void)dealloc {
-    [switchNameTableView release];
-    switchNameTableView = nil;
-    [switchNameTableView release];
-    [panelSelectionScrollView release];
     CFRelease(switchPanelURLDictionary);
-    [SwitchStatusText release];
-    [SwitchStatusActivity release];
-    [helpButton release];
-    [bgColorSegControl release];
-    [bgColorLabel release];
-    [ConfigButton release];
-    [super dealloc];
 }
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -129,9 +118,7 @@
         [panelNameLabel setText:[viewController switchPanelName]];
         [panelNameLabel setTextAlignment:UITextAlignmentCenter];
         [panelSelectionScrollView addSubview:panelNameLabel];
-        [panelNameLabel release];
-        [viewController release];
-        CFDictionaryAddValue(switchPanelURLDictionary, myButton, url);
+        // Redesign CFDictionaryAddValue(switchPanelURLDictionary, myButton, url);
     }
     [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, 100)];
     [panelSelectionScrollView setScrollEnabled:YES];
@@ -187,24 +174,22 @@
     // Load programatically-created view
     switchPanelViewController *viewController = [switchPanelViewController alloc];
     NSURL *url;
+#if 0
+// REDESIGN
     if(!CFDictionaryGetValueIfPresent(switchPanelURLDictionary, sender, (const void **) &url)) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Panel dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
-        [message release];
-        [viewController release];
         return;
     }
-
+#endif
     [viewController setUrlToLoad:url];
     [self.navigationController pushViewController:viewController animated:YES];
-    [viewController release];
 }
 
 - (IBAction)display_help:(id)sender {
     [[self navigationController] setNavigationBarHidden:NO];
     helpDisplayViewController *helpViewCtrl = [helpDisplayViewController alloc];
     [self.navigationController pushViewController:helpViewCtrl animated:YES];
-    [helpViewCtrl release];
 }
 - (IBAction)config_pressed:(id)sender {
     //[[self navigationController] setNavigationBarHidden:NO];
@@ -212,10 +197,11 @@
     [configViewCtrl setModalPresentationStyle:UIModalPresentationFormSheet];
     [configViewCtrl setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
     configViewCtrl->appDelegate = appDelegate;
+#if 0
+// REDESIGN
     configViewCtrl->switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], [appDelegate active_switch_index])];
-
+#endif
     [self presentModalViewController:configViewCtrl animated:YES];
-    [configViewCtrl release];
 }
 
 - (void) switch_names_updated:(NSNotification *) notification {
@@ -249,9 +235,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
     if(cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"];
     }
-    NSString *switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
+    NSString *switchName = [NSString stringWithString:(__bridge NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], indexPath.row)];
     cell.textLabel.text = switchName;
     if(indexPath.row == [appDelegate active_switch_index]) {
         cell.detailTextLabel.text = @"Connected";

@@ -20,7 +20,7 @@
     [super setUp];
     
     // Set-up code here.
-    app_delegate = [[UIApplication sharedApplication] delegate];
+    app_delegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication] delegate];
     nav_controller = [app_delegate navigationController];
     rootViewController = [[nav_controller viewControllers] objectAtIndex:0];
 }
@@ -61,7 +61,7 @@
     [panel->allowNavButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue([panel->backButton isEnabled], @"Back button did not enable in switch panel");
     // Retrieve the first switch from the dictionary
-    STAssertTrue((CFDictionaryGetCount([panel buttonToSwitchDictionary]) > 0), @"No switches in dictionary");
+    STAssertTrue([[panel buttonToSwitchDictionary] count] > 0, @"No switches in dictionary");
     [panel->myButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertFalse([panel->backButton isEnabled], @"Back button did not disable on switch press in switch panel");
     [panel->allowNavButton sendActionsForControlEvents:UIControlEventTouchUpInside];

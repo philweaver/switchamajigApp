@@ -21,29 +21,12 @@
 @synthesize ScanNetworkButton;
 @synthesize wifiNameDictionary = _wifiNameDictionary;
 
-- (void)dealloc {
-    [ScanActivityIndicator release];
-    [wifiNameTable release];
-    [CancelButton release];
-    [datePicker release];
-    [SwitchamajigNameText release];
-    [NetworkNameText release];
-    [ConfigureNetworkButton release];
-    [ScanNetworkButton release];
-    [_wifiDataLock release];
-    CFRelease([self wifiNameDictionary]);
-    CFRelease([self wifiNameArray]);
-    [super dealloc];
-}
-
 - (void)viewDidUnload
 {
     [self setScanActivityIndicator:nil];
     [self setWifiNameTable:nil];
-    [_wifiDataLock release];
-    CFRelease([self wifiNameDictionary]);
-    CFRelease([self wifiNameArray]);
-
+    [self setWifiNameDictionary:nil];
+    [self setWifiNameArray:nil];
     [self setCancelButton:nil];
     [self setDatePicker:nil];
     [self setSwitchamajigNameText:nil];
@@ -76,11 +59,9 @@
     [super viewDidLoad];
     nowEnteringPassphrase = NO;
     nowConfirmingConfig = NO;
-    NSLock *theLock = [[NSLock alloc] init];
-    [self setWifiDataLock:theLock];
-    [theLock release];
-    [self setWifiNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
-    [self setWifiNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
+    [self setWifiDataLock:[[NSLock alloc] init]];
+    [self setWifiNameDictionary:[NSMutableDictionary dictionaryWithCapacity:5]];
+    [self setWifiNameArray:[NSMutableArray arrayWithCapacity:5]];
 
     [SwitchamajigNameText setText:switchName];
     [ConfigureNetworkButton setEnabled:NO];
@@ -97,7 +78,6 @@
                                                     cancelButtonTitle:@"OK"  
                                                     otherButtonTitles:nil];
             [message show];  
-            [message release];
             [self performSelectorOnMainThread:@selector(Cancel:) withObject:nil waitUntilDone:NO];
             return;
         }
@@ -166,7 +146,6 @@
                                                     cancelButtonTitle:@"OK"  
                                                     otherButtonTitles:nil];
             [message show];  
-            [message release];
         }
         [self performSelectorOnMainThread:@selector(Cancel:) withObject:nil waitUntilDone:NO];
     }
@@ -221,27 +200,26 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return CFArrayGetCount([self wifiNameArray]);
+    return [[self wifiNameArray] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
     if(cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
     }
-    cell.textLabel.text = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([self wifiNameArray], indexPath.row)];
+    cell.textLabel.text = [NSString stringWithString:[[self wifiNameArray] objectAtIndex:indexPath.row]];
     return cell;
 }
 
 // Support for connecting to a switch when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [[self wifiDataLock] lock];
-    NSString *networkName = (NSString*)CFArrayGetValueAtIndex([self wifiNameArray], indexPath.row);
-    NSNumber *wifiIndex;
-    if(!CFDictionaryGetValueIfPresent([self wifiNameDictionary], networkName, (const void **) &wifiIndex)) {
+    NSString *networkName = [[self wifiNameArray] objectAtIndex:indexPath.row];
+    NSNumber *wifiIndex = [[self wifiNameDictionary] objectForKey:networkName];
+    if(wifiIndex == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
-        [message release];
         [[self wifiDataLock] unlock];
         return;
     }
@@ -255,7 +233,6 @@
                                                 cancelButtonTitle:@"OK"  
                                                 otherButtonTitles:nil];
         [message show];  
-        [message release];
         return;
     }
     [NetworkNameText setText:networkName];
@@ -265,36 +242,36 @@
 
 // Provide options for walking in 
 - (void)Background_Thread_To_Detect_Wifi {
-    NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
-    [[self wifiDataLock] lock];
-    CFDictionaryRemoveAllValues([self wifiNameDictionary]);    
-    CFArrayRemoveAllValues([self wifiNameArray]);
-    [[self wifiDataLock] unlock];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
-    if(!switchamajig1_enter_command_mode([appDelegate switch_socket])) {
-        [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Unable to configure Switchamajig (cmd)" waitUntilDone:NO];
-    } 
-    else {
-        sleep(2);
-        if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
-            [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Found no wifi networks (scan)." waitUntilDone:NO];
-        } else if(!strcmp(availableNetworks[0].ssid, "Ch")) {
-            // Mysterious failure when reply from controller is garbled
-            [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Found no wifi networks (Ch)." waitUntilDone:NO];
-            num_avail_wifi = 0;
+    @autoreleasepool {
+        [[self wifiDataLock] lock];
+        [[self wifiNameDictionary] removeAllObjects];    
+        [[self wifiNameArray] removeAllObjects];
+        [[self wifiDataLock] unlock];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
+        if(!switchamajig1_enter_command_mode([appDelegate switch_socket])) {
+            [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Unable to configure Switchamajig (cmd)" waitUntilDone:NO];
+        } 
+        else {
+            sleep(2);
+            if(!switchamajig1_scan_wifi([appDelegate switch_socket], &num_avail_wifi, availableNetworks, MAX_AVAIL_NETWORKS)) {
+                [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Found no wifi networks (scan)." waitUntilDone:NO];
+            } else if(!strcmp(availableNetworks[0].ssid, "Ch")) {
+                // Mysterious failure when reply from controller is garbled
+                [self performSelectorOnMainThread:@selector(ShowScanAlert:) withObject:@"Found no wifi networks (Ch)." waitUntilDone:NO];
+                num_avail_wifi = 0;
+            }
         }
+        [[self wifiDataLock] lock];
+        for(int i=0; i < num_avail_wifi; ++i) {
+            NSString *networkName1 = [NSString stringWithCString:availableNetworks[i].ssid encoding:NSUTF8StringEncoding];
+            [[self wifiNameArray] addObject:networkName1];
+            NSNumber *wifiNetIndex = [NSNumber numberWithInt:i];
+            [[self wifiNameDictionary] setObject:wifiNetIndex forKey:networkName1];
+        }
+        [[self wifiDataLock] unlock];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
+        [self performSelectorOnMainThread:@selector(EnableUIAfterScan) withObject:nil waitUntilDone:NO];
     }
-    [[self wifiDataLock] lock];
-    for(int i=0; i < num_avail_wifi; ++i) {
-        NSString *networkName1 = [NSString stringWithCString:availableNetworks[i].ssid encoding:NSUTF8StringEncoding];
-        CFArrayAppendValue([self wifiNameArray], networkName1);
-        NSNumber *wifiNetIndex = [NSNumber numberWithInt:i];
-        CFDictionaryAddValue([self wifiNameDictionary], networkName1, wifiNetIndex);
-    }
-    [[self wifiDataLock] unlock];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
-    [self performSelectorOnMainThread:@selector(EnableUIAfterScan) withObject:nil waitUntilDone:NO];
-    [mempool release];
     return;
 }
 
@@ -331,7 +308,6 @@
                                                 cancelButtonTitle:@"OK"  
                                                 otherButtonTitles:nil];
         [message show];  
-        [message release];
     }
     // Clear the last switch info file
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
@@ -355,7 +331,6 @@
                                             otherButtonTitles:@"Choose Network",nil];
     [message setAlertViewStyle:UIAlertViewStyleSecureTextInput];
     [message show];  
-    [message release];
 }
 
 - (IBAction)NetworkNameChanged:(id)sender {
@@ -392,6 +367,5 @@
                                             cancelButtonTitle:@"OK"  
                                             otherButtonTitles:nil];
     [message show];  
-    [message release];
 }
 @end

@@ -28,7 +28,6 @@
     NSNetServiceBrowser *netServiceBrowser;
 }
 - (void)Background_Thread_To_Detect_Switches;
-- (void)Background_Thread_To_Transmit;
 - (void)activate:(NSObject *)switches;
 - (void)deactivate:(NSObject *)switches;
 - (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;

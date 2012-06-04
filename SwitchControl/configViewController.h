@@ -42,8 +42,8 @@
 @property (retain, nonatomic) IBOutlet UITableView *wifiNameTable;
 // Information for WiFi network detection
 @property (retain) NSLock *wifiDataLock;
-@property (nonatomic) CFMutableDictionaryRef wifiNameDictionary;
-@property (nonatomic) CFMutableArrayRef wifiNameArray;
+@property (nonatomic) NSMutableDictionary *wifiNameDictionary;
+@property (nonatomic) NSMutableArray *wifiNameArray;
 @property (retain, nonatomic) IBOutlet UIButton *CancelButton;
 @property (retain, nonatomic) IBOutlet UIPickerView *datePicker;
 @property (retain, nonatomic) IBOutlet UITextField *SwitchamajigNameText;

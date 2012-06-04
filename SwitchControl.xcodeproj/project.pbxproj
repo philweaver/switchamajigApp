@@ -10,7 +10,7 @@
 		AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0012991455E28D00BBEE91 /* switchamajig_50.png */; };
 		AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD00129A1455E28D00BBEE91 /* switchamajig_72.png */; };
 		AD17D5EE1573521E0080A828 /* libKissXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD17D5ED1573521E0080A828 /* libKissXML.a */; };
-		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; };
+		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
 		AD4D39A014AAEF3600ADA893 /* 6_tworows.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */; };
@@ -20,6 +20,9 @@
 		AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */; };
 		AD86623414B567AB00C5860D /* configViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD86623214B567AB00C5860D /* configViewController.m */; };
 		AD86623514B567AB00C5860D /* configViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD86623314B567AB00C5860D /* configViewController.xib */; };
+		AD921B01157D507A00940981 /* libSwitchamajigDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B00157D507A00940981 /* libSwitchamajigDriver.a */; };
+		AD921B04157D6CA100940981 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B03157D6CA000940981 /* CFNetwork.framework */; };
+		AD921B06157D6CAC00940981 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B05157D6CAC00940981 /* Security.framework */; };
 		ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
 		ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF113DB539C00448025 /* Foundation.framework */; };
 		ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF313DB539C00448025 /* CoreGraphics.framework */; };
@@ -63,7 +66,7 @@
 /* Begin PBXFileReference section */
 		AD0012991455E28D00BBEE91 /* switchamajig_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_50.png; sourceTree = "<group>"; };
 		AD00129A1455E28D00BBEE91 /* switchamajig_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_72.png; sourceTree = "<group>"; };
-		AD17D5ED1573521E0080A828 /* libKissXML.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libKissXML.a; path = "../KissXML/build/Release-iphoneos/libKissXML.a"; sourceTree = "<group>"; };
+		AD17D5ED1573521E0080A828 /* libKissXML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKissXML.a; path = "../KissXML/build/Release-iphoneos/libKissXML.a"; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -78,6 +81,9 @@
 		AD86623114B567AB00C5860D /* configViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = configViewController.h; sourceTree = "<group>"; };
 		AD86623214B567AB00C5860D /* configViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = configViewController.m; sourceTree = "<group>"; };
 		AD86623314B567AB00C5860D /* configViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = configViewController.xib; sourceTree = "<group>"; };
+		AD921B00157D507A00940981 /* libSwitchamajigDriver.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libSwitchamajigDriver.a; path = "../SwitchamajigDriver/build/Release-iphoneos/libSwitchamajigDriver.a"; sourceTree = "<group>"; };
+		AD921B03157D6CA000940981 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		AD921B05157D6CAC00940981 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		ADB75BEB13DB539C00448025 /* SwitchControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitchControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADB75BEF13DB539C00448025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		ADB75BF113DB539C00448025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -118,6 +124,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD921B06157D6CAC00940981 /* Security.framework in Frameworks */,
+				AD921B04157D6CA100940981 /* CFNetwork.framework in Frameworks */,
+				AD921B01157D507A00940981 /* libSwitchamajigDriver.a in Frameworks */,
 				AD17D5EE1573521E0080A828 /* libKissXML.a in Frameworks */,
 				ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */,
 				ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */,
@@ -143,6 +152,9 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				AD921B05157D6CAC00940981 /* Security.framework */,
+				AD921B03157D6CA000940981 /* CFNetwork.framework */,
+				AD921B00157D507A00940981 /* libSwitchamajigDriver.a */,
 				AD17D5ED1573521E0080A828 /* libKissXML.a */,
 				AD762F3D14F3650D00812CF8 /* 6_steering.xml */,
 				AD0012991455E28D00BBEE91 /* switchamajig_50.png */,
@@ -433,6 +445,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -450,7 +463,10 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				"HEADER_SEARCH_PATHS[arch=*]" = /usr/include/libxml2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				"OTHER_LDFLAGS[arch=*]" = "-lxml2";
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lxml2",
+					"-ObjC",
+				);
 				PRODUCT_NAME = Switchamajig;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
@@ -463,6 +479,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COMPRESS_PNG_FILES = YES;
 				COPY_PHASE_STRIP = YES;
@@ -474,7 +491,10 @@
 				"HEADER_SEARCH_PATHS[arch=*]" = /usr/include/libxml2;
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				"OTHER_LDFLAGS[arch=*]" = "-lxml2";
+				"OTHER_LDFLAGS[arch=*]" = (
+					"-lxml2",
+					"-ObjC",
+				);
 				PRODUCT_NAME = Switchamajig;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
@@ -486,6 +506,7 @@
 		ADB75C1E13DB539C00448025 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -501,6 +522,7 @@
 		ADB75C1F13DB539C00448025 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;

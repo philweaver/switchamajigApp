@@ -46,7 +46,7 @@
     UIView *myView = [[UIView alloc] initWithFrame:cgRct];
     [myView setBackgroundColor:bgColor];
 	myView.autoresizesSubviews = YES;
-    [self setButtonToSwitchDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
+    [self setButtonToSwitchDictionary:[NSMutableDictionary dictionaryWithCapacity:10]]; 
     
     // Create two-button combo to allow navigation
     allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -104,7 +104,6 @@
         bool y_ok = [frameScan scanInt:&y];
         bool w_ok = [frameScan scanInt:&w];
         bool h_ok = [frameScan scanInt:&h];
-        [frameScan release];
         if(!x_ok || !y_ok || !w_ok || !h_ok)
             continue;
         buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
@@ -122,7 +121,6 @@
         bool g_ok = [colorScan scanFloat:&g];
         bool b_ok = [colorScan scanFloat:&b];
         bool a_ok = [colorScan scanFloat:&a];
-        [colorScan release];
         if(!r_ok || !g_ok || !b_ok || !a_ok)
             continue;
         
@@ -143,7 +141,6 @@
             NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
             int mask;
             bool mask_ok = [maskScan scanInt:&mask];
-            [maskScan release];
             if(!mask_ok)
                 continue;
             // Display on button what switches it activates
@@ -159,14 +156,13 @@
             }
             [myButton setTitle:switchesActivatedText forState:UIControlStateNormal];
             NSNumber *switchNum = [NSNumber numberWithInt:mask];
-            CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchNum);
+            [[self buttonToSwitchDictionary] setValue:switchNum forKey:myButton];
         } else {
             // Create array to hold sequence
             NSMutableArray *switchSequence = [[NSMutableArray alloc] initWithCapacity:5];
             // Element 0: flag to shut down sequencing
             NSNumber *num = [[NSNumber alloc] initWithInt:0];
             [switchSequence insertObject:num atIndex:0];
-            [num release];
             NSArray *sequenceElementNodes = [[sequenceNodes objectAtIndex:0] nodesForXPath:@".//sequenceelement" error:&xmlError];
             DDXMLNode *sequenceElement;
             for(sequenceElement in sequenceElementNodes) {
@@ -178,7 +174,6 @@
                 NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
                 int mask;
                 bool mask_ok = [maskScan scanInt:&mask];
-                [maskScan release];
                 if(!mask_ok)
                     continue;
                 NSNumber *switchNum = [NSNumber numberWithInt:mask];
@@ -186,15 +181,13 @@
                 NSScanner *timeScan = [[NSScanner alloc] initWithString:timeString];
                 float time;
                 bool time_ok = [timeScan scanFloat:&time];
-                [timeScan release];
                 if(!time_ok)
                     continue;
                 NSNumber *timeNum = [NSNumber numberWithFloat:time];
                 [switchSequence addObject:switchNum];
                 [switchSequence addObject:timeNum];
             }
-            CFDictionaryAddValue([self buttonToSwitchDictionary], myButton, switchSequence);
-            [switchSequence release];
+            [[self buttonToSwitchDictionary] setValue:switchSequence forKey:myButton];
         }
         if([textNodes count]) {
             [myButton setTitle:[[textNodes objectAtIndex:0] stringValue] forState:UIControlStateNormal];
@@ -209,11 +202,8 @@
     [textToShowSwitchName setBackgroundColor:bgColor];
     [self updateSwitchNameText];
     [myView addSubview:textToShowSwitchName];
-    [textToShowSwitchName release];
     
 	self.view = myView;
-    [myView release];
-    [xmlDoc release];
 }
 - (void)updateSwitchNameText {
     [textToShowSwitchName setTextAlignment:UITextAlignmentLeft];
@@ -222,9 +212,12 @@
         [textToShowSwitchName setText:@"Not connected"];
     } else {
         [textToShowSwitchName setTextColor:[appDelegate foregroundColor]];
-        NSString *switchName = (NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], [appDelegate active_switch_index]);
+#if 0
+// REDESIGN
+        NSString *switchName = [[appDelegate switchNameArray] objectAtIndex:[appDelegate active_switch_index]];
         NSString *switchNameText = [@"Connected to " stringByAppendingString:switchName];
         [textToShowSwitchName setText:switchNameText];
+#endif
     }
 }
 
@@ -235,26 +228,6 @@
     [super viewDidLoad];
 }
 */
-- (void) dealloc {
-    if([self isViewLoaded]) {
-        CFRelease([self buttonToSwitchDictionary]);
-        [urlToLoad release];
-        [switchPanelName release];
-    }
-    [super dealloc];
-}
-
-- (void)viewDidUnload
-{
-    
-    // Release any retained subviews of the main view.
-    CFRelease([self buttonToSwitchDictionary]);
-    [urlToLoad release];
-    [switchPanelName release];
-    // e.g. self.myOutlet = nil;
-    [super viewDidUnload];
-
-}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -265,11 +238,10 @@
 // Handlers for switches activated/deactiveated. They send commands to delegate
 - (IBAction)onSwitchActivated:(id)sender {
     [backButton setEnabled:NO];
-    NSObject *switches;
-    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switches)) {
+    NSObject *switches = [[self buttonToSwitchDictionary] objectForKey:sender];
+    if(switches == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
-        [message release];
         return;
     }
 
@@ -278,11 +250,10 @@
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
     [backButton setEnabled:NO];
-    NSObject *switches;
-    if(!CFDictionaryGetValueIfPresent([self buttonToSwitchDictionary], sender, (const void **) &switches)) {
+    NSObject *switches = [[self buttonToSwitchDictionary] objectForKey:sender];
+    if(switches == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
-        [message release];
         return;
     }
     

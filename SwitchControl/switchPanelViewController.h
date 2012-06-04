@@ -16,14 +16,14 @@
     id myButton; // last button initialized
     id textToShowSwitchName;
 }
-@property (nonatomic) CFMutableDictionaryRef buttonToSwitchDictionary;
 - (IBAction)allowNavigation:(id)sender;
 - (IBAction)disallowNavigation:(id)sender;
 - (IBAction)goBack:(id)sender;
 - (IBAction)onSwitchActivated:(id)sender;
 - (IBAction)onSwitchDeactivated:(id)sender;
 - (void)updateSwitchNameText;
-@property (nonatomic, retain) NSURL *urlToLoad;
-@property (nonatomic, retain) NSString *switchPanelName;
+@property (nonatomic, strong) NSURL *urlToLoad;
+@property (nonatomic, strong) NSString *switchPanelName;
+@property (nonatomic, strong) NSMutableDictionary *buttonToSwitchDictionary;
 
 @end
