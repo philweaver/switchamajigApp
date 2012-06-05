@@ -25,7 +25,6 @@
     return self;
 }
 */
-
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
@@ -156,7 +155,8 @@
             }
             [myButton setTitle:switchesActivatedText forState:UIControlStateNormal];
             NSNumber *switchNum = [NSNumber numberWithInt:mask];
-            [[self buttonToSwitchDictionary] setValue:switchNum forKey:myButton];
+            NSValue *value = [[NSValue alloc] initWithBytes:((void *)myButton) objCType:@encode(id)];
+            [[self buttonToSwitchDictionary] setObject:switchNum forKey:value];
         } else {
             // Create array to hold sequence
             NSMutableArray *switchSequence = [[NSMutableArray alloc] initWithCapacity:5];
@@ -187,7 +187,8 @@
                 [switchSequence addObject:switchNum];
                 [switchSequence addObject:timeNum];
             }
-            [[self buttonToSwitchDictionary] setValue:switchSequence forKey:myButton];
+            NSValue *value = [[NSValue alloc] initWithBytes:((void *)myButton) objCType:@encode(id)];
+            [[self buttonToSwitchDictionary] setObject:switchSequence forKey:value];
         }
         if([textNodes count]) {
             [myButton setTitle:[[textNodes objectAtIndex:0] stringValue] forState:UIControlStateNormal];

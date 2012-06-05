@@ -14,25 +14,20 @@
     SwitchControlAppDelegate *appDelegate;
     CFMutableDictionaryRef switchPanelURLDictionary;
     UILabel *SwitchStatusText;
-    UIActivityIndicatorView *SwitchStatusActivity;
     UIButton *helpButton;
     BOOL isConfigAvailable;
+    int textFontSize;
 }
 - (void) switch_names_updated:(NSNotification *) notification;
 - (void) reload_switch_name_table;
 - (void) ResetScrollPanel;
-- (void)initializeScrollPanelWithSwitchPanels;
+- (void)initializeScrollPanelWithSwitchPanels:(int)selectButtonHeight  textSize:(CGSize)textSize;
 - (IBAction)launchSwitchPanel:(id)sender;
 @property (nonatomic, retain) IBOutlet UIButton *helpButton;
 - (IBAction)display_help:(id)sender;
 - (IBAction)config_pressed:(id)sender;
 @property (nonatomic, retain) IBOutlet UIScrollView *panelSelectionScrollView;
-@property (nonatomic, retain) IBOutlet UITableView *switchNameTableView;
-@property (nonatomic, retain) IBOutlet UILabel *SwitchStatusText;
-@property (nonatomic, retain) IBOutlet UIActivityIndicatorView *SwitchStatusActivity;
-- (IBAction)bgColorSegControlIndexChanged:(id) sender;
-@property (retain, nonatomic) IBOutlet UILabel *bgColorLabel;
-@property (retain, nonatomic) IBOutlet UISegmentedControl *bgColorSegControl;
+@property (nonatomic, retain) IBOutlet UILabel *statusText;
 @property (retain, nonatomic) IBOutlet UIButton *ConfigButton;
 
 @end

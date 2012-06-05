@@ -37,7 +37,6 @@
 		ADB75C1613DB539C00448025 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1413DB539C00448025 /* InfoPlist.strings */; };
 		ADB75C1813DB539C00448025 /* SwitchControlTests.h in Resources */ = {isa = PBXBuildFile; fileRef = ADB75C1713DB539C00448025 /* SwitchControlTests.h */; };
 		ADB75C1A13DB539C00448025 /* SwitchControlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB75C1913DB539C00448025 /* SwitchControlTests.m */; };
-		ADBA89BB13E0D09500A89CB6 /* rootSwitchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */; };
 		ADC7C187142D5A830045ABD0 /* 1_yellow.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C186142D5A830045ABD0 /* 1_yellow.xml */; };
 		ADC7C189142D5B370045ABD0 /* 2_yellow_blue.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C188142D5B370045ABD0 /* 2_yellow_blue.xml */; };
 		ADC7C18B142D5B920045ABD0 /* 4_across_y_b_m_c.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C18A142D5B920045ABD0 /* 4_across_y_b_m_c.xml */; };
@@ -102,7 +101,6 @@
 		ADB75C1713DB539C00448025 /* SwitchControlTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchControlTests.h; sourceTree = "<group>"; };
 		ADB75C1913DB539C00448025 /* SwitchControlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchControlTests.m; sourceTree = "<group>"; };
 		ADBA89B713E0D09500A89CB6 /* rootSwitchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rootSwitchViewController.h; sourceTree = "<group>"; };
-		ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = rootSwitchViewController.xib; sourceTree = "<group>"; };
 		ADC7C186142D5A830045ABD0 /* 1_yellow.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_yellow.xml; sourceTree = "<group>"; };
 		ADC7C188142D5B370045ABD0 /* 2_yellow_blue.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 2_yellow_blue.xml; sourceTree = "<group>"; };
 		ADC7C18A142D5B920045ABD0 /* 4_across_y_b_m_c.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_across_y_b_m_c.xml; sourceTree = "<group>"; };
@@ -213,7 +211,6 @@
 				ADB75BF613DB539C00448025 /* Supporting Files */,
 				ADC7C18C142D62970045ABD0 /* rootSwitchViewController.m */,
 				ADBA89B713E0D09500A89CB6 /* rootSwitchViewController.h */,
-				ADBA89B913E0D09500A89CB6 /* rootSwitchViewController.xib */,
 				AD3DD729141B1DF100DB8AEB /* switchPanelViewController.h */,
 				AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */,
 				AD86623114B567AB00C5860D /* configViewController.h */,
@@ -329,7 +326,6 @@
 			files = (
 				ADB75BFA13DB539C00448025 /* InfoPlist.strings in Resources */,
 				ADB75C0313DB539C00448025 /* MainWindow.xib in Resources */,
-				ADBA89BB13E0D09500A89CB6 /* rootSwitchViewController.xib in Resources */,
 				ADC7C187142D5A830045ABD0 /* 1_yellow.xml in Resources */,
 				ADC7C189142D5B370045ABD0 /* 2_yellow_blue.xml in Resources */,
 				ADC7C18B142D5B920045ABD0 /* 4_across_y_b_m_c.xml in Resources */,

@@ -14,26 +14,40 @@
 
 @implementation rootSwitchViewController
 @synthesize ConfigButton;
-@synthesize bgColorLabel;
-@synthesize bgColorSegControl;
 @synthesize helpButton;
 @synthesize panelSelectionScrollView;
-@synthesize switchNameTableView;
-@synthesize SwitchStatusText;
-@synthesize SwitchStatusActivity;
+@synthesize statusText;
 
 - (void)dealloc {
     CFRelease(switchPanelURLDictionary);
 }
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-        appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
-    }
-    return self;
+#pragma mark - View lifecycle
+#define border 20
+#define button_spacing 50
+#define FRAME_WIDTH 1024
+#define FRAME_HEIGHT 768
+- (void) loadView {
+    textFontSize = 60;
+    NSString *sampleText = @"Steering Plus";
+    CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+    int textHeight = textSize.height;
+    int selectButtonHeight = 477;
+    appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
+    
+    [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
+    [[self view] setBackgroundColor:[UIColor blackColor]];
+    [self setStatusText:[[UILabel alloc] initWithFrame:CGRectMake(border, 0, FRAME_WIDTH-2*border, textHeight)]];
+    [[self statusText] setText:@"Welcome to Switchamajig"];
+    [[self statusText] setBackgroundColor:[UIColor blackColor]];
+    [[self statusText] setTextColor:[UIColor whiteColor]];
+    [[self statusText] setFont:[UIFont systemFontOfSize:textFontSize]];
+    [[self view] addSubview:[self statusText]];
+    [self setPanelSelectionScrollView:[[UIScrollView alloc] initWithFrame:CGRectMake(border, textHeight+button_spacing, FRAME_WIDTH-2*border, FRAME_HEIGHT-border-(textHeight+button_spacing))]];
+    [[self panelSelectionScrollView] setScrollEnabled:YES];
+    [[self view] addSubview:[self panelSelectionScrollView]];
+    [self initializeScrollPanelWithSwitchPanels:selectButtonHeight textSize:textSize];
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -44,32 +58,28 @@
     // Release any cached data, images, etc that aren't in use.
 }
 
-#pragma mark - View lifecycle
-#define switch_select_button_w 102
-#define switch_select_button_h 77
-#define switch_select_button_spacing 50
-#define switch_label_height 36
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
 
-    // Make background color selector disappear
-    [bgColorLabel setHidden:YES];
-    [bgColorSegControl setHidden:YES];
     // Initially the config button is not visible
-    [ConfigButton setHidden:YES];
+    //[ConfigButton setHidden:YES];
     // Determine if we will enable config - need flexible alert views
     isConfigAvailable = [UIAlertView instancesRespondToSelector:@selector(setAlertViewStyle:)];
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
-    [self initializeScrollPanelWithSwitchPanels];
 }
 
-- (void)initializeScrollPanelWithSwitchPanels {
+- (void)initializeScrollPanelWithSwitchPanels:(int)selectButtonHeight textSize:(CGSize)textSize {
     UIColor *bgColor = [UIColor blackColor];
     UIColor *fgColor = [UIColor whiteColor];
+    int selectButtonWidth = selectButtonHeight + (selectButtonHeight/2);
+    if(textSize.width > selectButtonWidth) {
+        selectButtonWidth = textSize.width;
+        selectButtonHeight = (selectButtonWidth*2)/3;
+    }
 
     if(switchPanelURLDictionary) {
         CFDictionaryRemoveAllValues(switchPanelURLDictionary);
@@ -80,8 +90,8 @@
     NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
     NSURL *url;
     
-    int current_button_x = switch_select_button_spacing;
-    int current_button_y = switch_select_button_spacing;
+    int current_button_x = button_spacing;
+    int current_button_y = button_spacing;
     
     for(url in xmlUrls) {
         // Render view controller into image
@@ -95,15 +105,15 @@
         // Create button with image
         // Create the specified button
         id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, switch_select_button_w, switch_select_button_h)];
+        [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, selectButtonWidth, selectButtonHeight)];
         // Also set rectangle for label
-        CGRect panelNameLabelRect = CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y + switch_select_button_h, switch_select_button_w, switch_label_height);
+        CGRect panelNameLabelRect = CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y + selectButtonHeight, selectButtonWidth, textSize.height);
         [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)]; 
         [panelSelectionScrollView addSubview:myButton];
-        current_button_y += switch_select_button_h + switch_select_button_spacing;
-        if(current_button_y + switch_select_button_h >= [panelSelectionScrollView bounds].size.height) {
-            current_button_y = switch_select_button_spacing;
-            current_button_x += switch_select_button_w + switch_select_button_spacing;
+        current_button_y += selectButtonHeight + textSize.height + button_spacing;
+        if(current_button_y + selectButtonHeight >= [panelSelectionScrollView bounds].size.height) {
+            current_button_y = button_spacing;
+            current_button_x += selectButtonWidth + button_spacing;
         }
         size = [myButton bounds].size;
         UIGraphicsBeginImageContext(size);
@@ -112,27 +122,26 @@
         UIGraphicsEndImageContext();
         [myButton setImage:scaledImage forState:UIControlStateNormal];
         // Add text label
-         UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
+        UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
         [panelNameLabel setBackgroundColor:bgColor];
         [panelNameLabel setTextColor:fgColor];
         [panelNameLabel setText:[viewController switchPanelName]];
         [panelNameLabel setTextAlignment:UITextAlignmentCenter];
+        [panelNameLabel setFont:[UIFont systemFontOfSize:textFontSize]];
         [panelSelectionScrollView addSubview:panelNameLabel];
         // Redesign CFDictionaryAddValue(switchPanelURLDictionary, myButton, url);
     }
+    if(current_button_y != button_spacing)
+        current_button_x += selectButtonWidth + button_spacing;
     [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, 100)];
     [panelSelectionScrollView setScrollEnabled:YES];
 }
 
 - (void)viewDidUnload
 {
-    [self setSwitchNameTableView:nil];
     [self setPanelSelectionScrollView:nil];
-    [self setSwitchStatusText:nil];
-    [self setSwitchStatusActivity:nil];
+    [self setStatusText:nil];
     [self setHelpButton:nil];
-    [self setBgColorSegControl:nil];
-    [self setBgColorLabel:nil];
     [super viewDidUnload];
     CFRelease(switchPanelURLDictionary);
 
@@ -161,7 +170,11 @@
         [thisView removeFromSuperview];
     }
     // Reinitialize the scroll panel
-    [self initializeScrollPanelWithSwitchPanels];
+    int selectButtonHeight = 77;
+    NSString *sampleText = @"Steering Plus";
+    CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+
+    [self initializeScrollPanelWithSwitchPanels:selectButtonHeight textSize:textSize];
 }
 
 
@@ -211,13 +224,10 @@
     [[appDelegate switchDataLock] lock];
     // Hide the config button if we aren't connected
     [[self ConfigButton] setHidden:YES];
-    [switchNameTableView reloadData];
     if(CFDictionaryGetCount([appDelegate switchNameDictionary])) {
         [SwitchStatusText setText:@"Choose A Switch"];
-        [SwitchStatusActivity stopAnimating];
     } else {
         [SwitchStatusText setText:@"Searching For Controllers"];
-        [SwitchStatusActivity startAnimating];
     }
     
     [[appDelegate switchDataLock] unlock];
@@ -262,16 +272,5 @@
     [self reload_switch_name_table];
 }
 
-- (IBAction)bgColorSegControlIndexChanged:(id) sender {
-    int segmentIndex = [[self bgColorSegControl] selectedSegmentIndex];
-    if(segmentIndex == 0) {
-        // Set switch panel background to black
-        [appDelegate setBackgroundColor:[UIColor blackColor]];
-    } else {
-        // Set switch panel background to black
-        [appDelegate setBackgroundColor:[UIColor whiteColor]];
-    }
-    [self ResetScrollPanel];
-}
 
 @end

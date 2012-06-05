@@ -52,7 +52,7 @@
     [self setBackgroundColor:[UIColor blackColor]];
     [self setForegroundColor:[UIColor whiteColor]];
     // Initialize the root view controller
-    [self setNavigationController:[[UINavigationController alloc] initWithRootViewController:[[rootSwitchViewController alloc] initWithNibName:@"rootSwitchViewController" bundle:nil]]];
+    [self setNavigationController:[[UINavigationController alloc] initWithRootViewController:[[rootSwitchViewController alloc] initWithNibName:nil bundle:nil]]];
     [[self window] setRootViewController: [self navigationController]];
     [self.window makeKeyAndVisible];    
     // Start the background thread that listens for switches
@@ -61,7 +61,6 @@
     switch_state = 0;
     [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     [self setSwitchStateLock:[[NSLock alloc] init]];
-    [self performSelectorInBackground:@selector(Background_Thread_To_Transmit) withObject:nil];
     // Create browser to listen for Bonjour services
     netServiceBrowser = [[NSNetServiceBrowser alloc] init];
     [netServiceBrowser setDelegate:self];
