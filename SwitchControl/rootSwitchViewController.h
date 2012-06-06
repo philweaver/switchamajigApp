@@ -16,7 +16,6 @@
     UILabel *SwitchStatusText;
     UIButton *helpButton;
     BOOL isConfigAvailable;
-    int textFontSize;
 }
 - (void) switch_names_updated:(NSNotification *) notification;
 - (void) reload_switch_name_table;

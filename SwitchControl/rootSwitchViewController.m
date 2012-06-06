@@ -28,11 +28,11 @@
 #define FRAME_WIDTH 1024
 #define FRAME_HEIGHT 768
 - (void) loadView {
-    textFontSize = 60;
+    int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     NSString *sampleText = @"Steering Plus";
     CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
     int textHeight = textSize.height;
-    int selectButtonHeight = 477;
+    int selectButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
     appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
     
     [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
@@ -127,7 +127,7 @@
         [panelNameLabel setTextColor:fgColor];
         [panelNameLabel setText:[viewController switchPanelName]];
         [panelNameLabel setTextAlignment:UITextAlignmentCenter];
-        [panelNameLabel setFont:[UIFont systemFontOfSize:textFontSize]];
+        [panelNameLabel setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
         [panelSelectionScrollView addSubview:panelNameLabel];
         // Redesign CFDictionaryAddValue(switchPanelURLDictionary, myButton, url);
     }
@@ -170,9 +170,9 @@
         [thisView removeFromSuperview];
     }
     // Reinitialize the scroll panel
-    int selectButtonHeight = 77;
+    int selectButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
     NSString *sampleText = @"Steering Plus";
-    CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+    CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
 
     [self initializeScrollPanelWithSwitchPanels:selectButtonHeight textSize:textSize];
 }

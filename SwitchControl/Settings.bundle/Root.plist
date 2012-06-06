@@ -8,27 +8,47 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
-			<string>Switchamajig Networking</string>
+			<string>Accessing The Panels</string>
 		</dict>
 		<dict>
-			<key>Title</key>
-			<string>IP Protocol</string>
 			<key>Type</key>
-			<string>PSMultiValueSpecifier</string>
-			<key>Titles</key>
-			<array>
-				<string>UDP</string>
-				<string>TCP</string>
-			</array>
-			<key>DefaultValue</key>
-			<integer>0</integer>
-			<key>Values</key>
-			<array>
-				<integer>0</integer>
-				<integer>1</integer>
-			</array>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Text Size</string>
 			<key>Key</key>
-			<string>IP_PROTOCOL</string>
+			<string>textSizeIdentifier</string>
+		</dict>
+		<dict>
+			<key>MinimumValue</key>
+			<integer>10</integer>
+			<key>Type</key>
+			<string>PSSliderSpecifier</string>
+			<key>DefaultValue</key>
+			<integer>12</integer>
+			<key>Key</key>
+			<string>textSizePreference</string>
+			<key>MaximumValue</key>
+			<integer>100</integer>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Size of Button to Select Switch Panel</string>
+			<key>Key</key>
+			<string>ButtonSizeId</string>
+		</dict>
+		<dict>
+			<key>MinimumValue</key>
+			<integer>50</integer>
+			<key>Type</key>
+			<string>PSSliderSpecifier</string>
+			<key>DefaultValue</key>
+			<integer>100</integer>
+			<key>Key</key>
+			<string>switchPanelSizePreference</string>
+			<key>MaximumValue</key>
+			<integer>500</integer>
 		</dict>
 	</array>
 	<key>StringsTable</key>
