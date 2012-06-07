@@ -10,23 +10,22 @@
 #import "SwitchControlAppDelegate.h"
 
 @interface rootSwitchViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
-    UIScrollView *panelSelectionScrollView;
     SwitchControlAppDelegate *appDelegate;
     CFMutableDictionaryRef switchPanelURLDictionary;
-    UILabel *SwitchStatusText;
-    UIButton *helpButton;
     BOOL isConfigAvailable;
+    int selectButtonHeight;
+    int friendlyNameDictionaryIndex;
 }
 - (void) switch_names_updated:(NSNotification *) notification;
 - (void) reload_switch_name_table;
 - (void) ResetScrollPanel;
-- (void)initializeScrollPanelWithSwitchPanels:(int)selectButtonHeight  textSize:(CGSize)textSize;
-- (IBAction)launchSwitchPanel:(id)sender;
-@property (nonatomic, retain) IBOutlet UIButton *helpButton;
-- (IBAction)display_help:(id)sender;
-- (IBAction)config_pressed:(id)sender;
-@property (nonatomic, retain) IBOutlet UIScrollView *panelSelectionScrollView;
-@property (nonatomic, retain) IBOutlet UILabel *statusText;
-@property (retain, nonatomic) IBOutlet UIButton *ConfigButton;
-
+- (void) initializeScrollPanelWithTextSize:(CGSize)textSize;
+- (void) launchSwitchPanel:(id)sender;
+- (void) display_help:(id)sender;
+- (void) config_pressed:(id)sender;
+- (void) statusMessageCallback;
+@property (nonatomic, strong) UIButton *helpButton;
+@property (nonatomic, strong) UIScrollView *panelSelectionScrollView;
+@property (nonatomic, strong) UILabel *statusText;
+@property (strong, nonatomic) UIButton *configButton;
 @end

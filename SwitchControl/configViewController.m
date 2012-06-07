@@ -166,15 +166,14 @@
 - (IBAction)Cancel:(id)sender {
     // We may have changed the name or network settings of this device, so close our connection to it and
     // clear our information about switches from our dictionary
-    [[appDelegate switchDataLock] lock];
-    CFDictionaryRemoveAllValues([appDelegate switchNameDictionary]);
-    CFArrayRemoveAllValues([appDelegate switchNameArray]);
+    [[appDelegate statusInfoLock] lock];
+    [[appDelegate friendlyNameHostNameDictionary] removeAllObjects];
     [appDelegate setActive_switch_index:-1];
     if([appDelegate switch_socket]) {
         close([appDelegate switch_socket]);
         [appDelegate setSwitch_socket:0];
     }
-    [[appDelegate switchDataLock] unlock];
+    [[appDelegate statusInfoLock] unlock];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
     [self dismissModalViewControllerAnimated:YES];
 }

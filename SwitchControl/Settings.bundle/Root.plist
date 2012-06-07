@@ -50,6 +50,26 @@
 			<key>MaximumValue</key>
 			<integer>500</integer>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Show Help Button</string>
+			<key>Key</key>
+			<string>showHelpButtonPreference</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Show Network Config Button</string>
+			<key>Key</key>
+			<string>showNetworkConfigButtonPreference</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

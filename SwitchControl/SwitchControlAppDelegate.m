@@ -15,10 +15,10 @@
 
 @synthesize window = _window;
 @synthesize navigationController = _navigationController;
-@synthesize switchDataLock = _switchDataLock;
+@synthesize friendlyNameHostNameDictionary;
+@synthesize statusMessages;
+@synthesize statusInfoLock;
 @synthesize switchStateLock = _switchStateLock;
-@synthesize switchNameDictionary = _switchNameDictionary;
-@synthesize switchNameArray = _switchNameArray;
 @synthesize active_switch_index = _active_switch_index;
 @synthesize switch_socket = _switch_socket;
 @synthesize settings_switch_connection_protocol = _settings_switch_connection_protocol;
@@ -38,11 +38,8 @@
     sigpipeaction.sa_handler = SIG_IGN;
     sigaction(SIGPIPE, &sigpipeaction, NULL);
     // Initialize the list of switches and the lock that keeps it threadsafe
-    [self setSwitchDataLock:[[NSLock alloc] init]];
-    [self setSwitchNameDictionary:CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks)];
-    [self setSwitchNameArray:CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)];
-    CFDictionaryRemoveAllValues([self switchNameDictionary]);    
-    CFArrayRemoveAllValues([self switchNameArray]);
+    [self setFriendlyNameHostNameDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    [self setStatusInfoLock:[[NSLock alloc] init]];
     
     // Read protocol from settings
     int settingsVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"IP_PROTOCOL"];
@@ -113,8 +110,6 @@
 {
     if([self switch_socket] >= 0)
         close([self switch_socket]);
-    CFRelease([self switchNameDictionary]);
-    CFRelease([self switchNameArray]);
 }
 
 // Detect switches in area
@@ -393,6 +388,13 @@ char *commands[] = {
 }
 
 - (void)deactivate:(NSObject *)switches {
+}
+
+- (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds {
+    NSArray *messageArray = [NSArray arrayWithObjects:message, seconds, color, nil];
+    [[self statusInfoLock] lock];
+    [[self statusMessages] addObject:messageArray];
+    [[self statusInfoLock] unlock];
 }
 
 // Initialize connection with remote switch

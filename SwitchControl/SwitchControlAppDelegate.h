@@ -34,12 +34,13 @@
 - (void)SequenceThroughSwitches:(id)switchSequence;
 - (void)sendSwitchState;
 - (void)display_battery_warning:(NSString *)text;
+- (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
-@property (retain) NSLock *switchDataLock;
 @property (retain) NSLock *switchStateLock;
-@property (nonatomic) CFMutableDictionaryRef switchNameDictionary;
-@property (nonatomic) CFMutableArrayRef switchNameArray;
+@property (strong, nonatomic) NSMutableDictionary *friendlyNameHostNameDictionary;
+@property (strong, nonatomic) NSLock *statusInfoLock;
+@property (strong, nonatomic) NSMutableArray *statusMessages;
 @property (nonatomic) int active_switch_index;
 @property (nonatomic) int switch_socket;
 @property (nonatomic) int settings_switch_connection_protocol;
