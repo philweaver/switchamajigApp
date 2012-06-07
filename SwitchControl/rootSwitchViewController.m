@@ -307,7 +307,7 @@
 
 // Support for connecting to a switch when its name is selected from the table
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [appDelegate connect_to_switch:indexPath.row protocol:[appDelegate settings_switch_connection_protocol] retries:10 showMessagesOnError:YES];
+    [appDelegate connect_to_switch:indexPath.row protocol:0 retries:10 showMessagesOnError:YES];
     if([appDelegate switch_socket])
         [appDelegate sendSwitchState];
 

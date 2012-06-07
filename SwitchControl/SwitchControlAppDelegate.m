@@ -21,8 +21,6 @@
 @synthesize switchStateLock = _switchStateLock;
 @synthesize active_switch_index = _active_switch_index;
 @synthesize switch_socket = _switch_socket;
-@synthesize settings_switch_connection_protocol = _settings_switch_connection_protocol;
-@synthesize current_switch_connection_protocol = _current_switch_connection_protocol;
 @synthesize backgroundColor = _backgroundColor;
 @synthesize foregroundColor = _foregroundColor;
 
@@ -50,11 +48,9 @@
     [self.window makeKeyAndVisible];  
     // Listen for Switchamajigs
     sjigControllerListener = [[SwitchamajigControllerDeviceListener alloc] initWithDelegate:self];
-    // Start the background thread that listens for switches
     //  Initialize switch state
     [self setSwitch_socket:-1];
     switch_state = 0;
-    //[self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     [self setSwitchStateLock:[[NSLock alloc] init]];
     // Create browser to listen for Bonjour services
     netServiceBrowser = [[NSNetServiceBrowser alloc] init];
@@ -110,153 +106,8 @@
         close([self switch_socket]);
 }
 
-// Detect switches in area
-#define EXPECTED_PACKET_SIZE 110
-#define DEVICE_STRING_OFFSET 60
-#define BATTERY_VOLTAGE_OFFSET 14
-#define BATTERY_VOLTAGE_WARN_LIMIT 2000
-
 #define ITACH_MAX_PACKET_SIZE 1024
 
-- (void)Background_Thread_To_Detect_Switches {
-    @autoreleasepool {
-        bool haveShownBatteryWarning = false; // Flag to show battery warning only once per session
-        // Check if we have network access
-        NetworkStatus internetStatus;
-        int retries = 50;
-        do {
-            Reachability *r = [Reachability reachabilityForLocalWiFi];
-            internetStatus = [r currentReachabilityStatus];
-            if(internetStatus == NotReachable)
-                NSLog(@"Retrying check for network access.");
-            [NSThread sleepForTimeInterval:1.0];
-        } while((internetStatus == NotReachable) && retries--);
-        if(internetStatus == NotReachable) {
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Network Error" message:@"No WiFi Connection."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-            [message show];  
-            return;
-        }
-#if 0
-// This mechanism needs to be implemented for new architecture
-        // Try to connect to last switch we were using
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *cacheDirectory = [paths objectAtIndex:0];
-        NSString *filename = [cacheDirectory stringByAppendingString:@"lastswitchinfo.txt"];
-        NSString *twoNames = [NSString stringWithContentsOfFile:filename encoding:NSUTF8StringEncoding error:nil];
-        NSString *initialSwitchName = 0, *initialIP = 0;
-        if(twoNames) {
-            NSScanner *myScanner = [NSScanner scannerWithString:twoNames];
-            [myScanner scanUpToString:@":" intoString:&initialSwitchName];
-            [myScanner scanString:@":" intoString:NULL];
-            initialIP = [twoNames substringFromIndex:[myScanner scanLocation]];
-            [[self switchDataLock] lock];
-            CFArrayAppendValue([self switchNameArray], initialSwitchName);
-            CFDictionaryAddValue([self switchNameDictionary], initialSwitchName, initialIP);
-            [[self switchDataLock] unlock];
-            // Connect via TCP to confirm that we have a connection
-            [self connect_to_switch:0 protocol:IPPROTO_TCP retries:0 showMessagesOnError:NO];
-            // Assuming TCP succeeded, reconnect again if we don't want TCP
-            if(([self active_switch_index] >= 0) && ([self settings_switch_connection_protocol] != IPPROTO_TCP))
-                [self connect_to_switch:0 protocol:[self settings_switch_connection_protocol] retries:0 showMessagesOnError:NO];
-        }
-        if([self active_switch_index] < 0) {
-            [[self switchDataLock] lock];
-            CFDictionaryRemoveAllValues([self switchNameDictionary]);
-            CFArrayRemoveAllValues([self switchNameArray]);
-            [[self switchDataLock] unlock];
-        } else {
-            [self sendSwitchState];
-        }
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
-#endif        
-        // Open socket to detect Switchamajig Controllers with Roving Modules
-        int detect_socket;
-        detect_socket = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-        if(socket < 0) {
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error opening UDP socket."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-            [message show];  
-            return;
-        }
-        struct sockaddr_in sockin_addr;
-        memset(&sockin_addr, 0, sizeof(sockin_addr));
-        sockin_addr.sin_family = AF_INET;
-        sockin_addr.sin_port = htons(55555);
-        sockin_addr.sin_addr.s_addr = INADDR_ANY;
-        if(bind(detect_socket, (struct sockaddr *) &sockin_addr, sizeof(sockin_addr)) < 0) {
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error binding UDP socket."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-            [message show];  
-            close(detect_socket);
-            return;
-        }
-        
-        // Now loop and listen for switches
-        char buffer[2*EXPECTED_PACKET_SIZE+1];
-        while(1) {
-            struct sockaddr_storage switch_address;
-            socklen_t addr_len = sizeof(switch_address);
-            //  Use a non-blocking receive to see if anything arrived 
-            int numbytes = recvfrom(detect_socket, buffer, 2*EXPECTED_PACKET_SIZE, MSG_PEEK | MSG_DONTWAIT, (struct sockaddr *) &switch_address, &addr_len);
-            if((numbytes < 0) && (errno == EWOULDBLOCK))
-                numbytes = 0;
-            if(numbytes < 0) {
-                //printf("Error numbytes=%d\n", numbytes);
-                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error checking for data."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-                [message show];  
-                close(detect_socket);
-                return;
-            }
-            // Switch to blocking and receive any data that's available.
-            numbytes = (numbytes) ? (recvfrom(detect_socket, buffer, EXPECTED_PACKET_SIZE, 0, (struct sockaddr *) &switch_address, &addr_len)) : 0;
-            if(numbytes < 0){
-                UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Detect error!" message:@"Error on recvfrom."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-                [message show];  
-                close(detect_socket);
-                return;
-            }
-            //if(numbytes)
-            //    printf("numbytes=%d\n", numbytes);
-            if(numbytes == EXPECTED_PACKET_SIZE) {
-                // Get the IP address in string format
-                char ip_addr_string[INET6_ADDRSTRLEN];
-                struct sockaddr *sockaddr_ptr = (struct sockaddr *) &switch_address;
-                
-                inet_ntop(switch_address.ss_family, (sockaddr_ptr->sa_family == AF_INET) ? (void*)&(((struct sockaddr_in *)sockaddr_ptr)->sin_addr) : (void*)&(((struct sockaddr_in6 *)sockaddr_ptr)->sin6_addr), ip_addr_string, sizeof(ip_addr_string));
-                //printf("Received: %s from %s\n", buffer+DEVICE_STRING_OFFSET, ip_addr_string);
-                NSString *switchName = [NSString stringWithCString:buffer+DEVICE_STRING_OFFSET encoding:NSASCIIStringEncoding];
-                int batteryVoltage = ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET]) * 256 + ((unsigned char)buffer[BATTERY_VOLTAGE_OFFSET + 1]);
-                if(!haveShownBatteryWarning && (batteryVoltage < BATTERY_VOLTAGE_WARN_LIMIT)) {
-                    NSString *batteryWarningText = [switchName stringByAppendingString:@" needs its batteries replaced"];
-                    [self performSelectorInBackground:@selector(display_battery_warning:) withObject:batteryWarningText];
-                    haveShownBatteryWarning = true;
-                }
-#if 0
-                // New mechanism needed
-                NSString *ipAddrStr = [NSString stringWithCString:ip_addr_string encoding:NSASCIIStringEncoding];
-                // Lock the switch info and then update it
-                [[self switchDataLock] lock];
-                if(CFDictionaryContainsKey((CFDictionaryRef) [self switchNameDictionary], switchName)) {
-                    CFDictionaryRemoveValue([self switchNameDictionary], switchName);
-                } else {
-                    CFArrayAppendValue([self switchNameArray], switchName);
-                }
-                CFDictionaryAddValue([self switchNameDictionary], switchName, ipAddrStr);
-                [[self switchDataLock] unlock];
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
-#endif
-            }
-        }
-        // This code is unreachable now, but if we ever allow the above loop to exit, we'll need these lines to do it gracefully
-        close(detect_socket);
-        return;
-    }
-}
-
-- (void) display_battery_warning:(NSString *)text {
-    @autoreleasepool {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Low Battery" message:text  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
-        [message show];  
-    }
-}
 
 #define MAX_STRING 1024
 static int convertFromLogicalToPhysicalSwitchMask(int logicalSwitchMask) {
@@ -339,6 +190,8 @@ bool verify_socket_reply(int socket, const char *expected_string) {
 #define SWITCHAMAJIG_PACKET_BYTE_0 255
 #define SWITCHAMAJIG_CMD_SET_RELAY 0
 - (void)sendSwitchState {
+#if 0
+    // REDESIGN
     int switchIndex = [self active_switch_index];
     unsigned char packet[SWITCHAMAJIG_PACKET_LENGTH];
     memset(packet, 0, sizeof(packet));
@@ -367,6 +220,7 @@ bool verify_socket_reply(int socket, const char *expected_string) {
             }
         } while((retval <= 0) && (retries--));
     }
+#endif
 }
 
 #define COMMAND_OFFSET 65536

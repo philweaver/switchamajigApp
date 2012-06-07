@@ -23,17 +23,14 @@
 #define SQ_PORTNUM 80
 @interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate, SwitchamajigDeviceListenerDelegate> {
     int switch_state;
-    struct sockaddr_in udp_socket_address;
     NSNetServiceBrowser *netServiceBrowser;
     SwitchamajigControllerDeviceListener *sjigControllerListener;
 }
-- (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(NSObject *)switches;
 - (void)deactivate:(NSObject *)switches;
 - (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
 - (void)SequenceThroughSwitches:(id)switchSequence;
 - (void)sendSwitchState;
-- (void)display_battery_warning:(NSString *)text;
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
@@ -43,8 +40,6 @@
 @property (strong, nonatomic) NSMutableArray *statusMessages;
 @property (nonatomic) int active_switch_index;
 @property (nonatomic) int switch_socket;
-@property (nonatomic) int settings_switch_connection_protocol;
-@property (nonatomic) int current_switch_connection_protocol;
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
 
