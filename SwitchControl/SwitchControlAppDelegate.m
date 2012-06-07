@@ -29,6 +29,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    // Initialize default settings values if needed
+    [[NSUserDefaults standardUserDefaults] registerDefaults:[self defaultsFromPlistNamed:@"Root"]];
     [self setActive_switch_index:-1];
     // Disable SIGPIPE
     struct sigaction sigpipeaction;
@@ -349,5 +351,36 @@ char *commands[] = {
     [statusInfoLock unlock];
 }
 
+// Handle settings initialization
+- (NSDictionary *)defaultsFromPlistNamed:(NSString *)plistName {
+    NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
+    NSAssert(settingsBundle, @"Could not find Settings.bundle while loading defaults.");
+    
+    NSString *plistFullName = [NSString stringWithFormat:@"%@.plist", plistName];
+    
+    NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[settingsBundle stringByAppendingPathComponent:plistFullName]];
+    NSAssert1(settings, @"Could not load plist '%@' while loading defaults.", plistFullName);
+    
+    NSArray *preferences = [settings objectForKey:@"PreferenceSpecifiers"];
+    NSAssert1(preferences, @"Could not find preferences entry in plist '%@' while loading defaults.", plistFullName);
+    
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
+    for(NSDictionary *prefSpecification in preferences) {
+        NSString *key = [prefSpecification objectForKey:@"Key"];
+        id value = [prefSpecification objectForKey:@"DefaultValue"];
+        if(key && value) {
+            [defaults setObject:value forKey:key];
+        } 
+        
+        NSString *type = [prefSpecification objectForKey:@"Type"];
+        if ([type isEqualToString:@"PSChildPaneSpecifier"]) {
+            NSString *file = [prefSpecification objectForKey:@"File"];
+            NSAssert1(file, @"Unable to get child plist name from plist '%@'", plistFullName);
+            [defaults addEntriesFromDictionary:[self defaultsFromPlistNamed:file]];
+        }        
+    }
+    
+    return defaults;
+}
 
 @end

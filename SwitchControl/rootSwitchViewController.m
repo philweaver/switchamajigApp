@@ -38,6 +38,10 @@
     int textHeight = textSize.height;
     int scrollPanelHeight = FRAME_HEIGHT-border-(textHeight+button_spacing);
     selectButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
+    if(textSize.width > (selectButtonHeight*3)/2) {
+        selectButtonHeight = (textSize.width*2)/3;
+    }
+
     int spaceOnButtomForExtraButtons = 0;
     BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showHelpButtonPreference"];
     BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showNetworkConfigButtonPreference"];
@@ -46,7 +50,7 @@
         scrollPanelHeight -= spaceOnButtomForExtraButtons;
         if(scrollPanelHeight < (selectButtonHeight + textHeight)) {
             // Reduce button size to make room for one row of buttons and text
-            selectButtonHeight = (FRAME_HEIGHT-border-button_spacing - 2*textHeight);
+            selectButtonHeight = (FRAME_HEIGHT-border-button_spacing - 2*textHeight)/2;
             scrollPanelHeight = selectButtonHeight + textHeight;
             spaceOnButtomForExtraButtons = selectButtonHeight;
         }
@@ -55,16 +59,30 @@
     // Set width of help and config buttons
     int helpConfigButtonWidth = (selectButtonHeight > 200) ? selectButtonHeight : 200;
     if(displayNetworkConfigButton) {
+        NSString *configText = @"Configure Network Settings";
         [self setConfigButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+        CGSize configTextSize = [configText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+        if(configTextSize.width > helpConfigButtonWidth)
+            helpConfigButtonWidth = configTextSize.width;
+        if(helpConfigButtonWidth > FRAME_WIDTH/2)
+            helpConfigButtonWidth = FRAME_WIDTH/2;
         [[self configButton] setFrame:CGRectMake(0, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
-        [[self configButton] setTitle:@"Configure Network Settings" forState:UIControlStateNormal];
+        [[self configButton] setTitle:configText forState:UIControlStateNormal];
+        [[[self configButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
         [[self configButton] addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside]; 
         [[self view] addSubview:[self configButton]];
     }
     if(displayHelpButton) {
+        NSString *helpText = @"Help";
         [self setHelpButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+        CGSize helpTextSize = [helpText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+        if(helpTextSize.width > helpConfigButtonWidth)
+            helpConfigButtonWidth = helpTextSize.width;
+        if(helpConfigButtonWidth > FRAME_WIDTH/2)
+            helpConfigButtonWidth = FRAME_WIDTH/2;
         [[self helpButton] setFrame:CGRectMake(FRAME_WIDTH-helpConfigButtonWidth, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
         [[self helpButton] setTitle:@"Help" forState:UIControlStateNormal];
+        [[[self helpButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
         [[self helpButton] addTarget:self action:@selector(display_help:) forControlEvents:UIControlEventTouchUpInside]; 
         [[self view] addSubview:[self helpButton]];
     }
@@ -142,10 +160,6 @@
     UIColor *bgColor = [UIColor blackColor];
     UIColor *fgColor = [UIColor whiteColor];
     int selectButtonWidth = selectButtonHeight + (selectButtonHeight/2);
-    if(textSize.width > selectButtonWidth) {
-        selectButtonWidth = textSize.width;
-        selectButtonHeight = (selectButtonWidth*2)/3;
-    }
 
     if(switchPanelURLDictionary) {
         CFDictionaryRemoveAllValues(switchPanelURLDictionary);
@@ -157,7 +171,7 @@
     NSURL *url;
     
     int current_button_x = button_spacing;
-    int current_button_y = button_spacing;
+    int current_button_y = 0;
     
     for(url in xmlUrls) {
         // Render view controller into image
@@ -178,7 +192,7 @@
         [panelSelectionScrollView addSubview:myButton];
         current_button_y += selectButtonHeight + textSize.height + button_spacing;
         if(current_button_y + selectButtonHeight >= [panelSelectionScrollView bounds].size.height) {
-            current_button_y = button_spacing;
+            current_button_y = 0;
             current_button_x += selectButtonWidth + button_spacing;
         }
         size = [myButton bounds].size;

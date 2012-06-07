@@ -43,6 +43,9 @@
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
 
+// Settings default handling
+- (NSDictionary *)defaultsFromPlistNamed:(NSString *)plistName;
+
 // NSNetServiceBrowserDelegate
 - (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindDomain:(NSString *)domainName moreComing:(BOOL)moreDomainsComing;
 - (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing;
