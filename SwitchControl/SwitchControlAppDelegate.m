@@ -41,22 +41,20 @@
     [self setFriendlyNameHostNameDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
     [self setStatusInfoLock:[[NSLock alloc] init]];
     
-    // Read protocol from settings
-    int settingsVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"IP_PROTOCOL"];
-
-    [self setSettings_switch_connection_protocol:((settingsVal == SETTINGS_TCP_PROTOCOL)?IPPROTO_TCP:IPPROTO_UDP)];
     // Initialize colors
     [self setBackgroundColor:[UIColor blackColor]];
     [self setForegroundColor:[UIColor whiteColor]];
     // Initialize the root view controller
     [self setNavigationController:[[UINavigationController alloc] initWithRootViewController:[[rootSwitchViewController alloc] initWithNibName:nil bundle:nil]]];
     [[self window] setRootViewController: [self navigationController]];
-    [self.window makeKeyAndVisible];    
+    [self.window makeKeyAndVisible];  
+    // Listen for Switchamajigs
+    sjigControllerListener = [[SwitchamajigControllerDeviceListener alloc] initWithDelegate:self];
     // Start the background thread that listens for switches
     //  Initialize switch state
     [self setSwitch_socket:-1];
     switch_state = 0;
-    [self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
+    //[self performSelectorInBackground:@selector(Background_Thread_To_Detect_Switches) withObject:nil];
     [self setSwitchStateLock:[[NSLock alloc] init]];
     // Create browser to listen for Bonjour services
     netServiceBrowser = [[NSNetServiceBrowser alloc] init];
@@ -481,5 +479,21 @@ char *commands[] = {
 - (void)netServiceWillResolve:(NSNetService *)sender{
     NSLog(@"netServiceWillResolve\n");
 }
+
+// SwitchamajigDeviceListenerDelegate
+- (void) SwitchamajigDeviceListenerFoundDevice:(id)listener hostname:(NSString*)hostname friendlyname:(NSString*)friendlyname {
+    [statusInfoLock lock];
+    [friendlyNameHostNameDictionary setObject:hostname forKey:friendlyname];
+    [statusInfoLock unlock];
+}
+- (void) SwitchamajigDeviceListenerHandleError:(id)listener theError:(NSError*)error {
+    NSLog(@"SwitchamajigDeviceListenerHandleError: %@", error); 
+}
+- (void) SwitchamajigDeviceListenerHandleBatteryWarning:(id)listener hostname:(NSString*)hostname friendlyname:(NSString*)friendlyname {
+    [statusInfoLock lock];
+    [self addStatusAlertMessage:[NSString stringWithFormat:@"%@ needs its batteries replaced",friendlyname]  withColor:[UIColor redColor] displayForSeconds:5.0];
+    [statusInfoLock unlock];
+}
+
 
 @end

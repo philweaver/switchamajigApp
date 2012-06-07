@@ -108,7 +108,7 @@
         NSArray *friendlyNames = [[appDelegate friendlyNameHostNameDictionary] allKeys];
         if(friendlyNameDictionaryIndex >= [friendlyNames count])
             friendlyNameDictionaryIndex = 0;
-        [[self statusText] setText:[friendlyNames objectAtIndex:friendlyNameDictionaryIndex]];
+        [[self statusText] setText:[NSString stringWithFormat:@"Connected to %@",[friendlyNames objectAtIndex:friendlyNameDictionaryIndex]]];
         [[self statusText] setTextColor:[UIColor whiteColor]];
         secondsUntilNextCall = 3.0;
     }

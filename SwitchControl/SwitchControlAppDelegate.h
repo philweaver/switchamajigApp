@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
 #import "sys/socket.h"
 #import "netinet/in.h"
 #import "netdb.h"
@@ -16,16 +17,15 @@
 #import "arpa/inet.h"
 #import "errno.h"
 
-@class singleSwitchView;
-@class twoSwitchView;
 @class rootSwitchViewController;
 #define PROTOCOL_SQ (IPPROTO_TCP + IPPROTO_UDP + 1)
 #define ROVING_PORTNUM 2000
 #define SQ_PORTNUM 80
-@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate> {
+@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate, SwitchamajigDeviceListenerDelegate> {
     int switch_state;
     struct sockaddr_in udp_socket_address;
     NSNetServiceBrowser *netServiceBrowser;
+    SwitchamajigControllerDeviceListener *sjigControllerListener;
 }
 - (void)Background_Thread_To_Detect_Switches;
 - (void)activate:(NSObject *)switches;
