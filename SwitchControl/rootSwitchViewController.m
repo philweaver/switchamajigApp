@@ -17,74 +17,102 @@
 @synthesize helpButton;
 @synthesize panelSelectionScrollView;
 @synthesize statusText;
-
-- (void)dealloc {
-    CFRelease(switchPanelURLDictionary);
-}
+@synthesize scanButton;
+@synthesize selectButton;
+@synthesize highlighting;
+@synthesize switchPanelURLDictionary;
 
 #pragma mark - View lifecycle
 #define border 20
 #define button_spacing 50
 #define FRAME_WIDTH 1024
 #define FRAME_HEIGHT 768
+#define MAX_BUTTON_HEIGHT_FOR_SCANNING 200
 - (void) loadView {
     appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
     [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
     [[self view] setBackgroundColor:[UIColor blackColor]];
-
+    [self setSwitchPanelURLDictionary:[[NSMutableDictionary alloc] initWithCapacity:10]];
     int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     NSString *sampleText = @"Steering Plus";
     CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
     int textHeight = textSize.height;
-    int scrollPanelHeight = FRAME_HEIGHT-border-(textHeight+button_spacing);
+    int scrollPanelHeight = FRAME_HEIGHT-border-textHeight;
     selectButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
     if(textSize.width > (selectButtonHeight*3)/2) {
         selectButtonHeight = (textSize.width*2)/3;
     }
 
-    int spaceOnButtomForExtraButtons = 0;
-    BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showHelpButtonPreference"];
-    BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showNetworkConfigButtonPreference"];
-    if(displayHelpButton || displayNetworkConfigButton) {
-        spaceOnButtomForExtraButtons = selectButtonHeight;
-        scrollPanelHeight -= spaceOnButtomForExtraButtons;
-        if(scrollPanelHeight < (selectButtonHeight + textHeight)) {
-            // Reduce button size to make room for one row of buttons and text
-            selectButtonHeight = (FRAME_HEIGHT-border-button_spacing - 2*textHeight)/2;
-            scrollPanelHeight = selectButtonHeight + textHeight;
+    // There are three types of layouts: 
+    // 1) The default, with help and/or config button, whose size is adjustable from settings
+    // 2) Same as (1) without help or config button, which allows for a larger scroll panel
+    // 3) Scanning. For scanning we don't show the help or config button. Instead we make the scroll view a single row and size it based on the text size, and then use the rest of the space for scan/select.
+    bool scanning = [[NSUserDefaults standardUserDefaults] integerForKey:@"enableScanningPreference"];
+    if(scanning) {
+        if(selectButtonHeight > MAX_BUTTON_HEIGHT_FOR_SCANNING)
+            selectButtonHeight = MAX_BUTTON_HEIGHT_FOR_SCANNING;
+        scrollPanelHeight = selectButtonHeight+textHeight;
+        int scanButtonHeight = FRAME_HEIGHT - textHeight - scrollPanelHeight;
+        int scanButtonWidth = (FRAME_WIDTH - button_spacing)/2;
+        // Create and set up scan button
+        [self setScanButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+        [[self scanButton] setFrame:CGRectMake(0, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+        [[self scanButton] setTitle:@"Scan" forState:UIControlStateNormal];
+        [[[self scanButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+        [[self scanButton] addTarget:self action:@selector(scanPressed:) forControlEvents:UIControlEventTouchUpInside]; 
+        [[self view] addSubview:[self scanButton]];
+        // Create and set up select button
+        [self setSelectButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+        [[self selectButton] setFrame:CGRectMake(FRAME_WIDTH - scanButtonWidth, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+        [[self selectButton] setTitle:@"Select" forState:UIControlStateNormal];
+        [[[self selectButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+        [[self selectButton] addTarget:self action:@selector(selectPressed:) forControlEvents:UIControlEventTouchUpInside]; 
+        [[self view] addSubview:[self selectButton]];
+    } else {
+        int spaceOnButtomForExtraButtons = 0;
+        BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showHelpButtonPreference"];
+        BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showNetworkConfigButtonPreference"];
+        if(displayHelpButton || displayNetworkConfigButton) {
             spaceOnButtomForExtraButtons = selectButtonHeight;
+            scrollPanelHeight -= spaceOnButtomForExtraButtons;
+            if(scrollPanelHeight < (selectButtonHeight + textHeight)) {
+                // Reduce button size to make room for one row of buttons and text
+                selectButtonHeight = (FRAME_HEIGHT-border-button_spacing - 2*textHeight)/2;
+                scrollPanelHeight = selectButtonHeight + textHeight;
+                spaceOnButtomForExtraButtons = selectButtonHeight;
+            }
         }
-    }
-    
-    // Set width of help and config buttons
-    int helpConfigButtonWidth = (selectButtonHeight > 200) ? selectButtonHeight : 200;
-    if(displayNetworkConfigButton) {
-        NSString *configText = @"Configure Network Settings";
-        [self setConfigButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
-        CGSize configTextSize = [configText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
-        if(configTextSize.width > helpConfigButtonWidth)
-            helpConfigButtonWidth = configTextSize.width;
-        if(helpConfigButtonWidth > FRAME_WIDTH/2)
-            helpConfigButtonWidth = FRAME_WIDTH/2;
-        [[self configButton] setFrame:CGRectMake(0, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
-        [[self configButton] setTitle:configText forState:UIControlStateNormal];
-        [[[self configButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
-        [[self configButton] addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside]; 
-        [[self view] addSubview:[self configButton]];
-    }
-    if(displayHelpButton) {
-        NSString *helpText = @"Help";
-        [self setHelpButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
-        CGSize helpTextSize = [helpText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
-        if(helpTextSize.width > helpConfigButtonWidth)
-            helpConfigButtonWidth = helpTextSize.width;
-        if(helpConfigButtonWidth > FRAME_WIDTH/2)
-            helpConfigButtonWidth = FRAME_WIDTH/2;
-        [[self helpButton] setFrame:CGRectMake(FRAME_WIDTH-helpConfigButtonWidth, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
-        [[self helpButton] setTitle:@"Help" forState:UIControlStateNormal];
-        [[[self helpButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
-        [[self helpButton] addTarget:self action:@selector(display_help:) forControlEvents:UIControlEventTouchUpInside]; 
-        [[self view] addSubview:[self helpButton]];
+        
+        // Set width of help and config buttons
+        int helpConfigButtonWidth = (selectButtonHeight > 200) ? selectButtonHeight : 200;
+        if(displayNetworkConfigButton) {
+            NSString *configText = @"Configure Network Settings";
+            [self setConfigButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+            CGSize configTextSize = [configText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+            if(configTextSize.width > helpConfigButtonWidth)
+                helpConfigButtonWidth = configTextSize.width;
+            if(helpConfigButtonWidth > FRAME_WIDTH/2)
+                helpConfigButtonWidth = FRAME_WIDTH/2;
+            [[self configButton] setFrame:CGRectMake(0, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
+            [[self configButton] setTitle:configText forState:UIControlStateNormal];
+            [[[self configButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+            [[self configButton] addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside]; 
+            [[self view] addSubview:[self configButton]];
+        }
+        if(displayHelpButton) {
+            NSString *helpText = @"Help";
+            [self setHelpButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+            CGSize helpTextSize = [helpText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+            if(helpTextSize.width > helpConfigButtonWidth)
+                helpConfigButtonWidth = helpTextSize.width;
+            if(helpConfigButtonWidth > FRAME_WIDTH/2)
+                helpConfigButtonWidth = FRAME_WIDTH/2;
+            [[self helpButton] setFrame:CGRectMake(FRAME_WIDTH-helpConfigButtonWidth, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
+            [[self helpButton] setTitle:@"Help" forState:UIControlStateNormal];
+            [[[self helpButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+            [[self helpButton] addTarget:self action:@selector(display_help:) forControlEvents:UIControlEventTouchUpInside]; 
+            [[self view] addSubview:[self helpButton]];
+        }
     }
     
     [self setStatusText:[[UILabel alloc] initWithFrame:CGRectMake(border, 0, FRAME_WIDTH-2*border, textHeight)]];
@@ -93,12 +121,51 @@
     [[self statusText] setTextColor:[UIColor whiteColor]];
     [[self statusText] setFont:[UIFont systemFontOfSize:textFontSize]];
     [[self view] addSubview:[self statusText]];
-    [self setPanelSelectionScrollView:[[UIScrollView alloc] initWithFrame:CGRectMake(border, textHeight+button_spacing, FRAME_WIDTH-2*border, scrollPanelHeight)]];
+    [self setPanelSelectionScrollView:[[UIScrollView alloc] initWithFrame:CGRectMake(border, textHeight, FRAME_WIDTH-2*border, scrollPanelHeight)]];
     [[self panelSelectionScrollView] setScrollEnabled:YES];
     [[self view] addSubview:[self panelSelectionScrollView]];
     [self initializeScrollPanelWithTextSize:textSize];
     // Prepare to run status timer
     [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
+    indexOfCurrentScanSelection = 0;
+    if(scanning)
+        [self highlightCurrentScanSelection:YES];
+}
+
+#define HIGHLIGHT_RECT_THICKNESS 3
+// Scanning support
+- (void) scanPressed:(id)sender {
+    [self highlightCurrentScanSelection:NO];
+    indexOfCurrentScanSelection++;
+    [self highlightCurrentScanSelection:YES];
+}
+
+- (void) selectPressed:(id)sender {
+    UIButton *panel = [[panelSelectionScrollView subviews] objectAtIndex:indexOfCurrentScanSelection*2 + 1];
+    [self launchSwitchPanel:panel];
+}
+
+- (void) highlightCurrentScanSelection:(BOOL)highlight {
+    if(indexOfCurrentScanSelection < 0)
+        indexOfCurrentScanSelection = numberOfPanelsInScrollView-1;
+    if(indexOfCurrentScanSelection >= numberOfPanelsInScrollView)
+        indexOfCurrentScanSelection = 0;
+    UIButton *panel = [[panelSelectionScrollView subviews] objectAtIndex:indexOfCurrentScanSelection*2 + 1];
+    CGRect highlightFrame = [panel frame];
+    highlightFrame.size.width += HIGHLIGHT_RECT_THICKNESS*2;
+    highlightFrame.size.height += HIGHLIGHT_RECT_THICKNESS*2;
+    highlightFrame.origin.x -= HIGHLIGHT_RECT_THICKNESS;
+    highlightFrame.origin.y -= HIGHLIGHT_RECT_THICKNESS;
+    [highlighting setFrame:highlightFrame];
+    UIColor *newColor = ((highlight)?[UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:1.0]:[UIColor blackColor]);
+    [highlighting setBackgroundColor:newColor];
+    UITextView *text = [[panelSelectionScrollView subviews] objectAtIndex:indexOfCurrentScanSelection*2 + 2];
+    newColor = ((highlight)?[UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:1.0]:[UIColor whiteColor]);
+    [text setTextColor:newColor];
+    if(highlight) {
+        // Reposition scroll to center the panel
+        [panelSelectionScrollView scrollRectToVisible:highlightFrame animated:YES];
+    }
 }
 
 - (void) statusMessageCallback {
@@ -161,19 +228,20 @@
     UIColor *fgColor = [UIColor whiteColor];
     int selectButtonWidth = selectButtonHeight + (selectButtonHeight/2);
 
-    if(switchPanelURLDictionary) {
-        CFDictionaryRemoveAllValues(switchPanelURLDictionary);
-        CFRelease(switchPanelURLDictionary);
-    }
-    switchPanelURLDictionary = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+    [switchPanelURLDictionary removeAllObjects];
     // Find all switch panel files
     NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
     NSURL *url;
     
     int current_button_x = button_spacing;
     int current_button_y = 0;
-    
+    // Create highlighter
+    [self setHighlighting:[[UIView alloc] initWithFrame:CGRectMake(current_button_x-HIGHLIGHT_RECT_THICKNESS, current_button_y-HIGHLIGHT_RECT_THICKNESS, selectButtonWidth+2*HIGHLIGHT_RECT_THICKNESS, selectButtonHeight+2*HIGHLIGHT_RECT_THICKNESS)]];
+    [panelSelectionScrollView addSubview:[self highlighting]];
+    [[self highlighting] setBackgroundColor:bgColor];
+    numberOfPanelsInScrollView = 0;
     for(url in xmlUrls) {
+        numberOfPanelsInScrollView++;
         // Render view controller into image
         switchPanelViewController *viewController = [switchPanelViewController alloc];
         [viewController setUrlToLoad:url];
@@ -209,11 +277,12 @@
         [panelNameLabel setTextAlignment:UITextAlignmentCenter];
         [panelNameLabel setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
         [panelSelectionScrollView addSubview:panelNameLabel];
-        // Redesign CFDictionaryAddValue(switchPanelURLDictionary, myButton, url);
+        [[self switchPanelURLDictionary] setObject:url forKey:[NSValue valueWithNonretainedObject:myButton]];
     }
     if(current_button_y != button_spacing)
         current_button_x += selectButtonWidth + button_spacing;
     [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, 100)];
+    
     [panelSelectionScrollView setScrollEnabled:YES];
 }
 
@@ -222,8 +291,8 @@
     [self setPanelSelectionScrollView:nil];
     [self setStatusText:nil];
     [self setHelpButton:nil];
+    [self setSwitchPanelURLDictionary:nil];
     [super viewDidUnload];
-    CFRelease(switchPanelURLDictionary);
 
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -265,15 +334,13 @@
 - (void)launchSwitchPanel:(id)sender {
     // Load programatically-created view
     switchPanelViewController *viewController = [switchPanelViewController alloc];
-    NSURL *url;
-#if 0
-// REDESIGN
-    if(!CFDictionaryGetValueIfPresent(switchPanelURLDictionary, sender, (const void **) &url)) {
+    NSURL *url = [switchPanelURLDictionary objectForKey:[NSValue valueWithNonretainedObject:sender]];
+
+    if(!url) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Select error!" message:@"Panel dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         return;
     }
-#endif
     [viewController setUrlToLoad:url];
     [self.navigationController pushViewController:viewController animated:YES];
 }

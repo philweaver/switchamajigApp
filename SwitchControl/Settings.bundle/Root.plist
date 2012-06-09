@@ -20,11 +20,11 @@
 		</dict>
 		<dict>
 			<key>MinimumValue</key>
-			<integer>10</integer>
+			<integer>15</integer>
 			<key>Type</key>
 			<string>PSSliderSpecifier</string>
 			<key>DefaultValue</key>
-			<integer>12</integer>
+			<integer>15</integer>
 			<key>Key</key>
 			<string>textSizePreference</string>
 			<key>MaximumValue</key>
@@ -40,7 +40,7 @@
 		</dict>
 		<dict>
 			<key>MinimumValue</key>
-			<integer>50</integer>
+			<integer>100</integer>
 			<key>Type</key>
 			<string>PSSliderSpecifier</string>
 			<key>DefaultValue</key>
@@ -69,6 +69,16 @@
 			<string>showNetworkConfigButtonPreference</string>
 			<key>DefaultValue</key>
 			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Enable Scanning</string>
+			<key>Key</key>
+			<string>enableScanningPreference</string>
+			<key>DefaultValue</key>
+			<false/>
 		</dict>
 	</array>
 	<key>StringsTable</key>
