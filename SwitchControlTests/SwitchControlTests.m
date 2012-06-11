@@ -37,16 +37,85 @@
     STAssertNotNil(app_delegate, @"Can't find application delegate");
 }
 
-- (void)test_001_Help
+- (void)test_001_RootViewController_001_Help
 {
+    // Disable scanning, enable help button
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showHelpButtonPreference"];
+    // Call loadview
+    [rootViewController loadView];
+    // Confirm that help button exists
+    STAssertNotNil([rootViewController helpButton], @"Scan Button nil when scanning enabled");
+    // Check that the nav bar appears and disappears as designed
     STAssertTrue(nav_controller.navigationBarHidden, @"Navigation bar not hidden in root view.");
     [[rootViewController helpButton] sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertFalse(nav_controller.navigationBarHidden, @"Navigation bar hidden on help screen.");
     [nav_controller popViewControllerAnimated:NO];
     [rootViewController viewWillAppear:YES];
     STAssertTrue(nav_controller.navigationBarHidden, @"Navigation bar not hidden in root view after help.");
+    // Confirm that help button does not appear when scanning enabled
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    [rootViewController loadView];
+    STAssertNil([rootViewController helpButton], @"Scan Button nil when scanning enabled");
+    // Confirm that help button does not appear when preference say not to
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
+    [rootViewController loadView];
+    STAssertNil([rootViewController helpButton], @"Scan Button nil when scanning enabled");
+
 }
 
+- (void)test_001_RootViewController_002_ScanningEnabled
+{
+    // Disable scanning
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
+    // Call loadview
+    [rootViewController loadView];
+    // Confirm no scan or select button
+    STAssertNil([rootViewController scanButton], @"Scan Button not nil when scanning disabled");
+    STAssertNil([rootViewController selectButton], @"Scan Button not nil when scanning disabled");
+    // Enable scanning, set select on left
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    // Call loadview
+    [rootViewController loadView];
+    // Confirm scan and select buttons exist
+    STAssertNotNil([rootViewController scanButton], @"Scan Button nil when scanning enabled");
+    STAssertNotNil([rootViewController selectButton], @"Scan Button nil when scanning enabled");
+}
+
+- (void)test_001_RootViewController_003_ScanningOptions
+{
+    // Enable scanning, select button on left and green, scan button yellow
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"selectButtonOnLeftPreference"];
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"selectButtonColorPreference"];
+    [[NSUserDefaults standardUserDefaults] setInteger:3 forKey:@"scanButtonColorPreference"];
+    // Call loadview
+    [rootViewController loadView];
+    // Confirm everything is set up as specified
+    STAssertTrue([[rootViewController scanButton] backgroundColor] == [UIColor yellowColor], @"Scan Button not yellow as preferences specify");
+    STAssertTrue([[rootViewController selectButton] backgroundColor] == [UIColor greenColor], @"Select Button not green as preferences specify");
+    CGRect scanFrame = [[rootViewController scanButton] frame];
+    CGRect selectFrame = [[rootViewController selectButton] frame];
+    NSLog(@"scan: %f %f %f %f", scanFrame.origin.x, scanFrame.origin.y, scanFrame.size.width, scanFrame.size.height);
+    NSLog(@"select: %f %f %f %f", selectFrame.origin.x, selectFrame.origin.y, selectFrame.size.width, selectFrame.size.height);
+    STAssertTrue((selectFrame.origin.x < scanFrame.origin.x), @"Select Button x coord %f not left of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
+    // Move select button to right, make it red, make scan button blue
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"selectButtonOnLeftPreference"];
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"selectButtonColorPreference"];
+    [[NSUserDefaults standardUserDefaults] setInteger:2 forKey:@"scanButtonColorPreference"];
+    // Call loadview
+    [rootViewController loadView];
+    // Confirm everything is set up as specified
+    STAssertTrue([[rootViewController scanButton] backgroundColor] == [UIColor blueColor], @"Scan Button not yellow as preferences specify");
+    STAssertTrue([[rootViewController selectButton] backgroundColor] == [UIColor redColor], @"Select Button not green as preferences specify");
+    scanFrame = [[rootViewController scanButton] frame];
+    selectFrame = [[rootViewController selectButton] frame];
+    STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
+}
+
+#if 0
 - (void)test_002_FirstViewController
 {
     // Select the first switch panel
@@ -132,4 +201,5 @@
     }
     STAssertTrue([[nav_controller visibleViewController] isKindOfClass:[rootSwitchViewController class]], @"Failed to cancel out of config window.");
 }
+#endif
 @end

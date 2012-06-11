@@ -28,8 +28,25 @@
 #define FRAME_WIDTH 1024
 #define FRAME_HEIGHT 768
 #define MAX_BUTTON_HEIGHT_FOR_SCANNING 200
+
++ (UIColor *) uiColorFromScanSelectPreferenceIndex:(int )colorIndex {
+    switch(colorIndex) {
+        case 0: return [UIColor greenColor];
+        case 1: return [UIColor redColor];
+        case 2: return [UIColor blueColor];
+        case 3: return [UIColor yellowColor];
+        case 4: return [UIColor orangeColor];
+        default: return [UIColor whiteColor];
+    }
+}
+
 - (void) loadView {
     appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
+    helpButton = nil;
+    configButton = nil;
+    scanButton = nil;
+    selectButton = nil;
+
     [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
     [[self view] setBackgroundColor:[UIColor blackColor]];
     [self setSwitchPanelURLDictionary:[[NSMutableDictionary alloc] initWithCapacity:10]];
@@ -55,23 +72,32 @@
         int scanButtonHeight = FRAME_HEIGHT - textHeight - scrollPanelHeight;
         int scanButtonWidth = (FRAME_WIDTH - button_spacing)/2;
         // Create and set up scan button
-        [self setScanButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
-        [[self scanButton] setFrame:CGRectMake(0, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+        [self setScanButton:[UIButton buttonWithType:UIButtonTypeCustom]];
         [[self scanButton] setTitle:@"Scan" forState:UIControlStateNormal];
         [[[self scanButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+        [[self scanButton] setBackgroundColor:[rootSwitchViewController uiColorFromScanSelectPreferenceIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@"scanButtonColorPreference"]]];
+        [[self scanButton] setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [[self scanButton] addTarget:self action:@selector(scanPressed:) forControlEvents:UIControlEventTouchUpInside]; 
         [[self view] addSubview:[self scanButton]];
         // Create and set up select button
-        [self setSelectButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
-        [[self selectButton] setFrame:CGRectMake(FRAME_WIDTH - scanButtonWidth, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+        [self setSelectButton:[UIButton buttonWithType:UIButtonTypeCustom]];
         [[self selectButton] setTitle:@"Select" forState:UIControlStateNormal];
         [[[self selectButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
-        [[self selectButton] addTarget:self action:@selector(selectPressed:) forControlEvents:UIControlEventTouchUpInside]; 
+        [[self selectButton] addTarget:self action:@selector(selectPressed:) forControlEvents:UIControlEventTouchUpInside];
+        [[self selectButton] setBackgroundColor:[rootSwitchViewController uiColorFromScanSelectPreferenceIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@"selectButtonColorPreference"]]];
+        [[self selectButton] setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        if([[NSUserDefaults standardUserDefaults] integerForKey:@"selectButtonOnLeftPreference"]) {
+            [[self selectButton] setFrame:CGRectMake(0, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+            [[self scanButton] setFrame:CGRectMake(FRAME_WIDTH - scanButtonWidth, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+        } else {
+            [[self scanButton] setFrame:CGRectMake(0, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+            [[self selectButton] setFrame:CGRectMake(FRAME_WIDTH - scanButtonWidth, textHeight+scrollPanelHeight, scanButtonWidth, scanButtonHeight)];
+        }
         [[self view] addSubview:[self selectButton]];
     } else {
         int spaceOnButtomForExtraButtons = 0;
-        BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showHelpButtonPreference"];
-        BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] integerForKey:@"showNetworkConfigButtonPreference"];
+        BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showHelpButtonPreference"];
+        BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showNetworkConfigButtonPreference"];
         if(displayHelpButton || displayNetworkConfigButton) {
             spaceOnButtomForExtraButtons = selectButtonHeight;
             scrollPanelHeight -= spaceOnButtomForExtraButtons;
