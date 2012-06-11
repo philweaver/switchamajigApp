@@ -97,8 +97,6 @@
     STAssertTrue([[rootViewController selectButton] backgroundColor] == [UIColor greenColor], @"Select Button not green as preferences specify");
     CGRect scanFrame = [[rootViewController scanButton] frame];
     CGRect selectFrame = [[rootViewController selectButton] frame];
-    NSLog(@"scan: %f %f %f %f", scanFrame.origin.x, scanFrame.origin.y, scanFrame.size.width, scanFrame.size.height);
-    NSLog(@"select: %f %f %f %f", selectFrame.origin.x, selectFrame.origin.y, selectFrame.size.width, selectFrame.size.height);
     STAssertTrue((selectFrame.origin.x < scanFrame.origin.x), @"Select Button x coord %f not left of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
     // Move select button to right, make it red, make scan button blue
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
@@ -113,6 +111,77 @@
     scanFrame = [[rootViewController scanButton] frame];
     selectFrame = [[rootViewController selectButton] frame];
     STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
+}
+
++ (BOOL) CheckAllTextInView:(UIView *)view hasSize:(float)size {
+    UIView *subView;
+    for(subView in [view subviews]) {
+        //NSLog(@"Checking subview");
+        NSString *title = nil;
+        CGFloat fontSize;
+        if([subView isKindOfClass:[UIButton class]]) {
+            UIButton *button = (UIButton *)subView;
+            title = [button titleForState:UIControlStateNormal];
+            fontSize = [[[button titleLabel] font] pointSize];
+            //NSLog(@" Subview is button. Title = %@, fontsize = %f", title, fontSize);
+        }
+        if([subView isKindOfClass:[UILabel class]]) {
+           UILabel *textView = (UILabel *)subView;
+            title = [textView text];
+            fontSize = [[textView font]pointSize];
+            //NSLog(@" Subview is UILabel. Title = %@, fontsize = %f", title, fontSize);
+        }
+        if(title != nil) {
+            //NSLog(@"Checking size for title %@", title);
+        }
+        if((title != nil) && (fontSize != size)) {
+            NSLog(@"Size does not match with title: %@", title);
+            return NO;
+        }
+        if(![SwitchControlTests CheckAllTextInView:subView hasSize:size])
+            return NO;
+    }
+    // If nothing failed or the list is empty, we're good
+    return YES;
+}
+
+- (void)test_001_RootViewController_004_TextSize {
+    float textSize = 15;
+    [[NSUserDefaults standardUserDefaults] setFloat:textSize forKey:@"textSizePreference"];
+    // Text size with no help, config, or scan
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showNetworkConfigButtonPreference"];
+    [rootViewController loadView]; 
+    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. Size = %f, no help or config buttons", textSize);
+    // Text size with help and config
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showHelpButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showNetworkConfigButtonPreference"];
+    [rootViewController loadView]; 
+    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. Size = %f, help and config buttons", textSize);
+    // Text size with scanning
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    [rootViewController loadView]; 
+    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. Size = %f, scanning", textSize);
+    
+    // Check with large text size
+    textSize = 50;
+    [[NSUserDefaults standardUserDefaults] setFloat:textSize forKey:@"textSizePreference"];
+    // Text size with no help, config, or scan
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showNetworkConfigButtonPreference"];
+    [rootViewController loadView]; 
+    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. Size = %f, no help or config buttons", textSize);
+    // Text size with help and config
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showHelpButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showNetworkConfigButtonPreference"];
+    [rootViewController loadView]; 
+    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. Size = %f, help and config buttons", textSize);
+    // Text size with scanning
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    [rootViewController loadView]; 
+    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. Size = %f, scanning", textSize);
 }
 
 #if 0
