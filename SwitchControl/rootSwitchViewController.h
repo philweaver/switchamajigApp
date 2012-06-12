@@ -12,7 +12,7 @@
 @interface rootSwitchViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
     SwitchControlAppDelegate *appDelegate;
     BOOL isConfigAvailable;
-    int selectButtonHeight;
+    int panelButtonHeight;
     int friendlyNameDictionaryIndex;
     int numberOfPanelsInScrollView;
     int indexOfCurrentScanSelection;

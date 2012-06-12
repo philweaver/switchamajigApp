@@ -26,7 +26,7 @@
 #define border 20
 #define button_spacing 50
 #define FRAME_WIDTH 1024
-#define FRAME_HEIGHT 768
+#define FRAME_HEIGHT 748
 #define MAX_BUTTON_HEIGHT_FOR_SCANNING 200
 
 + (UIColor *) uiColorFromScanSelectPreferenceIndex:(int )colorIndex {
@@ -46,29 +46,40 @@
     configButton = nil;
     scanButton = nil;
     selectButton = nil;
-
+    highlighting = nil;
+    // Temp
+#if 0
+    [[NSUserDefaults standardUserDefaults] setFloat:15 forKey:@"textSizePreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showHelpButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showNetworkConfigButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setFloat:200 forKey:@"switchPanelSizePreference"];
+#endif
+    // /Temp
+    panelButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
+    bool scanning = [[NSUserDefaults standardUserDefaults] integerForKey:@"enableScanningPreference"];
+    int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
+    if((textFontSize == 15) && (panelButtonHeight == 200) && (scanning))
+        scanning = true;
     [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
     [[self view] setBackgroundColor:[UIColor blackColor]];
     [self setSwitchPanelURLDictionary:[[NSMutableDictionary alloc] initWithCapacity:10]];
-    int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     NSString *sampleText = @"Steering Plus";
     CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
     int textHeight = textSize.height;
     int scrollPanelHeight = FRAME_HEIGHT-border-textHeight;
-    selectButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
-    if(textSize.width > (selectButtonHeight*3)/2) {
-        selectButtonHeight = (textSize.width*2)/3;
+    if(textSize.width > (panelButtonHeight*3)/2) {
+        panelButtonHeight = (textSize.width*2)/3;
     }
 
     // There are three types of layouts: 
     // 1) The default, with help and/or config button, whose size is adjustable from settings
     // 2) Same as (1) without help or config button, which allows for a larger scroll panel
     // 3) Scanning. For scanning we don't show the help or config button. Instead we make the scroll view a single row and size it based on the text size, and then use the rest of the space for scan/select.
-    bool scanning = [[NSUserDefaults standardUserDefaults] integerForKey:@"enableScanningPreference"];
     if(scanning) {
-        if(selectButtonHeight > MAX_BUTTON_HEIGHT_FOR_SCANNING)
-            selectButtonHeight = MAX_BUTTON_HEIGHT_FOR_SCANNING;
-        scrollPanelHeight = selectButtonHeight+textHeight;
+        if(panelButtonHeight > MAX_BUTTON_HEIGHT_FOR_SCANNING)
+            panelButtonHeight = MAX_BUTTON_HEIGHT_FOR_SCANNING;
+        scrollPanelHeight = panelButtonHeight+textHeight;
         int scanButtonHeight = FRAME_HEIGHT - textHeight - scrollPanelHeight;
         int scanButtonWidth = (FRAME_WIDTH - button_spacing)/2;
         // Create and set up scan button
@@ -99,18 +110,18 @@
         BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showHelpButtonPreference"];
         BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showNetworkConfigButtonPreference"];
         if(displayHelpButton || displayNetworkConfigButton) {
-            spaceOnButtomForExtraButtons = selectButtonHeight;
+            spaceOnButtomForExtraButtons = panelButtonHeight;
             scrollPanelHeight -= spaceOnButtomForExtraButtons;
-            if(scrollPanelHeight < (selectButtonHeight + textHeight)) {
+            if(scrollPanelHeight < (panelButtonHeight + textHeight)) {
                 // Reduce button size to make room for one row of buttons and text
-                selectButtonHeight = (FRAME_HEIGHT-border-button_spacing - 2*textHeight)/2;
-                scrollPanelHeight = selectButtonHeight + textHeight;
-                spaceOnButtomForExtraButtons = selectButtonHeight;
+                panelButtonHeight = (FRAME_HEIGHT-border-button_spacing - 2*textHeight)/2;
+                scrollPanelHeight = panelButtonHeight + textHeight;
+                spaceOnButtomForExtraButtons = panelButtonHeight;
             }
         }
         
         // Set width of help and config buttons
-        int helpConfigButtonWidth = (selectButtonHeight > 200) ? selectButtonHeight : 200;
+        int helpConfigButtonWidth = (panelButtonHeight > 200) ? panelButtonHeight : 200;
         if(displayNetworkConfigButton) {
             NSString *configText = @"Configure Network Settings";
             [self setConfigButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
@@ -252,7 +263,7 @@
 - (void)initializeScrollPanelWithTextSize:(CGSize)textSize {
     UIColor *bgColor = [UIColor blackColor];
     UIColor *fgColor = [UIColor whiteColor];
-    int selectButtonWidth = selectButtonHeight + (selectButtonHeight/2);
+    int selectButtonWidth = panelButtonHeight + (panelButtonHeight/2);
 
     [switchPanelURLDictionary removeAllObjects];
     // Find all switch panel files
@@ -262,7 +273,7 @@
     int current_button_x = button_spacing;
     int current_button_y = 0;
     // Create highlighter
-    [self setHighlighting:[[UIView alloc] initWithFrame:CGRectMake(current_button_x-HIGHLIGHT_RECT_THICKNESS, current_button_y-HIGHLIGHT_RECT_THICKNESS, selectButtonWidth+2*HIGHLIGHT_RECT_THICKNESS, selectButtonHeight+2*HIGHLIGHT_RECT_THICKNESS)]];
+    [self setHighlighting:[[UIView alloc] initWithFrame:CGRectMake(current_button_x-HIGHLIGHT_RECT_THICKNESS, current_button_y-HIGHLIGHT_RECT_THICKNESS, selectButtonWidth+2*HIGHLIGHT_RECT_THICKNESS, panelButtonHeight+2*HIGHLIGHT_RECT_THICKNESS)]];
     [panelSelectionScrollView addSubview:[self highlighting]];
     [[self highlighting] setBackgroundColor:bgColor];
     numberOfPanelsInScrollView = 0;
@@ -279,13 +290,13 @@
         // Create button with image
         // Create the specified button
         id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, selectButtonWidth, selectButtonHeight)];
+        [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, selectButtonWidth, panelButtonHeight)];
         // Also set rectangle for label
-        CGRect panelNameLabelRect = CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y + selectButtonHeight, selectButtonWidth, textSize.height);
+        CGRect panelNameLabelRect = CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y + panelButtonHeight, selectButtonWidth, textSize.height);
         [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)]; 
         [panelSelectionScrollView addSubview:myButton];
-        current_button_y += selectButtonHeight + textSize.height + button_spacing;
-        if(current_button_y + selectButtonHeight >= [panelSelectionScrollView bounds].size.height) {
+        current_button_y += panelButtonHeight + textSize.height + button_spacing;
+        if(current_button_y + panelButtonHeight + textSize.height >= [panelSelectionScrollView bounds].size.height) {
             current_button_y = 0;
             current_button_x += selectButtonWidth + button_spacing;
         }
@@ -307,7 +318,7 @@
     }
     if(current_button_y != button_spacing)
         current_button_x += selectButtonWidth + button_spacing;
-    [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, 100)];
+    [panelSelectionScrollView setContentSize:CGSizeMake(current_button_x, [panelSelectionScrollView layer].bounds.size.height)];
     
     [panelSelectionScrollView setScrollEnabled:YES];
 }
