@@ -47,20 +47,17 @@
     scanButton = nil;
     selectButton = nil;
     highlighting = nil;
-    // Temp
 #if 0
-    [[NSUserDefaults standardUserDefaults] setFloat:15 forKey:@"textSizePreference"];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showHelpButtonPreference"];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showNetworkConfigButtonPreference"];
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
-    [[NSUserDefaults standardUserDefaults] setFloat:200 forKey:@"switchPanelSizePreference"];
+    // Handy for testing specific configurations
+    [[NSUserDefaults standardUserDefaults] setFloat:100 forKey:@"textSizePreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showNetworkConfigButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setFloat:500 forKey:@"switchPanelSizePreference"];
 #endif
-    // /Temp
     panelButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
     bool scanning = [[NSUserDefaults standardUserDefaults] integerForKey:@"enableScanningPreference"];
     int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
-    if((textFontSize == 15) && (panelButtonHeight == 200) && (scanning))
-        scanning = true;
     [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
     [[self view] setBackgroundColor:[UIColor blackColor]];
     [self setSwitchPanelURLDictionary:[[NSMutableDictionary alloc] initWithCapacity:10]];
@@ -80,7 +77,7 @@
         if(panelButtonHeight > MAX_BUTTON_HEIGHT_FOR_SCANNING)
             panelButtonHeight = MAX_BUTTON_HEIGHT_FOR_SCANNING;
         scrollPanelHeight = panelButtonHeight+textHeight;
-        int scanButtonHeight = FRAME_HEIGHT - textHeight - scrollPanelHeight;
+        int scanButtonHeight = FRAME_HEIGHT - border - textHeight - scrollPanelHeight;
         int scanButtonWidth = (FRAME_WIDTH - button_spacing)/2;
         // Create and set up scan button
         [self setScanButton:[UIButton buttonWithType:UIButtonTypeCustom]];
@@ -260,6 +257,36 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
 }
 
+- (UIImage *) imageFromViewController:(UIViewController*)viewController scaledTo:(CGSize)scaledSize {
+    // Create a graphics context large enough to hold the entire viewController image
+    CGSize originalViewSize = [[viewController view] bounds].size;
+    int unscaledBitmapByteCount = originalViewSize.width * originalViewSize.height * 4;
+    void *bitmapData = malloc(unscaledBitmapByteCount);
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGContextRef context = CGBitmapContextCreate(bitmapData, originalViewSize.width, originalViewSize.height, 8, originalViewSize.width*4, colorSpace, kCGImageAlphaPremultipliedLast);
+    [[[viewController view] layer] renderInContext:context];
+    CGImageRef unscaledImageCG = CGBitmapContextCreateImage(context);
+    free(bitmapData);
+    CGContextRelease(context);
+    
+    // Repeat process to scale image
+    int scaledBitmapByteCount = scaledSize.width * scaledSize.height * 4;
+    bitmapData = malloc(scaledBitmapByteCount);
+    context = CGBitmapContextCreate(bitmapData, scaledSize.width, scaledSize.height, 8, scaledSize.width*4, colorSpace, kCGImageAlphaPremultipliedLast);
+    CGRect scaledImageRect = CGRectMake(0.0, 0.0, scaledSize.width, scaledSize.height);
+    CGContextTranslateCTM(context, 0, scaledSize.height);
+    CGContextScaleCTM(context, 1.0, -1.0);
+    CGContextClearRect(context, scaledImageRect);
+    CGContextDrawImage(context, scaledImageRect, unscaledImageCG);
+    CGImageRef scaledImageCG = CGBitmapContextCreateImage(context);
+    UIImage *scaledImage = [UIImage imageWithCGImage:scaledImageCG];
+    free(bitmapData);
+    CGContextRelease(context);
+    CGImageRelease(scaledImageCG);
+    CGImageRelease(unscaledImageCG);
+    return scaledImage;
+}
+
 - (void)initializeScrollPanelWithTextSize:(CGSize)textSize {
     UIColor *bgColor = [UIColor blackColor];
     UIColor *fgColor = [UIColor whiteColor];
@@ -282,12 +309,6 @@
         // Render view controller into image
         switchPanelViewController *viewController = [switchPanelViewController alloc];
         [viewController setUrlToLoad:url];
-        CGSize size = [[viewController view] bounds].size;
-        UIGraphicsBeginImageContext(size);
-        [[[viewController view] layer] renderInContext:UIGraphicsGetCurrentContext()];
-        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        // Create button with image
         // Create the specified button
         id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, selectButtonWidth, panelButtonHeight)];
@@ -300,11 +321,7 @@
             current_button_y = 0;
             current_button_x += selectButtonWidth + button_spacing;
         }
-        size = [myButton bounds].size;
-        UIGraphicsBeginImageContext(size);
-        [image drawInRect:CGRectMake(0, 0, size.width, size.height)];
-        UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
+        UIImage *scaledImage = [self imageFromViewController:viewController scaledTo:[myButton bounds].size];
         [myButton setImage:scaledImage forState:UIControlStateNormal];
         // Add text label
         UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];

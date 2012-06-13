@@ -48,7 +48,7 @@
 			<key>Key</key>
 			<string>switchPanelSizePreference</string>
 			<key>MaximumValue</key>
-			<integer>500</integer>
+			<integer>496</integer>
 		</dict>
 		<dict>
 			<key>Type</key>

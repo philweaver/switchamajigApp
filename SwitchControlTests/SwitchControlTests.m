@@ -25,7 +25,6 @@
     nav_controller = [app_delegate navigationController];
     rootViewController = [[nav_controller viewControllers] objectAtIndex:0];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
-
 }
 
 - (void)setUp
@@ -62,8 +61,11 @@
     STAssertTrue(nav_controller.navigationBarHidden, @"Navigation bar not hidden in root view.");
     [[rootViewController helpButton] sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertFalse(nav_controller.navigationBarHidden, @"Navigation bar hidden on help screen.");
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
     [nav_controller popViewControllerAnimated:NO];
-    [rootViewController viewWillAppear:YES];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+
+    //[rootViewController viewWillAppear:YES];
     STAssertTrue(nav_controller.navigationBarHidden, @"Navigation bar not hidden in root view after help.");
     // Confirm that help button does not appear when scanning enabled
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
@@ -100,7 +102,8 @@
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"selectButtonOnLeftPreference"];
     [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"selectButtonColorPreference"];
     [[NSUserDefaults standardUserDefaults] setInteger:3 forKey:@"scanButtonColorPreference"];
-    [self reloadRootViewController];
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    [rootViewController view];
     // Confirm everything is set up as specified
     STAssertTrue([[rootViewController scanButton] backgroundColor] == [UIColor yellowColor], @"Scan Button not yellow as preferences specify");
     STAssertTrue([[rootViewController selectButton] backgroundColor] == [UIColor greenColor], @"Select Button not green as preferences specify");
@@ -112,7 +115,8 @@
     [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"selectButtonOnLeftPreference"];
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"selectButtonColorPreference"];
     [[NSUserDefaults standardUserDefaults] setInteger:2 forKey:@"scanButtonColorPreference"];
-    [self reloadRootViewController];
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    [rootViewController view];
     // Confirm everything is set up as specified
     STAssertTrue([[rootViewController scanButton] backgroundColor] == [UIColor blueColor], @"Scan Button not yellow as preferences specify");
     STAssertTrue([[rootViewController selectButton] backgroundColor] == [UIColor redColor], @"Select Button not green as preferences specify");
@@ -201,7 +205,7 @@
     float textSizes[numTextSizes] = {15, 50, 100};
     const int numTestConditions = 3;
     const int numButtonSizes = 3;
-    float buttonSizes[numButtonSizes] = {100, 200, 500};
+    float buttonSizes[numButtonSizes] = {200, 100, 494};
     for(int textSizeIndex=0; textSizeIndex < numTextSizes; ++textSizeIndex) {
         float textSize = textSizes[textSizeIndex];
         [[NSUserDefaults standardUserDefaults] setFloat:textSize forKey:@"textSizePreference"];
@@ -226,11 +230,11 @@
             }
             for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
                 float buttonSize = buttonSizes[buttonSizeIndex];
-                NSLog(@"Test iteration start. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+                //NSLog(@"Test iteration start. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
                 [[NSUserDefaults standardUserDefaults] setFloat:buttonSize forKey:@"switchPanelSizePreference"];
                 // Update the view, and then run the tests
-                [self reloadRootViewController];
-                NSLog(@"Returned");
+                rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+                [rootViewController view];
                 // Confirm text sizes
                 STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
                 // Make sure we don't have inappropriate overlaps
@@ -239,11 +243,11 @@
                 // Stuff should (generally) be inside its parent view
                 int numOutOfBounds = [SwitchControlTests numberOfSubviewsOutsideParents:[rootViewController view]];
                 STAssertTrue((numOutOfBounds == num_expected_outofbounds), @"Out of bounds views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOutOfBounds, num_expected_outofbounds, textSize, testConditionIndex, buttonSize);
-                NSLog(@"Test iteration complete. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+                //NSLog(@"Test iteration complete. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
             }
         }
     }
-    NSLog(@"Test 004 complete.");
+    //NSLog(@"Test 004 complete.");
 }
 
 - (void)test_001_RootViewController_005_ButtonSize {
