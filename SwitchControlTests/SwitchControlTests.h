@@ -16,5 +16,11 @@
     UINavigationController *nav_controller;
     rootSwitchViewController *rootViewController;
 }
+@end
 
+@interface MockNavigationController : UINavigationController {
+    @public
+    UIViewController *lastViewController;
+    BOOL didReceivePushViewController;
+}
 @end

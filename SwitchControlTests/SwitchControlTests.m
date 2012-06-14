@@ -13,6 +13,16 @@
 #define SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
 #define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 
+@implementation MockNavigationController
+
+- (void) pushViewController:(UIViewController *)viewController animated:(BOOL)animated {
+    didReceivePushViewController = YES;
+    lastViewController = viewController;
+    [super pushViewController:viewController animated:animated];
+}
+
+@end
+
 @implementation SwitchControlTests
 
 - (void) reloadRootViewController {
@@ -250,37 +260,20 @@
     //NSLog(@"Test 004 complete.");
 }
 
-- (void)test_001_RootViewController_005_ButtonSize {
-    // Small buttons
-    // No scanning, help, or config
-    // No scanning, but help and config buttons
-    // Scanning
+// Confirm that we can launch a switch panel
+- (void)test_001_RootViewController_005_LaunchSwitchPanel {
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    MockNavigationController *naviControl = [[MockNavigationController alloc] initWithRootViewController:rootViewController];
+    naviControl->didReceivePushViewController = NO;
+    [rootViewController view]; 
+    // Select the first switch panel
+    [[[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:1] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue(naviControl->didReceivePushViewController, @"Selecting switch panel did not push view controller");
+    STAssertTrue([naviControl->lastViewController isKindOfClass:[switchPanelViewController class]], @"Switch panel did not display");
 }
 
 #if 0
-- (void)test_002_FirstViewController
-{
-    // Select the first switch panel
-    [[[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:0] sendActionsForControlEvents:UIControlEventTouchUpInside];
-    switchPanelViewController *panel = (switchPanelViewController *) [nav_controller visibleViewController];
-    STAssertTrue([panel isKindOfClass:[switchPanelViewController class]], @"Switch panel did not display");
-    // Make sure panel loads a view
-    UIView *panelView = [panel view];
-    panelView = panelView;
-    // Check that the back button exists
-    STAssertFalse([panel->backButton isEnabled], @"Back button is enabled in switch panel");
-    [panel->allowNavButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    STAssertTrue([panel->backButton isEnabled], @"Back button did not enable in switch panel");
-    // Retrieve the first switch from the dictionary
-    STAssertTrue([[panel buttonToSwitchDictionary] count] > 0, @"No switches in dictionary");
-    [panel->myButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    STAssertFalse([panel->backButton isEnabled], @"Back button did not disable on switch press in switch panel");
-    [panel->allowNavButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    [panel->backButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    STAssertTrue([[nav_controller visibleViewController] isKindOfClass:[rootSwitchViewController class]], @"Back button did not display root switch controller");
-}
-
-
+// Implement this once configuration working
 -(void) test_005_ConfigNavigation
 {
     // Connect as UDP
