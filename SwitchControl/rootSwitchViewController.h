@@ -14,7 +14,6 @@
     SwitchControlAppDelegate *appDelegate;
     BOOL isConfigAvailable;
     int panelButtonHeight;
-    int friendlyNameDictionaryIndex;
     int numberOfPanelsInScrollView;
     int indexOfCurrentScanSelection;
 }
@@ -25,7 +24,6 @@
 - (void) launchSwitchPanel:(id)sender;
 - (void) display_help:(id)sender;
 - (void) config_pressed:(id)sender;
-- (void) statusMessageCallback;
 - (void) scanPressed:(id)sender;
 - (void) selectPressed:(id)sender;
 - (void) highlightCurrentScanSelection:(BOOL)highlight;

@@ -159,8 +159,6 @@
     [[self panelSelectionScrollView] setScrollEnabled:YES];
     [[self view] addSubview:[self panelSelectionScrollView]];
     [self initializeScrollPanelWithTextSize:textSize];
-    // Prepare to run status timer
-    //[NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
     indexOfCurrentScanSelection = 0;
     if(scanning)
         [self highlightCurrentScanSelection:YES];
@@ -200,39 +198,6 @@
         // Reposition scroll to center the panel
         [panelSelectionScrollView scrollRectToVisible:highlightFrame animated:YES];
     }
-}
-
-- (void) statusMessageCallback {
-    // If there are any alerts, display them
-    float secondsUntilNextCall = 0.5;
-    [[appDelegate statusInfoLock] lock];
-    if([[appDelegate statusMessages] count]) {
-        NSArray *messageArray = [[appDelegate statusMessages] objectAtIndex:0];
-        NSString *messageText = [messageArray objectAtIndex:0];
-        NSNumber *messageTime = [messageArray objectAtIndex:1];
-        UIColor *messageColor = [messageArray objectAtIndex:2];
-        [[self statusText] setText:messageText];
-        [[self statusText] setTextColor:messageColor];
-        secondsUntilNextCall = [messageTime floatValue];
-        [[appDelegate statusMessages] removeObjectAtIndex:0];
-        
-        
-    } 
-    else if ([[appDelegate friendlyNameHostNameDictionary] count] == 0) {
-        // If there are no names in the dictionary, state that
-        [[self statusText] setText:@"No Switchamajigs Connected"];
-        [[self statusText] setTextColor:[UIColor redColor]];        
-    } else {
-        // Cycle through all connected switches
-        NSArray *friendlyNames = [[appDelegate friendlyNameHostNameDictionary] allKeys];
-        if(friendlyNameDictionaryIndex >= [friendlyNames count])
-            friendlyNameDictionaryIndex = 0;
-        [[self statusText] setText:[NSString stringWithFormat:@"Connected to %@",[friendlyNames objectAtIndex:friendlyNameDictionaryIndex]]];
-        [[self statusText] setTextColor:[UIColor whiteColor]];
-        secondsUntilNextCall = 3.0;
-    }
-    [[appDelegate statusInfoLock] unlock];
-    [NSTimer scheduledTimerWithTimeInterval:secondsUntilNextCall target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
 }
 
 - (void)didReceiveMemoryWarning
