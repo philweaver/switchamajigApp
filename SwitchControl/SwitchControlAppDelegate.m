@@ -58,10 +58,41 @@
     netServiceBrowser = [[NSNetServiceBrowser alloc] init];
     [netServiceBrowser setDelegate:self];
     [netServiceBrowser searchForServicesOfType:@"_sqp._tcp." inDomain:@""];
+    // Prepare to run status timer
+    statusMessageTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
     //[netServiceBrowser searchForServicesOfType:@"_http._tcp." inDomain:@""];
-
+    friendlyNameDictionaryIndex = 0;
+    [self setStatusMessages:[[NSMutableArray alloc] initWithCapacity:5]];
     return YES;
 }
+
+- (void) statusMessageCallback {
+    // If there are any alerts, display them
+    float secondsUntilNextCall = 365.0*24.0*60.0*60.0; // If nothing to update, fire once a year, if we need it or not...
+    [[self statusInfoLock] lock];
+    if([[self statusMessages] count]) {
+        NSArray *messageArray = [[self statusMessages] objectAtIndex:0];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetText" object:[messageArray objectAtIndex:0]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetColor" object:[messageArray objectAtIndex:2]];
+        secondsUntilNextCall = [[messageArray objectAtIndex:1] floatValue];
+        [[self statusMessages] removeObjectAtIndex:0];
+    } 
+    else if ([[self friendlyNameHostNameDictionary] count] == 0) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetText" object:@"No Switchamajigs Found"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetColor" object:[UIColor redColor]];
+    } else {
+        // Cycle through all connected switches
+        NSArray *friendlyNames = [[self friendlyNameHostNameDictionary] allKeys];
+        if(++friendlyNameDictionaryIndex >= [friendlyNames count])
+            friendlyNameDictionaryIndex = 0;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetText" object:[NSString stringWithFormat:@"Connected to %@",[friendlyNames objectAtIndex:friendlyNameDictionaryIndex]]];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetColor" object:[UIColor whiteColor]];
+        secondsUntilNextCall = 3.0;
+    }
+    [[self statusInfoLock] unlock];
+    statusMessageTimer = [NSTimer scheduledTimerWithTimeInterval:secondsUntilNextCall target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
+}
+
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
@@ -245,10 +276,12 @@ char *commands[] = {
 }
 
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds {
-    NSArray *messageArray = [NSArray arrayWithObjects:message, seconds, color, nil];
+    NSArray *messageArray = [NSArray arrayWithObjects:message, [NSNumber numberWithFloat:seconds], color, nil];
     [[self statusInfoLock] lock];
     [[self statusMessages] addObject:messageArray];
     [[self statusInfoLock] unlock];
+    if([statusMessageTimer isValid])
+        [statusMessageTimer fire];
 }
 
 // Initialize connection with remote switch
@@ -341,14 +374,13 @@ char *commands[] = {
     [statusInfoLock lock];
     [friendlyNameHostNameDictionary setObject:hostname forKey:friendlyname];
     [statusInfoLock unlock];
+    [self addStatusAlertMessage:[NSString stringWithFormat:@"Found %@",friendlyname]  withColor:[UIColor whiteColor] displayForSeconds:5.0];
 }
 - (void) SwitchamajigDeviceListenerHandleError:(id)listener theError:(NSError*)error {
     NSLog(@"SwitchamajigDeviceListenerHandleError: %@", error); 
 }
 - (void) SwitchamajigDeviceListenerHandleBatteryWarning:(id)listener hostname:(NSString*)hostname friendlyname:(NSString*)friendlyname {
-    [statusInfoLock lock];
     [self addStatusAlertMessage:[NSString stringWithFormat:@"%@ needs its batteries replaced",friendlyname]  withColor:[UIColor redColor] displayForSeconds:5.0];
-    [statusInfoLock unlock];
 }
 
 // Handle settings initialization

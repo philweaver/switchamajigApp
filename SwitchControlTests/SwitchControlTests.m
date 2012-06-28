@@ -7,6 +7,7 @@
 //
 
 #import "SwitchControlTests.h"
+#import "SJUIStatusMessageLabel.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -54,9 +55,57 @@
     [super tearDown];
 }
 
-- (void)test_000_AppDelegate
+- (void)test_000_AppDelegate_Exists
 {
     STAssertNotNil(app_delegate, @"Can't find application delegate");
+}
+
+- (void)test_000_AppDelegate_Status_Messages
+{
+    SJUIStatusMessageLabel *statusLabel = [[SJUIStatusMessageLabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    // Make sure alert messages get through
+    [app_delegate addStatusAlertMessage:@"Test" withColor:[UIColor purpleColor] displayForSeconds:2.0];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    NSString *currentMessage = [statusLabel text];
+    UIColor *currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"Test"], @"Status alert is %@", currentMessage);
+    STAssertTrue([currentColor isEqual:[UIColor purpleColor]], @"Status alert message color wrong");
+    // Let time expire, look for no switchamajigs
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)2.5]];
+    currentMessage = [statusLabel text];
+    currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"No Switchamajigs Found"], @"Message when no SwitchamajigsFound is %@", currentMessage);
+    STAssertTrue([currentColor isEqual:[UIColor redColor]], @"No Switchamajigs message color wrong");
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:nil hostname:@"0.0.0.0" friendlyname:@"test_friendly"];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    currentMessage = [statusLabel text];
+    currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"Found test_friendly"], @"Not seeing found message");
+    STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
+    [app_delegate SwitchamajigDeviceListenerHandleBatteryWarning:nil hostname:@"0.0.0.0" friendlyname:@"test_friendly"];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    currentMessage = [statusLabel text];
+    currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"test_friendly needs its batteries replaced"], @"Low battery warning not shown");
+    STAssertTrue([currentColor isEqual:[UIColor redColor]], @"Low battery warning color wrong");
+    // Wait for messages to go away, verify that we say we're connected
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)5.5]];
+    currentMessage = [statusLabel text];
+    currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing connected message. Actual message=%@", currentMessage);
+    STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
+    // Add a second device
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:nil hostname:@"0.0.0.1" friendlyname:@"test_friendly2"];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)5.5]];
+    currentMessage = [statusLabel text];
+    currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly2"], @"Not seeing second connected message. Actual message=%@", currentMessage);
+    STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)3.5]];
+    currentMessage = [statusLabel text];
+    currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing connected messages cycle properly. Actual message=%@", currentMessage);
+    STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
 }
 
 - (void)test_001_RootViewController_001_Help

@@ -25,6 +25,8 @@
     int switch_state;
     NSNetServiceBrowser *netServiceBrowser;
     SwitchamajigControllerDeviceListener *sjigControllerListener;
+    int friendlyNameDictionaryIndex;
+    NSTimer *statusMessageTimer;
 }
 - (void)activate:(NSObject *)switches;
 - (void)deactivate:(NSObject *)switches;
@@ -32,6 +34,7 @@
 - (void)SequenceThroughSwitches:(id)switchSequence;
 - (void)sendSwitchState;
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds;
+- (void) statusMessageCallback;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchStateLock;

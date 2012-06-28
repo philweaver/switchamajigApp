@@ -149,7 +149,7 @@
         }
     }
     
-    [self setStatusText:[[UILabel alloc] initWithFrame:CGRectMake(border, 0, FRAME_WIDTH-2*border, textHeight)]];
+    [self setStatusText:[[SJUIStatusMessageLabel alloc] initWithFrame:CGRectMake(border, 0, FRAME_WIDTH-2*border, textHeight)]];
     [[self statusText] setText:@"Welcome to Switchamajig"];
     [[self statusText] setBackgroundColor:[UIColor blackColor]];
     [[self statusText] setTextColor:[UIColor whiteColor]];
@@ -160,7 +160,7 @@
     [[self view] addSubview:[self panelSelectionScrollView]];
     [self initializeScrollPanelWithTextSize:textSize];
     // Prepare to run status timer
-    [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
+    //[NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
     indexOfCurrentScanSelection = 0;
     if(scanning)
         [self highlightCurrentScanSelection:YES];

@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "SwitchControlAppDelegate.h"
+#import "SJUIStatusMessageLabel.h"
 
 @interface rootSwitchViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
     SwitchControlAppDelegate *appDelegate;
@@ -30,7 +31,7 @@
 - (void) highlightCurrentScanSelection:(BOOL)highlight;
 @property (nonatomic, strong) UIButton *helpButton;
 @property (nonatomic, strong) UIScrollView *panelSelectionScrollView;
-@property (nonatomic, strong) UILabel *statusText;
+@property (nonatomic, strong) SJUIStatusMessageLabel *statusText;
 @property (strong, nonatomic) UIButton *configButton;
 @property (strong, nonatomic) UIButton *scanButton;
 @property (strong, nonatomic) UIButton *selectButton;
