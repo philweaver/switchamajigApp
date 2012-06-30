@@ -54,7 +54,7 @@
     
     [super tearDown];
 }
-
+//#if 0
 - (void)test_000_AppDelegate_Exists
 {
     STAssertNotNil(app_delegate, @"Can't find application delegate");
@@ -319,6 +319,33 @@
     [[[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:1] sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue(naviControl->didReceivePushViewController, @"Selecting switch panel did not push view controller");
     STAssertTrue([naviControl->lastViewController isKindOfClass:[switchPanelViewController class]], @"Switch panel did not display");
+}
+
+- (void)test_002_SwitchPanelViewController_001_PanelLayout {
+    // Make sure panel displays properly
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"6_tworows" ofType:@"xml"]]];
+    UIView *thisView;
+    BOOL didFindFirstButton = NO;
+    BOOL didFindLastButton = NO;
+    for(thisView in [[viewController view] subviews]) {
+        CGRect frame = [thisView frame];
+        //NSLog(@"x = %f, y = %f, w = %f, h = %f", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+        if((frame.origin.x == 50) && (frame.origin.y == 50) && (frame.size.width == 274) && (frame.size.height == 294)) {
+            CGFloat red, green, blue, alpha;
+            [[thisView backgroundColor] getRed:&red green:&green blue:&blue alpha:&alpha];
+            if((red == 0.0) && (green == 1.0) && (blue == 0.0) && (alpha == 1.0))
+                didFindFirstButton = YES;
+        }
+        if((frame.origin.x == 698) && (frame.origin.y == 394) && (frame.size.width == 274) && (frame.size.height == 294)) {
+            CGFloat red, green, blue, alpha;
+            [[thisView backgroundColor] getRed:&red green:&green blue:&blue alpha:&alpha];
+            if((red == 1.0) && (green == 0.0) && (blue == 1.0) && (alpha == 1.0))
+                didFindLastButton = YES;
+        }
+    }
+    STAssertTrue(didFindFirstButton, @"First button in 6_tworows.xml does not exist.");
+    STAssertTrue(didFindLastButton, @"Last button in 6_tworows.xml does not exist.");
 }
 
 #if 0
