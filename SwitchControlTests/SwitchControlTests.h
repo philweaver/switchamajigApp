@@ -22,5 +22,6 @@
     @public
     UIViewController *lastViewController;
     BOOL didReceivePushViewController;
+    BOOL didReceivePopViewController;
 }
 @end

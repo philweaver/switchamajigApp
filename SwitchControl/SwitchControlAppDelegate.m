@@ -269,10 +269,8 @@ char *commands[] = {
     "POST /docmnd.xml HTTP/1.1\r\nContent-Type: text/xml\r\nContent-Length: 138\r\n\r\n<docommand key=\"dev\" repeat=\"n\" seq=\"n\" command=\"chnup\" irdata=\"L1b 11800 d4842424 54555545 55544555 44445555 55554441 30823000\" ch=\"0\" />" // Chan up
 };
 
-- (void)activate:(NSObject *)switches {
-}
-
-- (void)deactivate:(NSObject *)switches {
+- (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice {
+    // Stubbed out
 }
 
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds {

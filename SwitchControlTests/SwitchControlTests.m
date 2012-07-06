@@ -22,6 +22,11 @@
     [super pushViewController:viewController animated:animated];
 }
 
+- (UIViewController *) popViewControllerAnimated:(BOOL)animated {
+    didReceivePopViewController = YES;
+    return [super popViewControllerAnimated:animated];
+}
+
 @end
 
 @implementation SwitchControlTests
@@ -54,7 +59,20 @@
     
     [super tearDown];
 }
-//#if 0
+
++ (id) findSubviewOf:(UIView *)view withText:(NSString *)text {
+    UIView *subView;
+    for(subView in [view subviews]) {
+        if([subView isKindOfClass:[UIButton class]]) {
+            UIButton *button = (UIButton *) subView;
+            if([[button titleForState:UIControlStateNormal] isEqualToString:text])
+                return subView;
+        }
+    }
+    return nil;
+}
+
+#if 0
 - (void)test_000_AppDelegate_Exists
 {
     STAssertNotNil(app_delegate, @"Can't find application delegate");
@@ -346,6 +364,49 @@
     }
     STAssertTrue(didFindFirstButton, @"First button in 6_tworows.xml does not exist.");
     STAssertTrue(didFindLastButton, @"Last button in 6_tworows.xml does not exist.");
+}
+#endif
+
+- (void)test_002_SwitchPanelViewController_002_BackButton {
+    // Confirm that the back button works properly
+    // Set up settings to require two-button back
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"singleTapBackButtonPreference"];
+    // Load panel that has both back and enable
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"1_yellow" ofType:@"xml"]]];
+    // Confirm that back button is disabled and enable button is displayed
+    UIView *currentView = [viewController view];
+    id backButton = [SwitchControlTests findSubviewOf:currentView withText:@"Back"];
+    id enableBackButton = [SwitchControlTests findSubviewOf:currentView withText:@"Enable Back Button"];
+    STAssertNotNil(backButton, enableBackButton, @"Either the Back or the Back Enable Button doesn't exist");
+    STAssertFalse([backButton isEnabled], @"Back button enabled before enable button pressed");
+    // Enable the back button
+    [enableBackButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    // Confirm that back button is enabled
+    STAssertTrue([backButton isEnabled], @"Back button not enabled after enable button pressed");
+    // Touch a different control
+    [[SwitchControlTests findSubviewOf:currentView withText:@"1"] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    // Confirm that back button is disabled again
+    STAssertFalse([backButton isEnabled], @"Back button still enabled after pressing another control");
+    // Change setting for one-button back
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"singleTapBackButtonPreference"];
+    // Re-create panel 
+    viewController = [switchPanelViewController alloc];
+    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"1_yellow" ofType:@"xml"]]];
+    currentView = [viewController view];
+    // Confirm that the back button is enabled and enable button is not displayed
+    backButton = [SwitchControlTests findSubviewOf:currentView withText:@"Back"];
+    enableBackButton = [SwitchControlTests findSubviewOf:currentView withText:@"Enable Back Button"];
+    STAssertNotNil(backButton, @"Back button doesn't exist with single-button navigation");
+    STAssertNil(enableBackButton, @"Enable Back button exists with single-button navigation");
+    STAssertTrue([backButton isEnabled], @"Back button not enabled with single-button navigation");
+    // Confirm that the back button works
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    MockNavigationController *naviControl = [[MockNavigationController alloc] initWithRootViewController:rootViewController];
+    [naviControl pushViewController:viewController animated:NO];
+    naviControl->didReceivePopViewController = NO;
+    [backButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue(naviControl->didReceivePopViewController, @"Back button didn't work");
 }
 
 #if 0

@@ -28,8 +28,7 @@
     int friendlyNameDictionaryIndex;
     NSTimer *statusMessageTimer;
 }
-- (void)activate:(NSObject *)switches;
-- (void)deactivate:(NSObject *)switches;
+- (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice;
 - (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
 - (void)SequenceThroughSwitches:(id)switchSequence;
 - (void)sendSwitchState;

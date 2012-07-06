@@ -12,18 +12,17 @@
 @public
     SwitchControlAppDelegate *appDelegate;
     id backButton;
-    id allowNavButton;
-    id myButton; // last button initialized
     id textToShowSwitchName;
+    BOOL oneButtonNavigation;
 }
 - (IBAction)allowNavigation:(id)sender;
 - (IBAction)disallowNavigation:(id)sender;
 - (IBAction)goBack:(id)sender;
 - (IBAction)onSwitchActivated:(id)sender;
 - (IBAction)onSwitchDeactivated:(id)sender;
-- (void)updateSwitchNameText;
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;
-@property (nonatomic, strong) NSMutableDictionary *buttonToSwitchDictionary;
+@property (nonatomic, strong) NSMutableDictionary *activateButtonDictionary;
+@property (nonatomic, strong) NSMutableDictionary *deactivateButtonDictionary;
 
 @end

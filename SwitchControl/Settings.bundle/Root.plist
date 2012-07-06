@@ -12,6 +12,16 @@
 		</dict>
 		<dict>
 			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Single-Tap Back Button</string>
+			<key>Key</key>
+			<string>singleTapBackButtonPreference</string>
+			<key>DefaultValue</key>
+			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
 			<string>Text Size</string>
@@ -34,7 +44,7 @@
 			<key>Type</key>
 			<string>PSTextFieldSpecifier</string>
 			<key>Title</key>
-			<string>Size of Button to Select Switch Panel</string>
+			<string>Navigation Button Size</string>
 			<key>Key</key>
 			<string>ButtonSizeId</string>
 		</dict>

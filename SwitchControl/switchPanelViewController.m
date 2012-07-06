@@ -9,10 +9,12 @@
 #import "switchPanelViewController.h"
 #import "stdio.h"
 #import "../../KissXML/KissXML/DDXMLDocument.h"
+#import "SJUIStatusMessageLabel.h"
 
 @implementation switchPanelViewController
 
-@synthesize buttonToSwitchDictionary;
+@synthesize activateButtonDictionary;
+@synthesize deactivateButtonDictionary;
 @synthesize urlToLoad;
 @synthesize switchPanelName;
 /*
@@ -45,25 +47,9 @@
     UIView *myView = [[UIView alloc] initWithFrame:cgRct];
     [myView setBackgroundColor:bgColor];
 	myView.autoresizesSubviews = YES;
-    [self setButtonToSwitchDictionary:[NSMutableDictionary dictionaryWithCapacity:10]]; 
+    [self setActivateButtonDictionary:[NSMutableDictionary dictionaryWithCapacity:10]]; 
+    [self setDeactivateButtonDictionary:[NSMutableDictionary dictionaryWithCapacity:10]]; 
     
-    // Create two-button combo to allow navigation
-    allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    CGRect buttonRect = CGRectMake(412, 704, 200, 44);
-    [allowNavButton setFrame:buttonRect];
-    [allowNavButton setTitle:[NSString stringWithCString:"Enable Back Button" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-    [allowNavButton addTarget:self action:@selector(allowNavigation:) forControlEvents:UIControlEventTouchUpInside]; 
-    [myView addSubview:allowNavButton];
-
-    backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    buttonRect = CGRectMake(490, 0, 44, 44);
-    [backButton setFrame:buttonRect];
-    [backButton setTitle:[NSString stringWithCString:"Back" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-    [backButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [backButton addTarget:self action:@selector(goBack:) forControlEvents:UIControlEventTouchUpInside];
-    [backButton setEnabled:NO];
-    [myView addSubview:backButton];
-
     NSError *xmlError=nil, *fileError=nil;
     NSString *xmlString = [NSString stringWithContentsOfURL:urlToLoad encoding:NSUTF8StringEncoding error:&fileError];
     
@@ -85,9 +71,9 @@
     for(element in elementNodes) {
         NSArray *frameNodes = [element nodesForXPath:@".//frame" error:&xmlError];
         NSArray *colorNodes = [element nodesForXPath:@".//rgbacolor" error:&xmlError];
-        NSArray *maskNodes = [element nodesForXPath:@".//switchmask" error:&xmlError];
-        NSArray *sequenceNodes = [element nodesForXPath:@".//switchsequence" error:&xmlError];
         NSArray *textNodes = [element nodesForXPath:@".//switchtext" error:&xmlError];
+        NSArray *activateNodes = [element nodesForXPath:@".//onswitchactivate/actionsequenceondevice" error:&xmlError];
+        NSArray *deactivateNodes = [element nodesForXPath:@".//onswitchdeactivate/actionsequenceondevice" error:&xmlError];
 
         // Read frame
         if([frameNodes count] <= 0) {
@@ -105,7 +91,7 @@
         bool h_ok = [frameScan scanInt:&h];
         if(!x_ok || !y_ok || !w_ok || !h_ok)
             continue;
-        buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
+        CGRect buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
 
         // Read color
         if([colorNodes count] <= 0) {
@@ -122,104 +108,59 @@
         bool a_ok = [colorScan scanFloat:&a];
         if(!r_ok || !g_ok || !b_ok || !a_ok)
             continue;
-        
-        // Read switch or sequence
-        if(([maskNodes count] <= 0) && ([sequenceNodes count] <= 0)) {
-            NSLog(@"No switch mask or sequence found.\n");
-            continue;
-        }
         // Create the specified button
-        myButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:buttonRect];
         [myButton setBackgroundColor:[UIColor colorWithRed:r green:g blue:b alpha:a]];
         [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
         [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)];
-        if(![sequenceNodes count]) {
-            DDXMLNode *maskNode = [maskNodes objectAtIndex:0];
-            NSString *maskString = [maskNode stringValue];
-            NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
-            int mask;
-            bool mask_ok = [maskScan scanInt:&mask];
-            if(!mask_ok)
-                continue;
-            // Display on button what switches it activates
-            NSMutableString *switchesActivatedText =  [NSMutableString stringWithCapacity:64];
-            BOOL listedFirstSwitch = NO;
-            for(int bit=1; bit <= 16; ++bit) {
-                if(!(mask & (1 << (bit-1))))
-                    continue;
-                if(listedFirstSwitch)
-                    [switchesActivatedText appendString:@" and "];
-                [switchesActivatedText appendFormat:@"%d", bit];
-                listedFirstSwitch = YES;
-            }
-            [myButton setTitle:switchesActivatedText forState:UIControlStateNormal];
-            NSNumber *switchNum = [NSNumber numberWithInt:mask];
-            NSValue *value = [[NSValue alloc] initWithBytes:((void *)myButton) objCType:@encode(id)];
-            [[self buttonToSwitchDictionary] setObject:switchNum forKey:value];
-        } else {
-            // Create array to hold sequence
-            NSMutableArray *switchSequence = [[NSMutableArray alloc] initWithCapacity:5];
-            // Element 0: flag to shut down sequencing
-            NSNumber *num = [[NSNumber alloc] initWithInt:0];
-            [switchSequence insertObject:num atIndex:0];
-            NSArray *sequenceElementNodes = [[sequenceNodes objectAtIndex:0] nodesForXPath:@".//sequenceelement" error:&xmlError];
-            DDXMLNode *sequenceElement;
-            for(sequenceElement in sequenceElementNodes) {
-                NSArray *maskNodes = [sequenceElement nodesForXPath:@".//switchmask" error:&xmlError];
-                NSArray *timeNodes = [sequenceElement nodesForXPath:@".//time" error:&xmlError];
-                if(![maskNodes count] || ![timeNodes count])
-                    continue;
-                NSString *maskString = [[maskNodes objectAtIndex:0] stringValue];
-                NSScanner *maskScan = [[NSScanner alloc] initWithString:maskString];
-                int mask;
-                bool mask_ok = [maskScan scanInt:&mask];
-                if(!mask_ok)
-                    continue;
-                NSNumber *switchNum = [NSNumber numberWithInt:mask];
-                NSString *timeString = [[timeNodes objectAtIndex:0] stringValue];
-                NSScanner *timeScan = [[NSScanner alloc] initWithString:timeString];
-                float time;
-                bool time_ok = [timeScan scanFloat:&time];
-                if(!time_ok)
-                    continue;
-                NSNumber *timeNum = [NSNumber numberWithFloat:time];
-                [switchSequence addObject:switchNum];
-                [switchSequence addObject:timeNum];
-            }
-            NSValue *value = [[NSValue alloc] initWithBytes:((void *)myButton) objCType:@encode(id)];
-            [[self buttonToSwitchDictionary] setObject:switchSequence forKey:value];
-        }
+        
+        // Read text for switch
         if([textNodes count]) {
             [myButton setTitle:[[textNodes objectAtIndex:0] stringValue] forState:UIControlStateNormal];
         } 
         [myButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+
+        // Associate the actions for pressing the button
+        NSValue *value = [[NSValue alloc] initWithBytes:((void *)myButton) objCType:@encode(id)];
+        [[self activateButtonDictionary] setObject:activateNodes forKey:value];
+        [[self deactivateButtonDictionary] setObject:deactivateNodes forKey:value];
+        
         [myView addSubview:myButton];
     }
     
-    // Show what switch we're connected to
+    oneButtonNavigation = [[NSUserDefaults standardUserDefaults] boolForKey:@"singleTapBackButtonPreference"];
+    CGRect backButtonRect;
+    backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    if(!oneButtonNavigation) {
+        // Create two-button combo to allow navigation
+        id allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        CGRect buttonRect = CGRectMake(412, 704, 200, 44);
+        [allowNavButton setFrame:buttonRect];
+        [allowNavButton setTitle:[NSString stringWithCString:"Enable Back Button" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+        [allowNavButton addTarget:self action:@selector(allowNavigation:) forControlEvents:UIControlEventTouchUpInside]; 
+        [myView addSubview:allowNavButton];
+        backButtonRect = CGRectMake(490, 0, 44, 44);
+        [backButton setEnabled:NO];
+    } else {
+        float backButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
+        float backButtonWidth = backButtonHeight * 1.5;
+        backButtonRect = CGRectMake(0, 0, backButtonWidth, backButtonHeight);
+        [backButton setEnabled:YES];
+    }
+    [backButton setFrame:backButtonRect];
+    [backButton setTitle:[NSString stringWithCString:"Back" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+    [backButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    [backButton addTarget:self action:@selector(goBack:) forControlEvents:UIControlEventTouchUpInside];
+    [myView addSubview:backButton];
+    
+    // Show status
     CGRect textRect = CGRectMake(700, 0, 324, 36);
-    textToShowSwitchName = [[UILabel alloc] initWithFrame:textRect];
+    textToShowSwitchName = [[SJUIStatusMessageLabel alloc] initWithFrame:textRect];
     [textToShowSwitchName setBackgroundColor:bgColor];
-    [self updateSwitchNameText];
     [myView addSubview:textToShowSwitchName];
     
 	self.view = myView;
-}
-- (void)updateSwitchNameText {
-    [textToShowSwitchName setTextAlignment:UITextAlignmentLeft];
-    if([appDelegate active_switch_index] < 0) {
-        [textToShowSwitchName setTextColor:[UIColor redColor]];
-        [textToShowSwitchName setText:@"Not connected"];
-    } else {
-        [textToShowSwitchName setTextColor:[appDelegate foregroundColor]];
-#if 0
-// REDESIGN
-        NSString *switchName = [[appDelegate switchNameArray] objectAtIndex:[appDelegate active_switch_index]];
-        NSString *switchNameText = [@"Connected to " stringByAppendingString:switchName];
-        [textToShowSwitchName setText:switchNameText];
-#endif
-    }
 }
 
 /*
@@ -236,37 +177,39 @@
 	return YES;
 }
 
-// Handlers for switches activated/deactiveated. They send commands to delegate
+// Handlers for switches activated/deactivated. Send XML node information to delegate.
 - (IBAction)onSwitchActivated:(id)sender {
     [backButton setEnabled:NO];
-    NSObject *switches = [[self buttonToSwitchDictionary] objectForKey:sender];
-    if(switches == nil) {
+    NSArray *actions = [[self activateButtonDictionary] objectForKey:sender];
+    if(actions == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         return;
     }
-
-    [appDelegate activate:switches];
-    [self updateSwitchNameText];
+    DDXMLNode *action;
+    for(action in actions) {
+        [appDelegate performActionSequence:action];
+    }
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
     [backButton setEnabled:NO];
-    NSObject *switches = [[self buttonToSwitchDictionary] objectForKey:sender];
-    if(switches == nil) {
+    NSArray *actions = [[self deactivateButtonDictionary] objectForKey:sender];
+    if(actions == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
         return;
     }
-    
-    [appDelegate deactivate:switches];
-    [self updateSwitchNameText];
+    DDXMLNode *action;
+    for(action in actions) {
+        [appDelegate performActionSequence:action];
+    }
 }
 // Navigation back to root controller
 - (IBAction)allowNavigation:(id)sender {
     [backButton setEnabled:YES];
 }
 - (IBAction)disallowNavigation:(id)sender{
-    [backButton setEnabled:NO];
+    [backButton setEnabled:oneButtonNavigation];
 }
 - (IBAction)goBack:(id)sender{
     [self.navigationController popViewControllerAnimated:YES];
