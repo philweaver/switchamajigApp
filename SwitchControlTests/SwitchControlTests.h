@@ -25,3 +25,10 @@
     BOOL didReceivePopViewController;
 }
 @end
+
+@interface MockSwitchControlDelegate : SwitchControlAppDelegate {
+@public
+    NSMutableArray *commandsReceived;
+}
+
+@end

@@ -29,6 +29,13 @@
 
 @end
 
+@implementation MockSwitchControlDelegate
+- (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice {
+    [commandsReceived addObject:actionSequenceOnDevice];
+}
+
+@end
+
 @implementation SwitchControlTests
 
 - (void) reloadRootViewController {
@@ -365,7 +372,6 @@
     STAssertTrue(didFindFirstButton, @"First button in 6_tworows.xml does not exist.");
     STAssertTrue(didFindLastButton, @"Last button in 6_tworows.xml does not exist.");
 }
-#endif
 
 - (void)test_002_SwitchPanelViewController_002_BackButton {
     // Confirm that the back button works properly
@@ -373,7 +379,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"singleTapBackButtonPreference"];
     // Load panel that has both back and enable
     switchPanelViewController *viewController = [switchPanelViewController alloc];
-    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"1_yellow" ofType:@"xml"]]];
+    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"__TEST001" ofType:@"xml"]]];
     // Confirm that back button is disabled and enable button is displayed
     UIView *currentView = [viewController view];
     id backButton = [SwitchControlTests findSubviewOf:currentView withText:@"Back"];
@@ -392,7 +398,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"singleTapBackButtonPreference"];
     // Re-create panel 
     viewController = [switchPanelViewController alloc];
-    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"1_yellow" ofType:@"xml"]]];
+    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"__TEST001" ofType:@"xml"]]];
     currentView = [viewController view];
     // Confirm that the back button is enabled and enable button is not displayed
     backButton = [SwitchControlTests findSubviewOf:currentView withText:@"Back"];
@@ -407,6 +413,33 @@
     naviControl->didReceivePopViewController = NO;
     [backButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue(naviControl->didReceivePopViewController, @"Back button didn't work");
+}
+#endif
+
+- (void)test_002_SwitchPanelViewController_003_CommandProcessing {
+    // Set ourselves up to intercept commands sent to the delegate
+    MockSwitchControlDelegate *myDelegate = [MockSwitchControlDelegate alloc];
+    myDelegate->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    // Open the test xml file
+    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"__TEST001" ofType:@"xml"]]];
+    // Force the view to load
+    UIView *theView = [viewController view];
+    // Now change the delegate
+    viewController->appDelegate = myDelegate;
+    // Press the button
+    id button = [SwitchControlTests findSubviewOf:theView withText:@"1"];
+    [button sendActionsForControlEvents:UIControlEventTouchDown];
+    // Verify the command sent is correct
+    DDXMLNode *node = [myDelegate->commandsReceived objectAtIndex:0];
+    NSString *xmlstring = [node XMLString];
+    NSString *expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnswitcheson>1</turnswitcheson></actionsequence></actionsequenceondevice>";
+    STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on press down", xmlstring);
+    // Release the button and verify again
+    [button sendActionsForControlEvents:UIControlEventTouchUpInside];
+    xmlstring = [[myDelegate->commandsReceived objectAtIndex:1] XMLString];
+    expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnswitchesoff>1</turnswitchesoff></actionsequence></actionsequenceondevice>";
+    STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
 }
 
 #if 0

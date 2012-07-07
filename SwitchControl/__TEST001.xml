@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <panel>
-    <panelname>Red</panelname>
+    <panelname>Yellow</panelname>
     <panelelement>
         <frame>50 50 924 638</frame>
-        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
         <switchtext>1</switchtext>
         <onswitchactivate>
             <actionsequenceondevice>

@@ -4,6 +4,22 @@
     <panelelement>
         <frame>50 50 924 638</frame>
         <rgbacolor>0.0 0.0 1.0 1.0</rgbacolor>
-        <switchmask>1</switchmask>
+        <switchtext>1</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitcheson>1</turnswitcheson>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitchesoff>1</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
     </panelelement>
 </panel>

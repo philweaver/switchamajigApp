@@ -15,6 +15,7 @@
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
 		AD4D39A014AAEF3600ADA893 /* 6_tworows.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */; };
 		AD554844154F318A008C246D /* ir_5_basic.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD554843154F318A008C246D /* ir_5_basic.xml */; };
+		AD68FCEC15A6A57200A7E7DF /* __TEST001.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD68FCEB15A6A57200A7E7DF /* __TEST001.xml */; };
 		AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AD762F3A14F31BB700812CF8 /* Settings.bundle */; };
 		AD762F3E14F3650E00812CF8 /* 6_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD762F3D14F3650D00812CF8 /* 6_steering.xml */; };
 		AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */; };
@@ -74,6 +75,7 @@
 		AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = switchPanelViewController.m; sourceTree = "<group>"; };
 		AD4D399F14AAEF3600ADA893 /* 6_tworows.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 6_tworows.xml; sourceTree = "<group>"; };
 		AD554843154F318A008C246D /* ir_5_basic.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ir_5_basic.xml; sourceTree = "<group>"; };
+		AD68FCEB15A6A57200A7E7DF /* __TEST001.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = __TEST001.xml; path = SwitchControl/__TEST001.xml; sourceTree = "<group>"; };
 		AD762F3A14F31BB700812CF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		AD762F3D14F3650D00812CF8 /* 6_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 6_steering.xml; sourceTree = "<group>"; };
 		AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_switchamajig1_cfg.cpp; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				ADC7C18A142D5B920045ABD0 /* 4_across_y_b_m_c.xml */,
 				ADC7C188142D5B370045ABD0 /* 2_yellow_blue.xml */,
 				ADC7C186142D5A830045ABD0 /* 1_yellow.xml */,
+				AD68FCEB15A6A57200A7E7DF /* __TEST001.xml */,
 				ADB75BF513DB539C00448025 /* SwitchControl */,
 				ADB75C1113DB539C00448025 /* SwitchControlTests */,
 				ADB75BEE13DB539C00448025 /* Frameworks */,
@@ -349,6 +352,7 @@
 				AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */,
 				AD762F3E14F3650E00812CF8 /* 6_steering.xml in Resources */,
 				AD554844154F318A008C246D /* ir_5_basic.xml in Resources */,
+				AD68FCEC15A6A57200A7E7DF /* __TEST001.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

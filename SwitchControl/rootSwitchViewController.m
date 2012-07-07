@@ -270,6 +270,10 @@
     [[self highlighting] setBackgroundColor:bgColor];
     numberOfPanelsInScrollView = 0;
     for(url in xmlUrls) {
+        // Skip test panels
+        BOOL isTest = [[NSPredicate predicateWithFormat:@"SELF contains \"__TEST\""] evaluateWithObject:[url absoluteString]];
+        if(isTest)
+            continue;
         numberOfPanelsInScrollView++;
         // Render view controller into image
         switchPanelViewController *viewController = [switchPanelViewController alloc];
