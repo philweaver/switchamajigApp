@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <panel>
-    <panelname>Yellow</panelname>
+    <panelname>Test001</panelname>
     <panelelement>
         <frame>50 50 924 638</frame>
         <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
@@ -22,4 +22,31 @@
             </actionsequenceondevice>
         </onswitchdeactivate>
     </panelelement>
+    <panelelement>
+        <frame>50 495 944 173</frame>
+        <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
+        <switchtext>2</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <loop>
+                    <friendlyname>Default</friendlyname>
+                    <turnswitcheson>1</turnswitcheson>
+                    <delay>0.5</delay>
+                    <turnswitchesoff>1</turnswitchesoff>
+                    <turnswitcheson>2</turnswitcheson>
+                    <delay>0.5</delay>
+                    <turnswitchesoff>2</turnswitchesoff>
+                </loop>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <stoploop/>
+                <actionsequence>
+                    <turnswitchesoff>1 2</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
+    </panelelement>    
 </panel>

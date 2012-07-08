@@ -5,39 +5,111 @@
         <frame>50 50 192 395</frame>
         <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
         <switchtext>Tail Left: 1</switchtext>
-        <switchmask>1</switchmask>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitcheson>1</turnswitcheson>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitchesoff>1</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
     </panelelement>
     <panelelement>
         <frame>292 50 192 395</frame>
         <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
         <switchtext>Tail Right: 2</switchtext>
-        <switchmask>2</switchmask>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitcheson>2</turnswitcheson>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitchesoff>2</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
     </panelelement>
     <panelelement>
         <frame>534 50 440 173</frame>
         <rgbacolor>0.0 0.0 1.0 1.0</rgbacolor>
         <switchtext>Tilt Up: 3</switchtext>
-        <switchmask>4</switchmask>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitcheson>3</turnswitcheson>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitchesoff>3</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
     </panelelement>
     <panelelement>
         <frame>534 273 440 173</frame>
         <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
         <switchtext>Tilt Down: 4</switchtext>
-        <switchmask>8</switchmask>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitcheson>4</turnswitcheson>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitchesoff>4</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
     </panelelement>
     <panelelement>
         <frame>50 495 944 173</frame>
         <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
         <switchtext>Swim: Toggle 1 and 2 for 1/2 second each</switchtext>
-        <switchsequence>
-            <sequenceelement>
-                <switchmask>1</switchmask>
-                <time>0.5</time>
-            </sequenceelement>
-            <sequenceelement>
-                <switchmask>2</switchmask>
-                <time>0.5</time>
-            </sequenceelement>
-        </switchsequence>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <loop>
+                    <friendlyname>Default</friendlyname>
+                    <turnswitcheson>1</turnswitcheson>
+                    <delay>0.5</delay>
+                    <turnswitchesoff>1</turnswitchesoff>
+                    <turnswitcheson>2</turnswitcheson>
+                    <delay>0.5</delay>
+                    <turnswitchesoff>2</turnswitchesoff>
+                </loop>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <stoploop/>
+            <actionsequenceondevice>
+                <friendlyname>Default</friendlyname>
+                <actionsequence>
+                    <turnswitchesoff>1 2</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
     </panelelement>
 </panel>

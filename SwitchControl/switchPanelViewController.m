@@ -122,7 +122,7 @@
         [myButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
 
         // Associate the actions for pressing the button
-        NSValue *value = [[NSValue alloc] initWithBytes:((void *)myButton) objCType:@encode(id)];
+        NSValue *value = [NSValue valueWithNonretainedObject:myButton];
         [[self activateButtonDictionary] setObject:activateNodes forKey:value];
         [[self deactivateButtonDictionary] setObject:deactivateNodes forKey:value];
         
@@ -180,7 +180,7 @@
 // Handlers for switches activated/deactivated. Send XML node information to delegate.
 - (IBAction)onSwitchActivated:(id)sender {
     [backButton setEnabled:oneButtonNavigation];
-    NSValue *value = [[NSValue alloc] initWithBytes:((void *)sender) objCType:@encode(id)];
+    NSValue *value = [NSValue valueWithNonretainedObject:sender];
     NSArray *actions = [[self activateButtonDictionary] objectForKey:value];
     if(actions == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
@@ -194,7 +194,7 @@
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
     [backButton setEnabled:oneButtonNavigation];
-    NSValue *value = [[NSValue alloc] initWithBytes:((void *)sender) objCType:@encode(id)];
+    NSValue *value = [NSValue valueWithNonretainedObject:sender];
     NSArray *actions = [[self deactivateButtonDictionary] objectForKey:value];
     if(actions == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  

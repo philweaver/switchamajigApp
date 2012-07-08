@@ -440,7 +440,19 @@
     xmlstring = [[myDelegate->commandsReceived objectAtIndex:1] XMLString];
     expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnswitchesoff>1</turnswitchesoff></actionsequence></actionsequenceondevice>";
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
+    // Check a button with multiple steps
+    button = [SwitchControlTests findSubviewOf:theView withText:@"2"];
+    [myDelegate->commandsReceived removeAllObjects];
+    [button sendActionsForControlEvents:UIControlEventTouchDown];
+    xmlstring = [[myDelegate->commandsReceived objectAtIndex:0] XMLString];
+    expectedString = @"<actionsequenceondevice><loop><friendlyname>Default</friendlyname><turnswitcheson>1</turnswitcheson><delay>0.5</delay><turnswitchesoff>1</turnswitchesoff><turnswitcheson>2</turnswitcheson><delay>0.5</delay><turnswitchesoff>2</turnswitchesoff></loop></actionsequenceondevice>";
+    STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
+    [button sendActionsForControlEvents:UIControlEventTouchUpInside];
+    xmlstring = [[myDelegate->commandsReceived objectAtIndex:1] XMLString];
+    expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><stoploop></stoploop><actionsequence><turnswitchesoff>1 2</turnswitchesoff></actionsequence></actionsequenceondevice>";
+    STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
 }
+
 
 #if 0
 // Implement this once configuration working
