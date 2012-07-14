@@ -149,9 +149,16 @@
     currentColor = [statusLabel textColor];
     STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing connected messages cycle properly. Actual message=%@", currentMessage);
     STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
+    // Verify lost contact message
+    [app_delegate SwitchamajigDeviceDriverDisconnected:driverID withError:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)5.0]];
+    currentMessage = [statusLabel text];
+    currentColor = [statusLabel textColor];
+    STAssertTrue([currentMessage isEqualToString:@"Disconnected from test_friendly2"], @"Disconnect message not seen. Actual message=%@", currentMessage);
+    STAssertTrue([currentColor isEqual:[UIColor redColor]], @"Disconnect message color wrong");
+    
     [simulatedController stopListening];
 }
-
 #endif
 
 - (void)test_000_AppDelegate_001_Dispatch_Controller_Cmd {
@@ -166,27 +173,48 @@
     [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
     // Verify that the command is passed to the controller
     NSError *error;
-    DDXMLDocument *node = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
-    [app_delegate performActionSequence:node];
+    DDXMLDocument *node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node1];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver1->commandsReceived count] == 1, @"Driver did not receive simple command.");
     NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
     STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive simple command. Instead got %@", commandString);
     // Verify that the command is passed when sent to the default controller
-    node = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
-    [app_delegate performActionSequence:node];
+    DDXMLDocument *node2 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node2];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver1->commandsReceived count] == 2, @"Driver did not receive command sent to default.");
     commandString = [driver1->commandsReceived objectAtIndex:1];
     STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive command sent to default. Instead got %@", commandString);
     // Mock up a second Sjig controller and register it with a different name
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"hoopy"];
+    // Verify that the new device is in the dictionary
+    STAssertNotNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"hoopy"], @"Second device not in dictionary after being detected");
+    // Mock up a Sjig controller and to verify that commands come through
+    MockSwitchamajigDriver *driver2 = [MockSwitchamajigDriver alloc];
+    driver2->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver2 forKey:@"hoopy"];
     // Verify that commands can go to both controllers
-    // Verify that the default did not change
+    DDXMLDocument *node3 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOn>2</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node3];
+    [app_delegate performActionSequence:node1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    STAssertTrue([driver1->commandsReceived count] == 3, @"Driver did not receive command sent to first driver after second one registered.");
+    commandString = [driver1->commandsReceived objectAtIndex:2];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive command sent to default. Instead got %@", commandString);
+    STAssertTrue([driver2->commandsReceived count] == 1, @"Second driver did not receive command.");
+    commandString = [driver2->commandsReceived objectAtIndex:0];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>2</turnSwitchesOn>"], @"Did not receive command sent to default. Instead got %@", commandString);
     
     // Report a loss of contact to the delegate
+    [app_delegate SwitchamajigDeviceDriverDisconnected:driver1 withError:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
     // Verify that the controller is no longer in dictionary
-    // Verify lost contact message
+    STAssertNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"frood"], @"Disconnected driver still in dictionary");
+    STAssertNotNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"hoopy"], @"Second driver disappeared when first was remove.");
     // Verify that sending a command doesn't cause any disasters
+    [app_delegate performActionSequence:node1];
+   
 }
 #if RUN_ALL_TESTS
 - (void)test_001_RootViewController_001_Help
