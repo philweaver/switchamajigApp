@@ -9,7 +9,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>1</turnswitcheson>
+                    <turnSwitchesOn>1</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -17,7 +17,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>1</turnswitchesoff>
+                    <turnSwitchesOff>1</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
@@ -30,12 +30,12 @@
             <actionsequenceondevice>
                 <loop>
                     <friendlyname>Hoopy</friendlyname>
-                    <turnswitcheson>1</turnswitcheson>
+                    <turnSwitchesOn>1</turnSwitchesOn>
                     <delay>0.5</delay>
-                    <turnswitchesoff>1</turnswitchesoff>
-                    <turnswitcheson>2</turnswitcheson>
+                    <turnSwitchesOff>1</turnSwitchesOff>
+                    <turnSwitchesOn>2</turnSwitchesOn>
                     <delay>0.5</delay>
-                    <turnswitchesoff>2</turnswitchesoff>
+                    <turnSwitchesOff>2</turnSwitchesOff>
                 </loop>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -44,7 +44,7 @@
                 <friendlyname>Hoopy</friendlyname>
                 <stoploop/>
                 <actionsequence>
-                    <turnswitchesoff>1 2</turnswitchesoff>
+                    <turnSwitchesOff>1 2</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
@@ -57,7 +57,7 @@
             <actionsequenceondevice>
                 <friendlyname>Frood</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>1</turnswitcheson>
+                    <turnSwitchesOn>1</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -65,7 +65,7 @@
             <actionsequenceondevice>
                 <friendlyname>Frood</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>2</turnswitcheson>
+                    <turnSwitchesOn>2</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>

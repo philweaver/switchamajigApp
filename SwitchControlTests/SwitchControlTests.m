@@ -97,6 +97,8 @@
 
 - (void)test_000_AppDelegate_000_Status_Messages
 {
+    SimulatedSwitchamajigController *simulatedController = [SimulatedSwitchamajigController alloc];
+    [simulatedController startListening];
     SJUIStatusMessageLabel *statusLabel = [[SJUIStatusMessageLabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
     // Make sure alert messages get through
     [app_delegate addStatusAlertMessage:@"Test" withColor:[UIColor purpleColor] displayForSeconds:2.0];
@@ -112,17 +114,16 @@
     STAssertTrue([currentMessage isEqualToString:@"No Switchamajigs Found"], @"Message when no SwitchamajigsFound is %@", currentMessage);
     STAssertTrue([currentColor isEqual:[UIColor redColor]], @"No Switchamajigs message color wrong");
     SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
-    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"0.0.0.0" friendlyname:@"test_friendly"];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"127.0.0.1" friendlyname:@"test_friendly"];
     // Make sure a driver was created
     id driverID = [[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"test_friendly"];
     STAssertNotNil(driverID, @"Delegate did not create driver");
-    [app_delegate SwitchamajigDeviceDriverConnected:driverID];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
     currentMessage = [statusLabel text];
     currentColor = [statusLabel textColor];
     STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing found message");
     STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
-    [app_delegate SwitchamajigDeviceListenerHandleBatteryWarning:nil hostname:@"0.0.0.0" friendlyname:@"test_friendly"];
+    [app_delegate SwitchamajigDeviceListenerHandleBatteryWarning:nil hostname:@"localhost" friendlyname:@"test_friendly"];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
     currentMessage = [statusLabel text];
     currentColor = [statusLabel textColor];
@@ -135,10 +136,9 @@
     STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing connected message. Actual message=%@", currentMessage);
     STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
     // Add a second device
-    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"0.0.0.1" friendlyname:@"test_friendly2"];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"test_friendly2"];
     driverID = [[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"test_friendly2"];
     STAssertNotNil(driverID, @"Delegate did not create driver2");
-    [app_delegate SwitchamajigDeviceDriverConnected:driverID];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)5.5]];
     currentMessage = [statusLabel text];
     currentColor = [statusLabel textColor];
@@ -149,6 +149,7 @@
     currentColor = [statusLabel textColor];
     STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing connected messages cycle properly. Actual message=%@", currentMessage);
     STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
+    [simulatedController stopListening];
 }
 
 #endif
@@ -165,14 +166,19 @@
     [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
     // Verify that the command is passed to the controller
     NSError *error;
-    DDXMLDocument *node = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnswitcheson>1</turnswitcheson></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    DDXMLDocument *node = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node];
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.1]];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver1->commandsReceived count] == 1, @"Driver did not receive simple command.");
     NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
-    STAssertTrue([commandString isEqualToString:@"<turnswitcheson>1</turnswitcheson>"], @"Did not receive simple command. Instead got %@", commandString);
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive simple command. Instead got %@", commandString);
     // Verify that the command is passed when sent to the default controller
-    
+    node = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    STAssertTrue([driver1->commandsReceived count] == 2, @"Driver did not receive command sent to default.");
+    commandString = [driver1->commandsReceived objectAtIndex:1];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive command sent to default. Instead got %@", commandString);
     // Mock up a second Sjig controller and register it with a different name
     // Verify that commands can go to both controllers
     // Verify that the default did not change
@@ -483,23 +489,23 @@
     // Verify the command sent is correct
     DDXMLNode *node = [myDelegate->commandsReceived objectAtIndex:0];
     NSString *xmlstring = [node XMLString];
-    NSString *expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnswitcheson>1</turnswitcheson></actionsequence></actionsequenceondevice>";
+    NSString *expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>";
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on press down", xmlstring);
     // Release the button and verify again
     [button sendActionsForControlEvents:UIControlEventTouchUpInside];
     xmlstring = [[myDelegate->commandsReceived objectAtIndex:1] XMLString];
-    expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnswitchesoff>1</turnswitchesoff></actionsequence></actionsequenceondevice>";
+    expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnSwitchesOff>1</turnSwitchesOff></actionsequence></actionsequenceondevice>";
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
     // Check a button with multiple steps
     button = [SwitchControlTests findSubviewOf:theView withText:@"2"];
     [myDelegate->commandsReceived removeAllObjects];
     [button sendActionsForControlEvents:UIControlEventTouchDown];
     xmlstring = [[myDelegate->commandsReceived objectAtIndex:0] XMLString];
-    expectedString = @"<actionsequenceondevice><loop><friendlyname>Hoopy</friendlyname><turnswitcheson>1</turnswitcheson><delay>0.5</delay><turnswitchesoff>1</turnswitchesoff><turnswitcheson>2</turnswitcheson><delay>0.5</delay><turnswitchesoff>2</turnswitchesoff></loop></actionsequenceondevice>";
+    expectedString = @"<actionsequenceondevice><loop><friendlyname>Hoopy</friendlyname><turnSwitchesOn>1</turnSwitchesOn><delay>0.5</delay><turnSwitchesOff>1</turnSwitchesOff><turnSwitchesOn>2</turnSwitchesOn><delay>0.5</delay><turnSwitchesOff>2</turnSwitchesOff></loop></actionsequenceondevice>";
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on press down", xmlstring);
     [button sendActionsForControlEvents:UIControlEventTouchUpInside];
     xmlstring = [[myDelegate->commandsReceived objectAtIndex:1] XMLString];
-    expectedString = @"<actionsequenceondevice><friendlyname>Hoopy</friendlyname><stoploop></stoploop><actionsequence><turnswitchesoff>1 2</turnswitchesoff></actionsequence></actionsequenceondevice>";
+    expectedString = @"<actionsequenceondevice><friendlyname>Hoopy</friendlyname><stoploop></stoploop><actionsequence><turnSwitchesOff>1 2</turnSwitchesOff></actionsequence></actionsequenceondevice>";
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
 }
 #endif

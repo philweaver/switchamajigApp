@@ -109,7 +109,7 @@
 		ADC7C18A142D5B920045ABD0 /* 4_across_y_b_m_c.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_across_y_b_m_c.xml; sourceTree = "<group>"; };
 		ADC7C18C142D62970045ABD0 /* rootSwitchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = rootSwitchViewController.m; sourceTree = "<group>"; };
 		ADC7C18E142D63F80045ABD0 /* 1_green.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_green.xml; sourceTree = "<group>"; };
-		ADC7C190142D64050045ABD0 /* 1_blue.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_blue.xml; sourceTree = "<group>"; };
+		ADC7C190142D64050045ABD0 /* 1_blue.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; lineEnding = 0; path = 1_blue.xml; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.xml; };
 		ADC7C192142D64110045ABD0 /* 1_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 1_red.xml; sourceTree = "<group>"; };
 		ADC7C194142D64980045ABD0 /* 2_green_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 2_green_red.xml; sourceTree = "<group>"; };
 		ADC7C196142D64D40045ABD0 /* 4_scross_g_r_b_y.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = 4_scross_g_r_b_y.xml; sourceTree = "<group>"; };
@@ -556,6 +556,7 @@
 				INFOPLIST_FILE = "SwitchControlTests/SwitchControlTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "../SwitchamajigDriver/SwitchamajigDriver/CocoaAsyncSocket/GCD/**";
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
@@ -575,6 +576,8 @@
 				INFOPLIST_FILE = "SwitchControlTests/SwitchControlTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
+				USER_HEADER_SEARCH_PATHS = "";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = ../SwitchamajigDriver/SwitchamajigDriver/CocoaAsyncSocket/GCD;
 				WRAPPER_EXTENSION = octest;
 			};
 			name = Release;

@@ -12,6 +12,7 @@
 #import "switchPanelViewController.h"
 #import "configViewController.h"
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
+#import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigControllerDeviceDriver.h"
 @interface SwitchControlTests : SenTestCase {
     SwitchControlAppDelegate *app_delegate;
     UINavigationController *nav_controller;

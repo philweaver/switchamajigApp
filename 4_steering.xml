@@ -9,7 +9,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>1</turnswitcheson>
+                    <turnSwitchesOn>1</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -17,7 +17,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>1</turnswitchesoff>
+                    <turnSwitchesOff>1</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
@@ -30,7 +30,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>2</turnswitcheson>
+                    <turnSwitchesOn>2</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -38,7 +38,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>2</turnswitchesoff>
+                    <turnSwitchesOff>2</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
@@ -51,7 +51,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>1 3</turnswitcheson>
+                    <turnSwitchesOn>1 3</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -59,7 +59,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>1 3</turnswitchesoff>
+                    <turnSwitchesOff>1 3</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
@@ -72,7 +72,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>1 4</turnswitcheson>
+                    <turnSwitchesOn>1 4</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -80,7 +80,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>1 4</turnswitchesoff>
+                    <turnSwitchesOff>1 4</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
@@ -93,7 +93,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>2 3</turnswitcheson>
+                    <turnSwitchesOn>2 3</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -101,7 +101,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>2 3</turnswitchesoff>
+                    <turnSwitchesOff>2 3</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
@@ -114,7 +114,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>2 4</turnswitcheson>
+                    <turnSwitchesOn>2 4</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -122,7 +122,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>2 4</turnswitchesoff>
+                    <turnSwitchesOff>2 4</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>

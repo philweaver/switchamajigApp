@@ -282,7 +282,17 @@ char *commands[] = {
         return;
     }
     // Look up the driver for friendly name
+    [statusInfoLock lock];
+    if([friendlyName isEqualToString:@"Default"]) {
+        if(![[self friendlyNameSwitchamajigDictionary]count]) {
+            [statusInfoLock unlock];
+            NSLog(@"Received default request, but no drivers available");
+            return;
+        }
+        friendlyName = [[[self friendlyNameSwitchamajigDictionary] allKeys] objectAtIndex:0];
+    }
     SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
+    [statusInfoLock unlock];
     if(driver == nil) {
         NSLog(@"performActionSequence: driver is nil for friendlyname %@", friendlyName);
         return;
@@ -327,6 +337,7 @@ char *commands[] = {
             if([threadExitBool boolValue])
                 break;
             // Send command to driver
+            NSLog(@"Issuing command %@", [action XMLString]);
             [driver issueCommandFromXMLNode:action];
         }
     }
@@ -428,19 +439,8 @@ char *commands[] = {
 
 // SwitchamajigDeviceDriverDelegate
 - (void) SwitchamajigDeviceDriverConnected:(id)deviceDriver {
-    // Show status message
-    [statusInfoLock lock];
-    NSArray *friendlyNames = [[self friendlyNameSwitchamajigDictionary] allKeysForObject:deviceDriver];
-    [statusInfoLock unlock];
-    if([friendlyNames count] != 1) {
-        NSLog(@"SwitchamajigDeviceDriverConnected: %d names for driver on connect.", [friendlyNames count]);
-        return; // Weird situation that should never occur; almost worth an alert dialog
-    }
-    NSString *friendlyName = [friendlyNames objectAtIndex:0];
-    NSString *statusString = [NSString stringWithFormat:@"Connected to %@",friendlyName];
-    NSLog(@"%@", statusString);
-    [self addStatusAlertMessage:statusString withColor:[UIColor whiteColor] displayForSeconds:5.0];
 }
+
 - (void) SwitchamajigDeviceDriverDisconnected:(id)deviceDriver withError:(NSError*)error {
     // Show status message
     [statusInfoLock lock];
@@ -464,21 +464,29 @@ char *commands[] = {
 - (void) SwitchamajigDeviceListenerFoundDevice:(id)listener hostname:(NSString*)hostname friendlyname:(NSString*)friendlyname {
     [statusInfoLock lock];
     SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyname];
-    if(driver == nil) {
-        if([listener isKindOfClass:[SwitchamajigControllerDeviceListener class]]) {
-            driver = [SwitchamajigControllerDeviceDriver alloc];
-        }
-        else {
-            // Unrecognized
-            NSLog(@"SwitchamajigDeviceListenerFoundDevice: Unrecognized listener");
-            [statusInfoLock unlock];
-            return;
-        }
+    // Don't constantly reinitialize drivers
+    if(driver != nil) {
+        [statusInfoLock unlock];
+        return;
+    }
+    if([listener isKindOfClass:[SwitchamajigControllerDeviceListener class]]) {
+        driver = [SwitchamajigControllerDeviceDriver alloc];
+    }
+    else {
+        // Unrecognized
+        NSLog(@"SwitchamajigDeviceListenerFoundDevice: Unrecognized listener");
+        [statusInfoLock unlock];
+        return;
     }
     driver = [driver initWithHostname:hostname];
     [driver setDelegate:self];
     [[self friendlyNameSwitchamajigDictionary] setObject:driver forKey:friendlyname];
     [statusInfoLock unlock];
+    // Show status message
+    NSString *statusString = [NSString stringWithFormat:@"Connected to %@",friendlyname];
+    NSLog(@"%@", statusString);
+    [self addStatusAlertMessage:statusString withColor:[UIColor whiteColor] displayForSeconds:5.0];
+    
 }
 - (void) SwitchamajigDeviceListenerHandleError:(id)listener theError:(NSError*)error {
     NSLog(@"SwitchamajigDeviceListenerHandleError: %@", error); 

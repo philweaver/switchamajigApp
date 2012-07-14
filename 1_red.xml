@@ -9,7 +9,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitcheson>1</turnswitcheson>
+                    <turnSwitchesOn>1</turnSwitchesOn>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
@@ -17,7 +17,7 @@
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
-                    <turnswitchesoff>1</turnswitchesoff>
+                    <turnSwitchesOff>1</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
