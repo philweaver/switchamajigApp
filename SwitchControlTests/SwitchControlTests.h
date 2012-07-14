@@ -11,6 +11,7 @@
 #import "rootSwitchViewController.h"
 #import "switchPanelViewController.h"
 #import "configViewController.h"
+#import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
 @interface SwitchControlTests : SenTestCase {
     SwitchControlAppDelegate *app_delegate;
     UINavigationController *nav_controller;
@@ -30,5 +31,10 @@
 @public
     NSMutableArray *commandsReceived;
 }
+@end
 
+@interface MockSwitchamajigDriver : SwitchamajigDriver {
+@public
+    NSMutableArray *commandsReceived;
+}
 @end

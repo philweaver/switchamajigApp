@@ -5,7 +5,7 @@
 //  Created by Phil Weaver on 7/23/11.
 //  Copyright 2011 PAW Solutions. All rights reserved.
 //
-
+#define RUN_ALL_TESTS 1
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
@@ -32,6 +32,16 @@
 @implementation MockSwitchControlDelegate
 - (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice {
     [commandsReceived addObject:actionSequenceOnDevice];
+}
+
+@end
+
+@implementation MockSwitchamajigDriver
+- (void)issueCommandFromXMLNode:(DDXMLNode *)command {
+    //NSLog(@"Mock driver command issued. count = %d", [commandsReceived count]);
+    //NSLog(@"Command = %@", [command XMLString]);
+    [commandsReceived addObject:[command XMLString]];
+    //NSLog(@"Mock driver count = %d on exit", [commandsReceived count]);
 }
 
 @end
@@ -79,13 +89,13 @@
     return nil;
 }
 
-#if 0
+#if RUN_ALL_TESTS
 - (void)test_000_AppDelegate_Exists
 {
     STAssertNotNil(app_delegate, @"Can't find application delegate");
 }
 
-- (void)test_000_AppDelegate_Status_Messages
+- (void)test_000_AppDelegate_000_Status_Messages
 {
     SJUIStatusMessageLabel *statusLabel = [[SJUIStatusMessageLabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
     // Make sure alert messages get through
@@ -101,11 +111,16 @@
     currentColor = [statusLabel textColor];
     STAssertTrue([currentMessage isEqualToString:@"No Switchamajigs Found"], @"Message when no SwitchamajigsFound is %@", currentMessage);
     STAssertTrue([currentColor isEqual:[UIColor redColor]], @"No Switchamajigs message color wrong");
-    [app_delegate SwitchamajigDeviceListenerFoundDevice:nil hostname:@"0.0.0.0" friendlyname:@"test_friendly"];
+    SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"0.0.0.0" friendlyname:@"test_friendly"];
+    // Make sure a driver was created
+    id driverID = [[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"test_friendly"];
+    STAssertNotNil(driverID, @"Delegate did not create driver");
+    [app_delegate SwitchamajigDeviceDriverConnected:driverID];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
     currentMessage = [statusLabel text];
     currentColor = [statusLabel textColor];
-    STAssertTrue([currentMessage isEqualToString:@"Found test_friendly"], @"Not seeing found message");
+    STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing found message");
     STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
     [app_delegate SwitchamajigDeviceListenerHandleBatteryWarning:nil hostname:@"0.0.0.0" friendlyname:@"test_friendly"];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
@@ -120,7 +135,10 @@
     STAssertTrue([currentMessage isEqualToString:@"Connected to test_friendly"], @"Not seeing connected message. Actual message=%@", currentMessage);
     STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
     // Add a second device
-    [app_delegate SwitchamajigDeviceListenerFoundDevice:nil hostname:@"0.0.0.1" friendlyname:@"test_friendly2"];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"0.0.0.1" friendlyname:@"test_friendly2"];
+    driverID = [[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"test_friendly2"];
+    STAssertNotNil(driverID, @"Delegate did not create driver2");
+    [app_delegate SwitchamajigDeviceDriverConnected:driverID];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)5.5]];
     currentMessage = [statusLabel text];
     currentColor = [statusLabel textColor];
@@ -133,6 +151,38 @@
     STAssertTrue([currentColor isEqual:[UIColor whiteColor]], @"Found message color wrong");
 }
 
+#endif
+
+- (void)test_000_AppDelegate_001_Dispatch_Controller_Cmd {
+    SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
+    [[app_delegate friendlyNameSwitchamajigDictionary] removeAllObjects];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"frood"];
+    // Verify that the new device is in the dictionary
+    STAssertNotNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"frood"], @"Device not in dictionary after being detected");
+    // Mock up a Sjig controller and to verify that commands come through
+    MockSwitchamajigDriver *driver1 = [MockSwitchamajigDriver alloc];
+    driver1->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
+    // Verify that the command is passed to the controller
+    NSError *error;
+    DDXMLDocument *node = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnswitcheson>1</turnswitcheson></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.1]];
+    STAssertTrue([driver1->commandsReceived count] == 1, @"Driver did not receive simple command.");
+    NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
+    STAssertTrue([commandString isEqualToString:@"<turnswitcheson>1</turnswitcheson>"], @"Did not receive simple command. Instead got %@", commandString);
+    // Verify that the command is passed when sent to the default controller
+    
+    // Mock up a second Sjig controller and register it with a different name
+    // Verify that commands can go to both controllers
+    // Verify that the default did not change
+    
+    // Report a loss of contact to the delegate
+    // Verify that the controller is no longer in dictionary
+    // Verify lost contact message
+    // Verify that sending a command doesn't cause any disasters
+}
+#if RUN_ALL_TESTS
 - (void)test_001_RootViewController_001_Help
 {
     // Disable scanning, enable help button
@@ -220,7 +270,7 @@
         for(j=i+1; j < [theSubviews count]; ++j) {
             CGRect rect2 = [[theSubviews objectAtIndex:j] frame];
             if(CGRectIntersectsRect(rect1, rect2)) {
-                NSLog(@"Intersecting rectangles: (%4.1f, %4.1f, %4.1f, %4.1f) and (%4.1f, %4.1f, %4.1f, %4.1f)", rect1.origin.x, rect1.origin.y, rect1.size.width, rect1.size.height, rect2.origin.x, rect2.origin.y, rect2.size.width, rect2.size.height);
+                //NSLog(@"Intersecting rectangles: (%4.1f, %4.1f, %4.1f, %4.1f) and (%4.1f, %4.1f, %4.1f, %4.1f)", rect1.origin.x, rect1.origin.y, rect1.size.width, rect1.size.height, rect2.origin.x, rect2.origin.y, rect2.size.width, rect2.size.height);
                 numOverlaps++;
             }
         }
@@ -242,7 +292,7 @@
         rect1.origin.x = rect1.origin.y = 0; // Make origin relative to child views
         CGRect rect2 = [subView frame];
         if(!CGRectContainsRect(rect1, rect2)) {
-            NSLog(@"Out-of-bounds: (%4.1f, %4.1f, %4.1f, %4.1f) doesn't contain (%4.1f, %4.1f, %4.1f, %4.1f)", rect1.origin.x, rect1.origin.y, rect1.size.width, rect1.size.height, rect2.origin.x, rect2.origin.y, rect2.size.width, rect2.size.height);
+            //NSLog(@"Out-of-bounds: (%4.1f, %4.1f, %4.1f, %4.1f) doesn't contain (%4.1f, %4.1f, %4.1f, %4.1f)", rect1.origin.x, rect1.origin.y, rect1.size.width, rect1.size.height, rect2.origin.x, rect2.origin.y, rect2.size.width, rect2.size.height);
             numOutOfBounds++;
         }
         numOutOfBounds += [SwitchControlTests numberOfSubviewsOutsideParents:subView];
@@ -414,7 +464,7 @@
     [backButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue(naviControl->didReceivePopViewController, @"Back button didn't work");
 }
-#endif
+
 
 - (void)test_002_SwitchPanelViewController_003_CommandProcessing {
     // Set ourselves up to intercept commands sent to the delegate
@@ -445,14 +495,14 @@
     [myDelegate->commandsReceived removeAllObjects];
     [button sendActionsForControlEvents:UIControlEventTouchDown];
     xmlstring = [[myDelegate->commandsReceived objectAtIndex:0] XMLString];
-    expectedString = @"<actionsequenceondevice><loop><friendlyname>Default</friendlyname><turnswitcheson>1</turnswitcheson><delay>0.5</delay><turnswitchesoff>1</turnswitchesoff><turnswitcheson>2</turnswitcheson><delay>0.5</delay><turnswitchesoff>2</turnswitchesoff></loop></actionsequenceondevice>";
-    STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
+    expectedString = @"<actionsequenceondevice><loop><friendlyname>Hoopy</friendlyname><turnswitcheson>1</turnswitcheson><delay>0.5</delay><turnswitchesoff>1</turnswitchesoff><turnswitcheson>2</turnswitcheson><delay>0.5</delay><turnswitchesoff>2</turnswitchesoff></loop></actionsequenceondevice>";
+    STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on press down", xmlstring);
     [button sendActionsForControlEvents:UIControlEventTouchUpInside];
     xmlstring = [[myDelegate->commandsReceived objectAtIndex:1] XMLString];
-    expectedString = @"<actionsequenceondevice><friendlyname>Default</friendlyname><stoploop></stoploop><actionsequence><turnswitchesoff>1 2</turnswitchesoff></actionsequence></actionsequenceondevice>";
+    expectedString = @"<actionsequenceondevice><friendlyname>Hoopy</friendlyname><stoploop></stoploop><actionsequence><turnswitchesoff>1 2</turnswitchesoff></actionsequence></actionsequenceondevice>";
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
 }
-
+#endif
 
 #if 0
 // Implement this once configuration working

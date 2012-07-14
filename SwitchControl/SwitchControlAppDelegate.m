@@ -15,7 +15,8 @@
 
 @synthesize window = _window;
 @synthesize navigationController = _navigationController;
-@synthesize friendlyNameHostNameDictionary;
+@synthesize friendlyNameSwitchamajigDictionary;
+@synthesize actionnameActionthreadDictionary;
 @synthesize statusMessages;
 @synthesize statusInfoLock;
 @synthesize switchStateLock = _switchStateLock;
@@ -38,7 +39,8 @@
     sigpipeaction.sa_handler = SIG_IGN;
     sigaction(SIGPIPE, &sigpipeaction, NULL);
     // Initialize the list of switches and the lock that keeps it threadsafe
-    [self setFriendlyNameHostNameDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    [self setFriendlyNameSwitchamajigDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    [self setActionnameActionthreadDictionary:[[NSMutableDictionary alloc] initWithCapacity:20]];
     [self setStatusInfoLock:[[NSLock alloc] init]];
     
     // Initialize colors
@@ -77,12 +79,12 @@
         secondsUntilNextCall = [[messageArray objectAtIndex:1] floatValue];
         [[self statusMessages] removeObjectAtIndex:0];
     } 
-    else if ([[self friendlyNameHostNameDictionary] count] == 0) {
+    else if ([[self friendlyNameSwitchamajigDictionary] count] == 0) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetText" object:@"No Switchamajigs Found"];
         [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetColor" object:[UIColor redColor]];
     } else {
         // Cycle through all connected switches
-        NSArray *friendlyNames = [[self friendlyNameHostNameDictionary] allKeys];
+        NSArray *friendlyNames = [[self friendlyNameSwitchamajigDictionary] allKeys];
         if(++friendlyNameDictionaryIndex >= [friendlyNames count])
             friendlyNameDictionaryIndex = 0;
         [[NSNotificationCenter defaultCenter] postNotificationName:@"switchamajigMessagesSetText" object:[NSString stringWithFormat:@"Connected to %@",[friendlyNames objectAtIndex:friendlyNameDictionaryIndex]]];
@@ -270,7 +272,64 @@ char *commands[] = {
 };
 
 - (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice {
-    // Stubbed out
+    // Get the friendly name for this sequence
+    NSError *xmlError;
+    NSArray *friendlyNames = [actionSequenceOnDevice nodesForXPath:@".//friendlyname" error:&xmlError];
+    DDXMLNode *friendlyNameNode = [friendlyNames objectAtIndex:0];
+    NSString *friendlyName = [friendlyNameNode stringValue];
+    if(friendlyName == nil) {
+        NSLog(@"performActionSequence: friendlyname is nil");
+        return;
+    }
+    // Look up the driver for friendly name
+    SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
+    if(driver == nil) {
+        NSLog(@"performActionSequence: driver is nil for friendlyname %@", friendlyName);
+        return;
+    }
+    NSArray *actionSequences = [actionSequenceOnDevice nodesForXPath:@".//actionsequence" error:&xmlError];
+    DDXMLNode *actionSequence = [actionSequences objectAtIndex:0];
+    if(actionSequence == nil) {
+        NSLog(@"performActionSequence: action sequence is nil for string %@", [actionSequence XMLString]);
+        return;
+    }
+    // Create a key to specify this action
+    NSArray *actionNames = [actionSequenceOnDevice nodesForXPath:@".//actionname" error:&xmlError];
+    NSString *actionName;
+    if([actionNames count]) {
+        DDXMLNode *actionNameNode = [actionNames objectAtIndex:0];
+        actionName = [actionNameNode stringValue];
+    } else
+        actionName = friendlyName;
+    // Create an array to pass to the background thread with the synchronization object
+    NSNumber *threadExitBool = [NSNumber numberWithBool:NO];
+    // Add a dictionary entry for this thread
+    [actionnameActionthreadDictionary setValue:threadExitBool forKey:actionName];
+    NSArray *threadInfoArray = [NSArray arrayWithObjects:driver, actionSequence, threadExitBool, nil];
+    // Start a thread to perform the action
+    [self performSelectorInBackground:@selector(executeActionSequence:) withObject:threadInfoArray];
+}
+
+- (void) executeActionSequence:(NSArray *)threadInfoArray {
+    @autoreleasepool {
+        // Unpack the thread info
+        SwitchamajigDriver *driver = [threadInfoArray objectAtIndex:0];
+        DDXMLNode *actionSequence = [threadInfoArray objectAtIndex:1];
+        NSNumber *threadExitBool = [threadInfoArray objectAtIndex:2];
+        if((driver == nil) || (actionSequence == nil) || (threadExitBool == nil)) {
+            NSLog(@"executeActionSequence: values are nil. Aborting action.");
+            return;
+        }
+        NSArray *actions = [actionSequence children];
+        DDXMLNode *action;
+        for(action in actions) {
+            // Exit if requested to do so
+            if([threadExitBool boolValue])
+                break;
+            // Send command to driver
+            [driver issueCommandFromXMLNode:action];
+        }
+    }
 }
 
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds {
@@ -367,12 +426,59 @@ char *commands[] = {
     NSLog(@"netServiceWillResolve\n");
 }
 
+// SwitchamajigDeviceDriverDelegate
+- (void) SwitchamajigDeviceDriverConnected:(id)deviceDriver {
+    // Show status message
+    [statusInfoLock lock];
+    NSArray *friendlyNames = [[self friendlyNameSwitchamajigDictionary] allKeysForObject:deviceDriver];
+    [statusInfoLock unlock];
+    if([friendlyNames count] != 1) {
+        NSLog(@"SwitchamajigDeviceDriverConnected: %d names for driver on connect.", [friendlyNames count]);
+        return; // Weird situation that should never occur; almost worth an alert dialog
+    }
+    NSString *friendlyName = [friendlyNames objectAtIndex:0];
+    NSString *statusString = [NSString stringWithFormat:@"Connected to %@",friendlyName];
+    NSLog(@"%@", statusString);
+    [self addStatusAlertMessage:statusString withColor:[UIColor whiteColor] displayForSeconds:5.0];
+}
+- (void) SwitchamajigDeviceDriverDisconnected:(id)deviceDriver withError:(NSError*)error {
+    // Show status message
+    [statusInfoLock lock];
+    NSArray *friendlyNames = [[self friendlyNameSwitchamajigDictionary] allKeysForObject:deviceDriver];
+    [statusInfoLock unlock];
+    if([friendlyNames count] != 1) {
+        // Hopefully this won't happen. Each driver should have exactly one name
+        NSLog(@"SwitchamajigDeviceDriverConnected: %d names for driver on disconnect.", [friendlyNames count]);
+    }
+    NSString *friendlyName;
+    for (friendlyName in friendlyNames) {
+        [self addStatusAlertMessage:[NSString stringWithFormat:@"Disconnected from %@",friendlyName]  withColor:[UIColor redColor] displayForSeconds:5.0];
+    }
+    [statusInfoLock lock];
+    [[self friendlyNameSwitchamajigDictionary] removeObjectsForKeys:friendlyNames];
+    [statusInfoLock unlock];
+}
+
+
 // SwitchamajigDeviceListenerDelegate
 - (void) SwitchamajigDeviceListenerFoundDevice:(id)listener hostname:(NSString*)hostname friendlyname:(NSString*)friendlyname {
     [statusInfoLock lock];
-    [friendlyNameHostNameDictionary setObject:hostname forKey:friendlyname];
+    SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyname];
+    if(driver == nil) {
+        if([listener isKindOfClass:[SwitchamajigControllerDeviceListener class]]) {
+            driver = [SwitchamajigControllerDeviceDriver alloc];
+        }
+        else {
+            // Unrecognized
+            NSLog(@"SwitchamajigDeviceListenerFoundDevice: Unrecognized listener");
+            [statusInfoLock unlock];
+            return;
+        }
+    }
+    driver = [driver initWithHostname:hostname];
+    [driver setDelegate:self];
+    [[self friendlyNameSwitchamajigDictionary] setObject:driver forKey:friendlyname];
     [statusInfoLock unlock];
-    [self addStatusAlertMessage:[NSString stringWithFormat:@"Found %@",friendlyname]  withColor:[UIColor whiteColor] displayForSeconds:5.0];
 }
 - (void) SwitchamajigDeviceListenerHandleError:(id)listener theError:(NSError*)error {
     NSLog(@"SwitchamajigDeviceListenerHandleError: %@", error); 

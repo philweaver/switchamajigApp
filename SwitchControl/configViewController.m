@@ -167,7 +167,7 @@
     // We may have changed the name or network settings of this device, so close our connection to it and
     // clear our information about switches from our dictionary
     [[appDelegate statusInfoLock] lock];
-    [[appDelegate friendlyNameHostNameDictionary] removeAllObjects];
+    [[appDelegate friendlyNameSwitchamajigDictionary] removeAllObjects];
     [appDelegate setActive_switch_index:-1];
     if([appDelegate switch_socket]) {
         close([appDelegate switch_socket]);

@@ -21,7 +21,7 @@
 #define PROTOCOL_SQ (IPPROTO_TCP + IPPROTO_UDP + 1)
 #define ROVING_PORTNUM 2000
 #define SQ_PORTNUM 80
-@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate, SwitchamajigDeviceListenerDelegate> {
+@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate, SwitchamajigDeviceListenerDelegate, SwitchamajigDeviceDriverDelegate> {
     int switch_state;
     NSNetServiceBrowser *netServiceBrowser;
     SwitchamajigControllerDeviceListener *sjigControllerListener;
@@ -34,10 +34,12 @@
 - (void)sendSwitchState;
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds;
 - (void) statusMessageCallback;
+- (void) executeActionSequence:(NSArray *)threadInfoArray;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchStateLock;
-@property (strong, nonatomic) NSMutableDictionary *friendlyNameHostNameDictionary;
+@property (strong, nonatomic) NSMutableDictionary *friendlyNameSwitchamajigDictionary;
+@property (strong, nonatomic) NSMutableDictionary *actionnameActionthreadDictionary;
 @property (strong, nonatomic) NSLock *statusInfoLock;
 @property (strong, nonatomic) NSMutableArray *statusMessages;
 @property (nonatomic) int active_switch_index;

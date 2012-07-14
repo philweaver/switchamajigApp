@@ -29,7 +29,7 @@
         <onswitchactivate>
             <actionsequenceondevice>
                 <loop>
-                    <friendlyname>Default</friendlyname>
+                    <friendlyname>Hoopy</friendlyname>
                     <turnswitcheson>1</turnswitcheson>
                     <delay>0.5</delay>
                     <turnswitchesoff>1</turnswitchesoff>
@@ -41,10 +41,31 @@
         </onswitchactivate>
         <onswitchdeactivate>
             <actionsequenceondevice>
-                <friendlyname>Default</friendlyname>
+                <friendlyname>Hoopy</friendlyname>
                 <stoploop/>
                 <actionsequence>
                     <turnswitchesoff>1 2</turnswitchesoff>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchdeactivate>
+    </panelelement>    
+    <panelelement>
+        <frame>150 695 944 173</frame>
+        <rgbacolor>1.0 0.7 0.0 1.0</rgbacolor>
+        <switchtext>3</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice>
+                <friendlyname>Frood</friendlyname>
+                <actionsequence>
+                    <turnswitcheson>1</turnswitcheson>
+                </actionsequence>
+            </actionsequenceondevice>
+        </onswitchactivate>
+        <onswitchdeactivate>
+            <actionsequenceondevice>
+                <friendlyname>Frood</friendlyname>
+                <actionsequence>
+                    <turnswitcheson>2</turnswitcheson>
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
