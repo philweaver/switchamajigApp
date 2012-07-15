@@ -11,6 +11,16 @@
 #import "Reachability.h"
 #import "signal.h"
 
+// Silly widgit that probably means I should be signaling the action thread to stop in some better way
+@interface SwitchamajigMutableBool : NSObject {
+}
+@property BOOL value;
+@end
+@implementation SwitchamajigMutableBool
+@synthesize value;
+@end
+
+
 @implementation SwitchControlAppDelegate
 
 @synthesize window = _window;
@@ -145,18 +155,6 @@
 
 
 #define MAX_STRING 1024
-static int convertFromLogicalToPhysicalSwitchMask(int logicalSwitchMask) {
-    int physicalSwitchMask = 0;
-    if(logicalSwitchMask & 0x01)
-        physicalSwitchMask |= 0x20;
-    if(logicalSwitchMask & 0x02)
-        physicalSwitchMask |= 0x40;
-    if(logicalSwitchMask & 0x04)
-        physicalSwitchMask |= 0x80;
-    if(logicalSwitchMask & 0x08)
-        physicalSwitchMask |= 0x100;
-    return physicalSwitchMask;
-}
 
 // Utility function for verifying that we get the expected response from a socket
 bool verify_socket_reply(int socket, const char *expected_string);
@@ -275,10 +273,14 @@ char *commands[] = {
     // Get the friendly name for this sequence
     NSError *xmlError;
     NSArray *friendlyNames = [actionSequenceOnDevice nodesForXPath:@".//friendlyname" error:&xmlError];
+    if([friendlyNames count] < 1) {
+        NSLog(@"Can't find friendly name. Count = %d. Node string = %@", [friendlyNames count], [actionSequenceOnDevice XMLString]);
+        return;
+    }
     DDXMLNode *friendlyNameNode = [friendlyNames objectAtIndex:0];
     NSString *friendlyName = [friendlyNameNode stringValue];
     if(friendlyName == nil) {
-        NSLog(@"performActionSequence: friendlyname is nil");
+        NSLog(@"performActionSequence: friendlyname is nil. Node string = %@", [actionSequenceOnDevice XMLString]);
         return;
     }
     // Look up the driver for friendly name
@@ -298,12 +300,12 @@ char *commands[] = {
         return;
     }
     NSArray *actionSequences = [actionSequenceOnDevice nodesForXPath:@".//actionsequence" error:&xmlError];
-    DDXMLNode *actionSequence = [actionSequences objectAtIndex:0];
-    if(actionSequence == nil) {
-        NSLog(@"performActionSequence: action sequence is nil for string %@", [actionSequence XMLString]);
+    if([actionSequences count] < 1){
+        NSLog(@"performActionSequence: no action sequences for string %@", [actionSequenceOnDevice XMLString]);
         return;
     }
-    // Create a key to specify this action
+    DDXMLNode *actionSequence = [actionSequences objectAtIndex:0];
+
     NSArray *actionNames = [actionSequenceOnDevice nodesForXPath:@".//actionname" error:&xmlError];
     NSString *actionName;
     if([actionNames count]) {
@@ -311,8 +313,14 @@ char *commands[] = {
         actionName = [actionNameNode stringValue];
     } else
         actionName = friendlyName;
+    // Stop any existing thread with this name
+    SwitchamajigMutableBool *killCurrentThread = [actionnameActionthreadDictionary valueForKey:actionName];
+    if(killCurrentThread != nil) {
+        [killCurrentThread setValue:YES];
+    }
     // Create an array to pass to the background thread with the synchronization object
-    NSNumber *threadExitBool = [NSNumber numberWithBool:NO];
+    SwitchamajigMutableBool *threadExitBool = [SwitchamajigMutableBool alloc];
+    [threadExitBool setValue:NO];
     // Add a dictionary entry for this thread
     [actionnameActionthreadDictionary setValue:threadExitBool forKey:actionName];
     NSArray *threadInfoArray = [NSArray arrayWithObjects:driver, actionSequence, threadExitBool, nil];
@@ -320,12 +328,13 @@ char *commands[] = {
     [self performSelectorInBackground:@selector(executeActionSequence:) withObject:threadInfoArray];
 }
 
+
 - (void) executeActionSequence:(NSArray *)threadInfoArray {
     @autoreleasepool {
         // Unpack the thread info
         SwitchamajigDriver *driver = [threadInfoArray objectAtIndex:0];
         DDXMLNode *actionSequence = [threadInfoArray objectAtIndex:1];
-        NSNumber *threadExitBool = [threadInfoArray objectAtIndex:2];
+        SwitchamajigMutableBool *threadExitBool = [threadInfoArray objectAtIndex:2];
         if((driver == nil) || (actionSequence == nil) || (threadExitBool == nil)) {
             NSLog(@"executeActionSequence: values are nil. Aborting action.");
             return;
@@ -334,8 +343,36 @@ char *commands[] = {
         DDXMLNode *action;
         for(action in actions) {
             // Exit if requested to do so
-            if([threadExitBool boolValue])
+            if([threadExitBool value])
                 break;
+            if([[action name] isEqualToString:@"loop"]) {
+                // Recursively call this function to perform the actions in the loop
+                NSArray *loopInfoArray = [NSArray arrayWithObjects:driver, action, threadExitBool, nil];
+                while(![threadExitBool value]) {
+                    [self executeActionSequence:loopInfoArray];
+                }
+                continue;
+            }
+            if([[action name] isEqualToString:@"delay"]) {
+                NSScanner *delayScan = [[NSScanner alloc] initWithString:[action stringValue]];
+                double delay;
+                bool delay_ok = [delayScan scanDouble:&delay];
+                if(!delay_ok) {
+                    NSLog(@"Problem reading delay amount");
+                    continue;
+                }
+                [NSThread sleepForTimeInterval:delay];
+                continue;
+            }
+            if([[action name] isEqualToString:@"stopactionwithname"]) {
+                // Stop any existing thread with this name
+                SwitchamajigMutableBool *killCurrentThread = [actionnameActionthreadDictionary valueForKey:[action stringValue]];
+                if(killCurrentThread != nil) {
+                    [killCurrentThread setValue:YES];
+                }
+                continue;
+            }
+            
             // Send command to driver
             NSLog(@"Issuing command %@", [action XMLString]);
             [driver issueCommandFromXMLNode:action];

@@ -91,22 +91,25 @@
         <switchtext>Swim: Toggle 1 and 2 for 1/2 second each</switchtext>
         <onswitchactivate>
             <actionsequenceondevice>
-                <loop>
-                    <friendlyname>Default</friendlyname>
-                    <turnSwitchesOn>1</turnSwitchesOn>
-                    <delay>0.5</delay>
-                    <turnSwitchesOff>1</turnSwitchesOff>
-                    <turnSwitchesOn>2</turnSwitchesOn>
-                    <delay>0.5</delay>
-                    <turnSwitchesOff>2</turnSwitchesOff>
-                </loop>
+                <friendlyname>Default</friendlyname>
+                <actionname>toggleTail</actionname>
+                <actionsequence>
+                    <loop>
+                        <turnSwitchesOn>1</turnSwitchesOn>
+                        <delay>0.5</delay>
+                        <turnSwitchesOff>1</turnSwitchesOff>
+                        <turnSwitchesOn>2</turnSwitchesOn>
+                        <delay>0.5</delay>
+                        <turnSwitchesOff>2</turnSwitchesOff>
+                    </loop>
+                </actionsequence>
             </actionsequenceondevice>
         </onswitchactivate>
         <onswitchdeactivate>
-            <stoploop/>
             <actionsequenceondevice>
                 <friendlyname>Default</friendlyname>
                 <actionsequence>
+                    <stopactionwithname>toggleTail</stopactionwithname>
                     <turnSwitchesOff>1 2</turnSwitchesOff>
                 </actionsequence>
             </actionsequenceondevice>

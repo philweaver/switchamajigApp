@@ -159,7 +159,6 @@
     
     [simulatedController stopListening];
 }
-#endif
 
 - (void)test_000_AppDelegate_001_Dispatch_Controller_Cmd {
     SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
@@ -216,6 +215,68 @@
     [app_delegate performActionSequence:node1];
    
 }
+#endif
+
+- (void)test_000_AppDelegate_002_Multi_Step_Commands {
+    SimulatedSwitchamajigController *simulatedController = [SimulatedSwitchamajigController alloc];
+    [simulatedController startListening];
+    SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
+    [[app_delegate friendlyNameSwitchamajigDictionary] removeAllObjects];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"frood"];
+    // Mock up a Sjig controller and to verify that commands come through
+    MockSwitchamajigDriver *driver1 = [MockSwitchamajigDriver alloc];
+    driver1->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
+    // Send a multi-step command with a delay to the controller
+    NSError *error;
+    DDXMLDocument *node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn><delay>1</delay><turnSwitchesOff>1</turnSwitchesOff></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    int numCommandsReceived = [driver1->commandsReceived count];
+    STAssertTrue(numCommandsReceived == 1, @"Should have one command after starting sequence. Instead have %d.", numCommandsReceived);
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    numCommandsReceived = [driver1->commandsReceived count];
+    STAssertTrue(numCommandsReceived == 2, @"Should have one command after running sequence. Instead have %d.", numCommandsReceived);
+    // Verify that the commands were as expected
+    NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"First command was incorrect. Recieved %@.", commandString);
+    commandString = [driver1->commandsReceived objectAtIndex:1];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOff>1</turnSwitchesOff>"], @"Second command was incorrect. Recieved %@.", commandString);
+
+    // Send a loop command 
+    [driver1->commandsReceived removeAllObjects];
+    DDXMLDocument *node2 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionname>test</actionname><actionsequence><loop><turnSwitchesOn>1</turnSwitchesOn><delay>1</delay><turnSwitchesOff>1</turnSwitchesOff><delay>1</delay></loop></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node2];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    // Watch timing of command for two loops
+    numCommandsReceived = [driver1->commandsReceived count];
+    STAssertTrue(numCommandsReceived == 1, @"Should have one command after starting loop. Instead have %d.", numCommandsReceived);
+    for(int i=2; i <5; ++i) { 
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+        numCommandsReceived = [driver1->commandsReceived count];
+        STAssertTrue(numCommandsReceived == i, @"Should have %d commands in loop. Instead have %d.", i, numCommandsReceived);
+    }
+    // Stop the loop
+    DDXMLDocument *node3 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><stopactionwithname>test</stopactionwithname><turnSwitchesOff>1</turnSwitchesOff></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node3];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)2.0]];
+    numCommandsReceived = [driver1->commandsReceived count];
+    STAssertTrue(numCommandsReceived == 5, @"Should have five command after stopping loop. Instead have %d.", numCommandsReceived);
+    
+    // Verify that the commands were as expected
+    commandString = [driver1->commandsReceived objectAtIndex:0];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"First loop command was incorrect. Recieved %@.", commandString);
+    commandString = [driver1->commandsReceived objectAtIndex:1];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOff>1</turnSwitchesOff>"], @"Second loop command was incorrect. Recieved %@.", commandString);
+    commandString = [driver1->commandsReceived objectAtIndex:2];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Third loop command was incorrect. Recieved %@.", commandString);
+    commandString = [driver1->commandsReceived objectAtIndex:3];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOff>1</turnSwitchesOff>"], @"Fourth loop command was incorrect. Recieved %@.", commandString);
+    commandString = [driver1->commandsReceived objectAtIndex:4];
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOff>1</turnSwitchesOff>"], @"Fifth loop command was incorrect. Recieved %@.", commandString);
+    [simulatedController stopListening];
+}
+
 #if RUN_ALL_TESTS
 - (void)test_001_RootViewController_001_Help
 {
