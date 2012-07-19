@@ -3,7 +3,7 @@
 //  SwitchControlTests
 //
 //  Created by Phil Weaver on 7/23/11.
-//  Copyright 2011 PAW Solutions. All rights reserved.
+//  Copyright 2012 PAW Solutions. All rights reserved.
 //
 #define RUN_ALL_TESTS 1
 #import "SwitchControlTests.h"
@@ -215,7 +215,6 @@
     [app_delegate performActionSequence:node1];
    
 }
-#endif
 
 - (void)test_000_AppDelegate_002_Multi_Step_Commands {
     SimulatedSwitchamajigController *simulatedController = [SimulatedSwitchamajigController alloc];
@@ -277,7 +276,6 @@
     [simulatedController stopListening];
 }
 
-#if RUN_ALL_TESTS
 - (void)test_001_RootViewController_001_Help
 {
     // Disable scanning, enable help button
@@ -520,6 +518,8 @@
 
 - (void)test_002_SwitchPanelViewController_002_BackButton {
     // Confirm that the back button works properly
+    // Turn off panel editing, as during editing we suspend the two-button back
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"allowEditingOfSwitchPanelsPreference"];
     // Set up settings to require two-button back
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"singleTapBackButtonPreference"];
     // Load panel that has both back and enable
@@ -597,6 +597,81 @@
     expectedString = @"<actionsequenceondevice><friendlyname>Hoopy</friendlyname><stoploop></stoploop><actionsequence><turnSwitchesOff>1 2</turnSwitchesOff></actionsequence></actionsequenceondevice>";
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
 }
+
+#endif
+// Test that saving a switch panel works properly
+- (void)test_002_SwitchPanelViewController_004_SavePanel {
+    // Create a file name that won't conflict with anything
+    CFUUIDRef newUniqueId = CFUUIDCreate(kCFAllocatorDefault);
+    NSString * filename = (__bridge_transfer NSString*)CFUUIDCreateString(kCFAllocatorDefault, newUniqueId);
+    CFRelease(newUniqueId);
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSURL *newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:filename]];
+    
+    // Create a panel from a test XML file and enable configuration mode
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    // Open the test xml file
+    NSURL *originalURL = [NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"__TEST001" ofType:@"xml"]];
+    [viewController setUrlToLoad:originalURL];
+    // Save the switch panel to a file in the user file system
+    [viewController savePanelToPath:newFileURL];
+    // Confirm that the saved file's XML is identical to the original file's
+    NSError *fileError=nil;
+    NSString *xmlString1 = [NSString stringWithContentsOfURL:originalURL encoding:NSUTF8StringEncoding error:&fileError];
+    NSString *xmlString2 = [NSString stringWithContentsOfURL:newFileURL encoding:NSUTF8StringEncoding error:&fileError];
+    // Compare normalized xml strings; don't be picky about formatting
+    NSError *xmlError;
+    DDXMLDocument *xmlDoc1 = [[DDXMLDocument alloc] initWithXMLString:xmlString1 options:0 error:&xmlError];
+    DDXMLDocument *xmlDoc2 = [[DDXMLDocument alloc] initWithXMLString:xmlString2 options:0 error:&xmlError];
+    NSString *compareString1 = [xmlDoc1 XMLString];
+    NSString *compareString2 = [xmlDoc2 XMLString];
+    STAssertTrue([compareString1 isEqualToString:compareString2], @"Saved xml %@ differs from loaded xml %@", compareString2, compareString1);
+    // Remove the extra file
+    [[[NSFileManager alloc] init] removeItemAtURL:newFileURL error:&fileError];
+}
+
+- (void)test_002_SwitchPanelViewController_005_ConfigureLifeCycle {
+    // Work with "yellow" panel
+    // Create a panel from a test XML file and enable configuration mode
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    // Open the test xml file
+    NSURL *originalURL = [NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"1_yellow" ofType:@"xml"]];
+    [viewController setUrlToLoad:originalURL];
+    // Disable display of config button in settings
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"allowEditingOfSwitchPanelsPreference"];
+    // Verify that button doesn't appear
+    id configButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Edit Panel"];
+    STAssertNil(configButton, @"Edit button shown when preferences say not to.");
+    // Enable display of config button
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
+    // Verify that button does appear
+    viewController = [switchPanelViewController alloc];
+    [viewController setUrlToLoad:originalURL];
+    configButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Edit Panel"];
+    STAssertNotNil(configButton, @"Edit button not shown when enabled in settings.");
+    // Verify that delete button does not appear
+    id deleteButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Delete Panel"];
+    STAssertNil(deleteButton, @"Delete button shown for built-in panel.");
+    
+    // Select configure button
+    // Go back to root view controller, confirm new panel available
+    // Check that new panel and file were created with default name
+    // Choose new panel and configure
+    // Change name of panel
+    // Go back to root view controller
+    // Check that previous name file disappeared, new one appeared
+    // Press delete
+    // Check for warning dialog
+    // Press Cancel
+    // Verify that file and panel still there
+    // Press delete, agree to delete
+    // Verify we're back at the root view controller
+    // Verify that panel is gone
+}
+#if RUN_ALL_TESTS
+
+
 #endif
 
 #if 0

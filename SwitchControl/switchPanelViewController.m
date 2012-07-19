@@ -17,6 +17,7 @@
 @synthesize deactivateButtonDictionary;
 @synthesize urlToLoad;
 @synthesize switchPanelName;
+@synthesize editingActive;
 /*
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -58,7 +59,7 @@
         NSLog(@"XML Open Failed.");
     }
     // Set name
-    [self setSwitchPanelName:@""];
+    [self setSwitchPanelName:@"Panel"];
     NSArray *panelNameNodes = [xmlDoc nodesForXPath:@".//panel/panelname" error:&xmlError];
     if([panelNameNodes count]) {
         DDXMLNode *panelNameNode = [panelNameNodes objectAtIndex:0];
@@ -130,18 +131,22 @@
     }
     
     oneButtonNavigation = [[NSUserDefaults standardUserDefaults] boolForKey:@"singleTapBackButtonPreference"];
+    bool allowEditing = [[NSUserDefaults standardUserDefaults] boolForKey:@"allowEditingOfSwitchPanelsPreference"];
     CGRect backButtonRect;
     backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     if(!oneButtonNavigation) {
-        // Create two-button combo to allow navigation
-        id allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        CGRect buttonRect = CGRectMake(412, 704, 200, 44);
-        [allowNavButton setFrame:buttonRect];
-        [allowNavButton setTitle:[NSString stringWithCString:"Enable Back Button" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-        [allowNavButton addTarget:self action:@selector(allowNavigation:) forControlEvents:UIControlEventTouchUpInside]; 
-        [myView addSubview:allowNavButton];
+        // If we're allowing editing, don't bother with "Enable Back Button"
+        if(!allowEditing) {
+            // Create two-button combo to allow navigation
+            id allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            CGRect buttonRect = CGRectMake(412, 704, 200, 44);
+            [allowNavButton setFrame:buttonRect];
+            [allowNavButton setTitle:[NSString stringWithCString:"Enable Back Button" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+            [allowNavButton addTarget:self action:@selector(allowNavigation:) forControlEvents:UIControlEventTouchUpInside]; 
+            [myView addSubview:allowNavButton];
+            [backButton setEnabled:NO];
+        }
         backButtonRect = CGRectMake(490, 0, 44, 44);
-        [backButton setEnabled:NO];
     } else {
         float backButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
         float backButtonWidth = backButtonHeight * 1.5;
@@ -154,11 +159,34 @@
     [backButton addTarget:self action:@selector(goBack:) forControlEvents:UIControlEventTouchUpInside];
     [myView addSubview:backButton];
     
+    if(allowEditing) {
+        oneButtonNavigation = YES;
+        // Show button to start editing if we aren't already editing
+        if(!editingActive) {
+            id editButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            CGRect buttonRect = CGRectMake(300, 0, 100, 44);
+            [editButton setFrame:buttonRect];
+            [editButton setTitle:[NSString stringWithCString:"Edit Panel" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+            [editButton addTarget:self action:@selector(editPanel:) forControlEvents:UIControlEventTouchUpInside]; 
+            [myView addSubview:editButton];
+            // If this panel is built-in, don't allow deleting it
+            if([[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains \"@%\"", NSDocumentDirectory]] evaluateWithObject:[urlToLoad path]]) {
+                id deleteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+                CGRect buttonRect = CGRectMake(150, 0, 100, 44);
+                [deleteButton setFrame:buttonRect];
+                [deleteButton setTitle:[NSString stringWithCString:"Delete Panel" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+                [deleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside]; 
+                [myView addSubview:deleteButton];
+            }
+        }
+    }
     // Show status
     CGRect textRect = CGRectMake(700, 0, 324, 36);
     textToShowSwitchName = [[SJUIStatusMessageLabel alloc] initWithFrame:textRect];
     [textToShowSwitchName setBackgroundColor:bgColor];
     [myView addSubview:textToShowSwitchName];
+    
+   
     
 	self.view = myView;
 }
@@ -216,4 +244,54 @@
 - (IBAction)goBack:(id)sender{
     [self.navigationController popViewControllerAnimated:YES];
 }
+
+// Save the panel to a specified file
+- (void)savePanelToPath:(NSURL *)url {
+    UIView *panelView = [self view];
+    NSMutableString *stringToSave = [NSMutableString stringWithCapacity:500];
+    [stringToSave setString:@"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"];
+    [stringToSave appendString:@"<panel>\n"];
+    [stringToSave appendString:[NSString stringWithFormat:@"\t<panelname>%@</panelname>\n", [self switchPanelName]]];
+    // Loop over all panel elements
+    UIView *view;
+    for(view in [panelView subviews]) {
+        if(![view isKindOfClass:[UIButton class]])
+            continue; // Only look at buttons
+        UIButton *button = (UIButton *)view;
+        if([[button titleForState:UIControlStateNormal] isEqualToString:@"Back"])
+            continue;  // Don't save auto-positioned Back button
+        if([[button titleForState:UIControlStateNormal] isEqualToString:@"Enable Back Button"])
+            continue;  // Don't save auto-positioned Enable Back Button
+        [stringToSave appendString:@"\t<panelelement>\n"];
+        CGRect frame = [button frame];
+        [stringToSave appendString:[NSString stringWithFormat:@"\t\t<frame>%d %d %d %d</frame>\n", (int)frame.origin.x, (int)frame.origin.y, (int)frame.size.width, (int)frame.size.height]];
+        CGFloat r, g, b, a;
+        [[button backgroundColor] getRed:&r green:&g blue:&b alpha:&a];
+        [stringToSave appendString:[NSString stringWithFormat:@"\t\t<rgbacolor>%3.1f %3.1f %3.1f %3.1f</rgbacolor>\n", r, g, b, a]];
+        [stringToSave appendString:[NSString stringWithFormat:@"\t\t<switchtext>%@</switchtext>\n", [button titleForState:UIControlStateNormal]]];
+        // Store actions for switch activate and deactivate
+        NSValue *value = [NSValue valueWithNonretainedObject:button];
+        [stringToSave appendString:@"\t\t<onswitchactivate>\n"];
+        NSArray *actions = [[self activateButtonDictionary] objectForKey:value];
+        DDXMLNode *action;
+        for(action in actions) {
+            [stringToSave appendString:[NSString stringWithFormat:@"\t\t\t%@\n", [action XMLString]]];
+        }
+        [stringToSave appendString:@"\t\t</onswitchactivate>\n"];
+        [stringToSave appendString:@"\t\t<onswitchdeactivate>\n"];
+        actions = [[self deactivateButtonDictionary] objectForKey:value];
+        for(action in actions) {
+            [stringToSave appendString:[NSString stringWithFormat:@"\t\t\t%@\n", [action XMLString]]];
+        }
+        [stringToSave appendString:@"\t\t</onswitchdeactivate>\n"];
+        [stringToSave appendString:@"\t</panelelement>\n"];
+    }
+    [stringToSave appendString:@"</panel>"];
+    NSError *fileError;
+    [stringToSave writeToURL:url atomically:YES encoding:NSASCIIStringEncoding error:&fileError];
+    if(fileError) {
+        NSLog(@"File write error: %@", fileError);
+    }
+}
+
 @end

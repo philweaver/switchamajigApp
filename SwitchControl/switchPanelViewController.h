@@ -20,9 +20,11 @@
 - (IBAction)goBack:(id)sender;
 - (IBAction)onSwitchActivated:(id)sender;
 - (IBAction)onSwitchDeactivated:(id)sender;
+- (void)savePanelToPath:(NSURL *)url;
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;
 @property (nonatomic, strong) NSMutableDictionary *activateButtonDictionary;
 @property (nonatomic, strong) NSMutableDictionary *deactivateButtonDictionary;
+@property BOOL editingActive;
 
 @end
