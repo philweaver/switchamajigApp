@@ -252,55 +252,78 @@
     return scaledImage;
 }
 
+- (bool)addPanelButtonToScrollViewFromUrl:(NSURL*)url atOrigin:(CGPoint)origin withButtonSize:(CGSize)buttonSize andTextSize:(CGSize)textSize {
+    if(url == nil)
+        return false;
+    // Skip test panels
+    BOOL isTest = [[NSPredicate predicateWithFormat:@"SELF contains \"__TEST\""] evaluateWithObject:[url absoluteString]];
+    if(isTest)
+        return false;
+    numberOfPanelsInScrollView++;
+    // Render view controller into image
+    switchPanelViewController *viewController = [switchPanelViewController alloc];
+    [viewController setUrlToLoad:url];
+    // Create the specified button
+    id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [myButton setFrame:CGRectMake(origin.x, origin.y, buttonSize.width, buttonSize.height)];
+    // Also set rectangle for label
+    CGRect panelNameLabelRect = CGRectMake(origin.x, origin.y + buttonSize.height, buttonSize.width, textSize.height);
+    [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)]; 
+    [panelSelectionScrollView addSubview:myButton];
+    UIImage *scaledImage = [self imageFromViewController:viewController scaledTo:[myButton bounds].size];
+    [myButton setImage:scaledImage forState:UIControlStateNormal];
+    // Add text label
+    UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
+    [panelNameLabel setBackgroundColor:[UIColor blackColor]];
+    [panelNameLabel setTextColor:[UIColor whiteColor]];
+    [panelNameLabel setText:[viewController switchPanelName]];
+    [myButton setTitle:[viewController switchPanelName] forState:UIControlStateNormal]; // Use by test code to find buttons
+    [panelNameLabel setTextAlignment:UITextAlignmentCenter];
+    [panelNameLabel setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
+    [panelSelectionScrollView addSubview:panelNameLabel];
+    [[self switchPanelURLDictionary] setObject:url forKey:[NSValue valueWithNonretainedObject:myButton]];
+    return true;
+}
+
 - (void)initializeScrollPanelWithTextSize:(CGSize)textSize {
-    UIColor *bgColor = [UIColor blackColor];
-    UIColor *fgColor = [UIColor whiteColor];
     int selectButtonWidth = panelButtonHeight + (panelButtonHeight/2);
 
     [switchPanelURLDictionary removeAllObjects];
-    // Find all switch panel files
-    NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
-    NSURL *url;
     
     int current_button_x = button_spacing;
     int current_button_y = 0;
     // Create highlighter
     [self setHighlighting:[[UIView alloc] initWithFrame:CGRectMake(current_button_x-HIGHLIGHT_RECT_THICKNESS, current_button_y-HIGHLIGHT_RECT_THICKNESS, selectButtonWidth+2*HIGHLIGHT_RECT_THICKNESS, panelButtonHeight+2*HIGHLIGHT_RECT_THICKNESS)]];
     [panelSelectionScrollView addSubview:[self highlighting]];
-    [[self highlighting] setBackgroundColor:bgColor];
+    [[self highlighting] setBackgroundColor:[UIColor blackColor]];
     numberOfPanelsInScrollView = 0;
+    // Find all default switch panel files
+    NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
+    NSURL *url;
     for(url in xmlUrls) {
-        // Skip test panels
-        BOOL isTest = [[NSPredicate predicateWithFormat:@"SELF contains \"__TEST\""] evaluateWithObject:[url absoluteString]];
-        if(isTest)
+        bool success = [self addPanelButtonToScrollViewFromUrl:url atOrigin:CGPointMake(current_button_x, current_button_y) withButtonSize:CGSizeMake(selectButtonWidth, panelButtonHeight) andTextSize:textSize];
+        if(!success)
             continue;
-        numberOfPanelsInScrollView++;
-        // Render view controller into image
-        switchPanelViewController *viewController = [switchPanelViewController alloc];
-        [viewController setUrlToLoad:url];
-        // Create the specified button
-        id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [myButton setFrame:CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y, selectButtonWidth, panelButtonHeight)];
-        // Also set rectangle for label
-        CGRect panelNameLabelRect = CGRectMake((CGFloat)current_button_x, (CGFloat)current_button_y + panelButtonHeight, selectButtonWidth, textSize.height);
-        [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)]; 
-        [panelSelectionScrollView addSubview:myButton];
         current_button_y += panelButtonHeight + textSize.height + button_spacing;
         if(current_button_y + panelButtonHeight + textSize.height >= [panelSelectionScrollView bounds].size.height) {
             current_button_y = 0;
             current_button_x += selectButtonWidth + button_spacing;
         }
-        UIImage *scaledImage = [self imageFromViewController:viewController scaledTo:[myButton bounds].size];
-        [myButton setImage:scaledImage forState:UIControlStateNormal];
-        // Add text label
-        UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
-        [panelNameLabel setBackgroundColor:bgColor];
-        [panelNameLabel setTextColor:fgColor];
-        [panelNameLabel setText:[viewController switchPanelName]];
-        [panelNameLabel setTextAlignment:UITextAlignmentCenter];
-        [panelNameLabel setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
-        [panelSelectionScrollView addSubview:panelNameLabel];
-        [[self switchPanelURLDictionary] setObject:url forKey:[NSValue valueWithNonretainedObject:myButton]];
+    }
+    // Find all user switch panel files
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSArray *DocumentDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:documentsDirectory error:nil];
+    NSString *filename;
+    for(filename in DocumentDirectoryContents) {
+        NSString *fullpath = [documentsDirectory stringByAppendingPathComponent:filename];
+        url = [NSURL fileURLWithPath:fullpath];
+        [self addPanelButtonToScrollViewFromUrl:url atOrigin:CGPointMake(current_button_x, current_button_y) withButtonSize:CGSizeMake(selectButtonWidth, panelButtonHeight) andTextSize:textSize];
+        current_button_y += panelButtonHeight + textSize.height + button_spacing;
+        if(current_button_y + panelButtonHeight + textSize.height >= [panelSelectionScrollView bounds].size.height) {
+            current_button_y = 0;
+            current_button_x += selectButtonWidth + button_spacing;
+        }
     }
     if(current_button_y != button_spacing)
         current_button_x += selectButtonWidth + button_spacing;
@@ -351,7 +374,7 @@
 
 -(void) viewWillAppear:(BOOL)animated {
     [[self navigationController] setNavigationBarHidden:YES];
-    [self reload_switch_name_table];
+    [self ResetScrollPanel];
 }
 
 - (void)launchSwitchPanel:(id)sender {

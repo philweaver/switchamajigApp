@@ -5,7 +5,7 @@
 //  Created by Phil Weaver on 7/23/11.
 //  Copyright 2012 PAW Solutions. All rights reserved.
 //
-#define RUN_ALL_TESTS 1
+#define RUN_ALL_TESTS 0
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
@@ -82,7 +82,9 @@
     for(subView in [view subviews]) {
         if([subView isKindOfClass:[UIButton class]]) {
             UIButton *button = (UIButton *) subView;
-            if([[button titleForState:UIControlStateNormal] isEqualToString:text])
+            NSString *title = [button titleForState:UIControlStateNormal];
+            //NSLog(@"Findsubview: looking for %@. Current text is %@.\n", text, title);
+            if([title isEqualToString:text])
                 return subView;
         }
     }
@@ -645,29 +647,107 @@
     STAssertNil(configButton, @"Edit button shown when preferences say not to.");
     // Enable display of config button
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
+    // Determine the next panel's default name
+    NSMutableString *nextPanelName = [[NSMutableString alloc] initWithCapacity:15];
+    int i=1;
+    NSURL *newFileURL;
+    do {
+        ++i;
+        [nextPanelName setString:[NSString stringWithFormat:@"Panel %d", i]];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.xml", nextPanelName]]];
+    } while ([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]]);
+    // Press Yellow button on root controller
+    id yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
+    //NSLog(@"Yellowbutton = %@", yellowButton);
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     // Verify that button does appear
-    viewController = [switchPanelViewController alloc];
-    [viewController setUrlToLoad:originalURL];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
     configButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Edit Panel"];
     STAssertNotNil(configButton, @"Edit button not shown when enabled in settings.");
     // Verify that delete button does not appear
     id deleteButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Delete Panel"];
     STAssertNil(deleteButton, @"Delete button shown for built-in panel.");
-    
     // Select configure button
-    // Go back to root view controller, confirm new panel available
-    // Check that new panel and file were created with default name
+    [configButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    // Verify that new view controller has no edit button, but does have a delete button
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    configButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Edit Panel"];
+    STAssertNil(configButton, @"Edit button shown on newly created panel during editing.");
+    deleteButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Delete Panel"];
+    STAssertNil(deleteButton, @"Delete button shown on newly created during editing.");
+    // Go back, which should return to new panel with both edit and delete
+    id backButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Back"];
+    [backButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    configButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Edit Panel"];
+    STAssertNotNil(configButton, @"Edit button not shown on newly created panel after backing away from editing it.");
+    deleteButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Delete Panel"];
+    STAssertNotNil(deleteButton, @"Delete button not shown on newly created panel after backing away from editing it.");
+    // Return to the root view controller
+    backButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Back"];
+    [backButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+
+    // Check that new panel exists with default name
+    id newPanelButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:nextPanelName];
+    STAssertNotNil(newPanelButton, @"New panel button not displayed. Expected name %@", nextPanelName);
     // Choose new panel and configure
+    [newPanelButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    configButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Edit Panel"];
+    [configButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     // Change name of panel
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    STAssertTrue([[viewController->panelNameTextField text] isEqualToString:nextPanelName], @"Panel name not diplayed on config screen");
+    [viewController->panelNameTextField setText:@"hoopy"];
+    [viewController->panelNameTextField sendActionsForControlEvents:UIControlEventEditingDidEndOnExit];
     // Go back to root view controller
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     // Check that previous name file disappeared, new one appeared
+    STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:nextPanelName], @"Panel did not disappear after name change");
+    newPanelButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"hoopy"];
+    STAssertNotNil(newPanelButton, @"Panel's new name did not appear after name change");
+    
+    // Open the panel again
+    [newPanelButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    
+    // Make sure confirm dialog button isn't visible
+    STAssertTrue([viewController->confirmDeleteButton isHidden], @"Confirm delete button visible before being activated");
+    
     // Press delete
-    // Check for warning dialog
-    // Press Cancel
-    // Verify that file and panel still there
+    deleteButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Delete Panel"];
+    [deleteButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    // Make sure that the confirm button is now visible
+    STAssertFalse([viewController->confirmDeleteButton isHidden], @"Confirm delete button not visible after being activated");
+    
+    // Press the switch
+    id switchButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"1"];
+    [switchButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    // Make sure the confirm delete button disappeared
+    STAssertTrue([viewController->confirmDeleteButton isHidden], @"Confirm delete button didn't disappear when switch touched");
+    
     // Press delete, agree to delete
+    [deleteButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [viewController->confirmDeleteButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     // Verify we're back at the root view controller
+    STAssertTrue([nav_controller visibleViewController] == rootViewController, @"Deleting didn't go back to root view controller");
     // Verify that panel is gone
+    newPanelButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"hoopy"];
+    STAssertNil(newPanelButton, @"Panel still appears after being deleted.");
 }
 #if RUN_ALL_TESTS
 

@@ -130,7 +130,7 @@
         [myView addSubview:myButton];
     }
     
-    oneButtonNavigation = [[NSUserDefaults standardUserDefaults] boolForKey:@"singleTapBackButtonPreference"];
+    oneButtonNavigation = [[NSUserDefaults standardUserDefaults] boolForKey:@"singleTapBackButtonPreference"] & !editingActive;
     bool allowEditing = [[NSUserDefaults standardUserDefaults] boolForKey:@"allowEditingOfSwitchPanelsPreference"];
     CGRect backButtonRect;
     backButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -158,26 +158,30 @@
     [backButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [backButton addTarget:self action:@selector(goBack:) forControlEvents:UIControlEventTouchUpInside];
     [myView addSubview:backButton];
-    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *urlPath = [urlToLoad path];
+    NSPredicate *searchForDocumentsPredicate = [NSPredicate predicateWithFormat:@"SELF contains %@", documentsDirectory];
+    isBuiltInPanel = ![searchForDocumentsPredicate evaluateWithObject:urlPath];
     if(allowEditing) {
         oneButtonNavigation = YES;
         // Show button to start editing if we aren't already editing
         if(!editingActive) {
             id editButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-            CGRect buttonRect = CGRectMake(300, 0, 100, 44);
+            CGRect buttonRect = CGRectMake(150, 0, 100, 44);
             [editButton setFrame:buttonRect];
             [editButton setTitle:[NSString stringWithCString:"Edit Panel" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
             [editButton addTarget:self action:@selector(editPanel:) forControlEvents:UIControlEventTouchUpInside]; 
             [myView addSubview:editButton];
-            // If this panel is built-in, don't allow deleting it
-            if([[NSPredicate predicateWithFormat:[NSString stringWithFormat:@"SELF contains \"@%\"", NSDocumentDirectory]] evaluateWithObject:[urlToLoad path]]) {
-                id deleteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-                CGRect buttonRect = CGRectMake(150, 0, 100, 44);
-                [deleteButton setFrame:buttonRect];
-                [deleteButton setTitle:[NSString stringWithCString:"Delete Panel" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-                [deleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside]; 
-                [myView addSubview:deleteButton];
-            }
+        }
+        // If this panel is built-in or we're editting it, don't allow deleting it
+        if(!isBuiltInPanel && !editingActive) {
+            id deleteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            CGRect buttonRect = CGRectMake(300, 0, 100, 44);
+            [deleteButton setFrame:buttonRect];
+            [deleteButton setTitle:[NSString stringWithCString:"Delete Panel" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+            [deleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside]; 
+            [myView addSubview:deleteButton];
         }
     }
     // Show status
@@ -185,8 +189,31 @@
     textToShowSwitchName = [[SJUIStatusMessageLabel alloc] initWithFrame:textRect];
     [textToShowSwitchName setBackgroundColor:bgColor];
     [myView addSubview:textToShowSwitchName];
+
+    // OK always to create hidden button
+    confirmDeleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [confirmDeleteButton setFrame:CGRectMake(412, 704, 200, 44)];
+    [confirmDeleteButton setBackgroundImage:[[UIImage imageNamed:@"iphone_delete_button.png"] stretchableImageWithLeftCapWidth:8.0f topCapHeight:0.0f] forState:UIControlStateNormal];
+    [confirmDeleteButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [confirmDeleteButton setTitle:@"Confirm Delete" forState:UIControlStateNormal];
+    [confirmDeleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside];
+    [confirmDeleteButton setHidden:YES];
+    [myView addSubview:confirmDeleteButton];
     
-   
+    // Display configuration UI
+    if(editingActive) {
+        CGRect panelNameTextFieldRect = CGRectMake(50, 0, 200, 31);
+        panelNameTextField = [[UITextField alloc] initWithFrame:panelNameTextFieldRect];
+        [panelNameTextField setText:[self switchPanelName]];
+        [panelNameTextField addTarget:self action:@selector(onPanelNameChange:) forControlEvents:UIControlEventEditingDidEndOnExit];
+        [panelNameTextField setBackgroundColor:[UIColor whiteColor]];
+        [panelNameTextField setTextColor:[UIColor blackColor]];
+        [panelNameTextField setBorderStyle:UITextBorderStyleRoundedRect];
+        [panelNameTextField setFont:[UIFont systemFontOfSize:14.0f]];
+        [panelNameTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
+        [panelNameTextField setReturnKeyType:UIReturnKeyDone];
+        [myView addSubview:panelNameTextField];
+    }
     
 	self.view = myView;
 }
@@ -207,7 +234,7 @@
 
 // Handlers for switches activated/deactivated. Send XML node information to delegate.
 - (IBAction)onSwitchActivated:(id)sender {
-    [backButton setEnabled:oneButtonNavigation];
+    [self disallowNavigation:sender];
     NSValue *value = [NSValue valueWithNonretainedObject:sender];
     NSArray *actions = [[self activateButtonDictionary] objectForKey:value];
     if(actions == nil) {
@@ -221,7 +248,7 @@
     }
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
-    [backButton setEnabled:oneButtonNavigation];
+    [self disallowNavigation:sender];
     NSValue *value = [NSValue valueWithNonretainedObject:sender];
     NSArray *actions = [[self deactivateButtonDictionary] objectForKey:value];
     if(actions == nil) {
@@ -236,14 +263,62 @@
 }
 // Navigation back to root controller
 - (IBAction)allowNavigation:(id)sender {
+    [confirmDeleteButton setHidden:YES];
     [backButton setEnabled:YES];
 }
 - (IBAction)disallowNavigation:(id)sender{
+    [confirmDeleteButton setHidden:YES];
     [backButton setEnabled:oneButtonNavigation];
 }
 - (IBAction)goBack:(id)sender{
-    [self.navigationController popViewControllerAnimated:YES];
+    UINavigationController *navController = self.navigationController;
+    if(editingActive) {
+        [self savePanelToPath:urlToLoad];
+        [self.navigationController popViewControllerAnimated:NO];
+        // Push another panel that is the same as this one, but not being edited
+        switchPanelViewController *newViewController = [switchPanelViewController alloc];
+        [newViewController setUrlToLoad:[self urlToLoad]];
+        [navController pushViewController:newViewController animated:YES];
+    } else {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
+
+NSURL *GetURLWithNoConflictWithName(NSString *name);
+NSURL *GetURLWithNoConflictWithName(NSString *name) {
+    unsigned int i=0;
+    NSURL *newFileURL;
+    do {
+        ++i;
+        NSString *fileName = [NSString stringWithFormat:@"%@ %d.xml", name, i];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:fileName]];
+    } while ([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]]);
+    return newFileURL;
+}
+
+// Replace the current panel with one that enables editing
+- (void)editPanel:(id)sender {
+    // If this is a built-in panel, save it to a new file that we'll edit
+    if(isBuiltInPanel) {
+        urlToLoad = GetURLWithNoConflictWithName(@"Panel");
+        // Create a new name for the panel
+        [self setSwitchPanelName:[[urlToLoad lastPathComponent] stringByDeletingPathExtension]];
+        [self savePanelToPath:urlToLoad];
+    }
+    UINavigationController *navController = self.navigationController;
+    [navController popViewControllerAnimated:NO];
+    switchPanelViewController *newViewController = [switchPanelViewController alloc];
+    [newViewController setUrlToLoad:[self urlToLoad]];
+    [newViewController setEditingActive:YES];
+    UIView *view = [newViewController view]; // Force initialization
+    view = view; // Suppress warning
+    NSString *panelNameWithExtension = [urlToLoad lastPathComponent];
+    [newViewController setSwitchPanelName:[panelNameWithExtension stringByDeletingPathExtension]];
+    [navController pushViewController:newViewController animated:YES];
+}
+
 
 // Save the panel to a specified file
 - (void)savePanelToPath:(NSURL *)url {
@@ -258,10 +333,11 @@
         if(![view isKindOfClass:[UIButton class]])
             continue; // Only look at buttons
         UIButton *button = (UIButton *)view;
-        if([[button titleForState:UIControlStateNormal] isEqualToString:@"Back"])
-            continue;  // Don't save auto-positioned Back button
-        if([[button titleForState:UIControlStateNormal] isEqualToString:@"Enable Back Button"])
-            continue;  // Don't save auto-positioned Enable Back Button
+        // Don't save UI buttons
+        NSString *buttonTitle = [button titleForState:UIControlStateNormal];
+        if(([buttonTitle isEqualToString:@"Back"]) || ([buttonTitle isEqualToString:@"Enable Back Button"]) || ([buttonTitle isEqualToString:@"Edit Panel"]) || ([buttonTitle isEqualToString:@"Delete Panel"]) || ([buttonTitle isEqualToString:@"Confirm Delete"])) {
+            continue;  
+        }
         [stringToSave appendString:@"\t<panelelement>\n"];
         CGRect frame = [button frame];
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<frame>%d %d %d %d</frame>\n", (int)frame.origin.x, (int)frame.origin.y, (int)frame.size.width, (int)frame.size.height]];
@@ -292,6 +368,24 @@
     if(fileError) {
         NSLog(@"File write error: %@", fileError);
     }
+}
+
+// Configuration UI
+- (void)onPanelNameChange:(id)sender {
+    [self setSwitchPanelName:[panelNameTextField text]];
+}
+
+- (void)deletePanel:(id)sender {
+    if(sender == confirmDeleteButton) {
+        NSError *fileError;
+        [[NSFileManager defaultManager] removeItemAtURL:urlToLoad error:&fileError];
+        if(fileError) {
+            NSLog(@"Error deleting panel. Url = %@, error = %@", urlToLoad, fileError);
+        }
+        [self.navigationController popViewControllerAnimated:YES];
+        return;
+    }
+    [confirmDeleteButton setHidden:NO];
 }
 
 @end
