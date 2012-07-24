@@ -5,7 +5,7 @@
 //  Created by Phil Weaver on 7/23/11.
 //  Copyright 2012 PAW Solutions. All rights reserved.
 //
-#define RUN_ALL_TESTS 0
+#define RUN_ALL_TESTS 1
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
@@ -353,6 +353,7 @@
     selectFrame = [[rootViewController selectButton] frame];
     STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
 }
+#endif
 
 
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
@@ -417,7 +418,7 @@
             //NSLog(@"Checking size for title %@", title);
         }
         if((title != nil) && (fontSize != size)) {
-            NSLog(@"Size does not match with title: %@", title);
+            NSLog(@"Size does not match with title: %@. Should be %f, is %f", title, size, fontSize);
             return NO;
         }
         if(![SwitchControlTests CheckAllTextInView:subView hasSize:size])
@@ -460,24 +461,26 @@
             for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
                 float buttonSize = buttonSizes[buttonSizeIndex];
                 //NSLog(@"Test iteration start. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
-                [[NSUserDefaults standardUserDefaults] setFloat:buttonSize forKey:@"switchPanelSizePreference"];
-                // Update the view, and then run the tests
-                rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
-                [rootViewController view];
-                // Confirm text sizes
-                STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
-                // Make sure we don't have inappropriate overlaps
-                int numOverlaps = [SwitchControlTests numberOfSubviewOverlapsInView:[rootViewController view]];
-                STAssertTrue((numOverlaps == num_expected_overlaps), @"Overlapping views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOverlaps, num_expected_overlaps, textSize, testConditionIndex, buttonSize);
-                // Stuff should (generally) be inside its parent view
-                int numOutOfBounds = [SwitchControlTests numberOfSubviewsOutsideParents:[rootViewController view]];
-                STAssertTrue((numOutOfBounds == num_expected_outofbounds), @"Out of bounds views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOutOfBounds, num_expected_outofbounds, textSize, testConditionIndex, buttonSize);
-                //NSLog(@"Test iteration complete. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+                @autoreleasepool {
+                    [[NSUserDefaults standardUserDefaults] setFloat:buttonSize forKey:@"switchPanelSizePreference"];
+                    // Update the view, and then run the tests
+                    rootViewController = [rootSwitchViewController alloc];
+                    // Confirm text sizes
+                    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+                    // Make sure we don't have inappropriate overlaps
+                    int numOverlaps = [SwitchControlTests numberOfSubviewOverlapsInView:[rootViewController view]];
+                    STAssertTrue((numOverlaps == num_expected_overlaps), @"Overlapping views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOverlaps, num_expected_overlaps, textSize, testConditionIndex, buttonSize);
+                    // Stuff should (generally) be inside its parent view
+                    int numOutOfBounds = [SwitchControlTests numberOfSubviewsOutsideParents:[rootViewController view]];
+                    STAssertTrue((numOutOfBounds == num_expected_outofbounds), @"Out of bounds views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOutOfBounds, num_expected_outofbounds, textSize, testConditionIndex, buttonSize);
+                    NSLog(@"Test iteration complete. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+                }
             }
         }
     }
-    //NSLog(@"Test 004 complete.");
+    NSLog(@"Test 004 complete.");
 }
+#if RUN_ALL_TESTS
 
 // Confirm that we can launch a switch panel
 - (void)test_001_RootViewController_005_LaunchSwitchPanel {
@@ -600,7 +603,6 @@
     STAssertTrue([xmlstring isEqualToString:expectedString], @"Received %@ on release", xmlstring);
 }
 
-#endif
 // Test that saving a switch panel works properly
 - (void)test_002_SwitchPanelViewController_004_SavePanel {
     // Create a file name that won't conflict with anything
@@ -749,7 +751,6 @@
     newPanelButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"hoopy"];
     STAssertNil(newPanelButton, @"Panel still appears after being deleted.");
 }
-#if RUN_ALL_TESTS
 
 
 #endif

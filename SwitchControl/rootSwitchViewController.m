@@ -49,11 +49,11 @@
     highlighting = nil;
 #if 0
     // Handy for testing specific configurations
-    [[NSUserDefaults standardUserDefaults] setFloat:100 forKey:@"textSizePreference"];
+    [[NSUserDefaults standardUserDefaults] setFloat:50 forKey:@"textSizePreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showNetworkConfigButtonPreference"];
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
-    [[NSUserDefaults standardUserDefaults] setFloat:500 forKey:@"switchPanelSizePreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+    [[NSUserDefaults standardUserDefaults] setFloat:494 forKey:@"switchPanelSizePreference"];
 #endif
     panelButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
     bool scanning = [[NSUserDefaults standardUserDefaults] integerForKey:@"enableScanningPreference"];
@@ -226,29 +226,30 @@
     // Create a graphics context large enough to hold the entire viewController image
     CGSize originalViewSize = [[viewController view] bounds].size;
     int unscaledBitmapByteCount = originalViewSize.width * originalViewSize.height * 4;
-    void *bitmapData = malloc(unscaledBitmapByteCount);
+    void *bitmapData1 = malloc(unscaledBitmapByteCount);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(bitmapData, originalViewSize.width, originalViewSize.height, 8, originalViewSize.width*4, colorSpace, kCGImageAlphaPremultipliedLast);
-    [[[viewController view] layer] renderInContext:context];
-    CGImageRef unscaledImageCG = CGBitmapContextCreateImage(context);
-    free(bitmapData);
-    CGContextRelease(context);
+    CGContextRef context1 = CGBitmapContextCreate(bitmapData1, originalViewSize.width, originalViewSize.height, 8, originalViewSize.width*4, colorSpace, kCGImageAlphaPremultipliedLast);
+    [[[viewController view] layer] renderInContext:context1];
+    CGImageRef unscaledImageCG = CGBitmapContextCreateImage(context1);
     
     // Repeat process to scale image
     int scaledBitmapByteCount = scaledSize.width * scaledSize.height * 4;
-    bitmapData = malloc(scaledBitmapByteCount);
-    context = CGBitmapContextCreate(bitmapData, scaledSize.width, scaledSize.height, 8, scaledSize.width*4, colorSpace, kCGImageAlphaPremultipliedLast);
+    void *bitmapData2 = malloc(scaledBitmapByteCount);
+    CGContextRef context2 = CGBitmapContextCreate(bitmapData2, scaledSize.width, scaledSize.height, 8, scaledSize.width*4, colorSpace, kCGImageAlphaPremultipliedLast);
     CGRect scaledImageRect = CGRectMake(0.0, 0.0, scaledSize.width, scaledSize.height);
-    CGContextTranslateCTM(context, 0, scaledSize.height);
-    CGContextScaleCTM(context, 1.0, -1.0);
-    CGContextClearRect(context, scaledImageRect);
-    CGContextDrawImage(context, scaledImageRect, unscaledImageCG);
-    CGImageRef scaledImageCG = CGBitmapContextCreateImage(context);
+    CGContextTranslateCTM(context2, 0, scaledSize.height);
+    CGContextScaleCTM(context2, 1.0, -1.0);
+    CGContextClearRect(context2, scaledImageRect);
+    CGContextDrawImage(context2, scaledImageRect, unscaledImageCG);
+    CGImageRef scaledImageCG = CGBitmapContextCreateImage(context2);
     UIImage *scaledImage = [UIImage imageWithCGImage:scaledImageCG];
-    free(bitmapData);
-    CGContextRelease(context);
     CGImageRelease(scaledImageCG);
+    CGContextRelease(context2);
+    free(bitmapData2);
     CGImageRelease(unscaledImageCG);
+    viewController.view.layer.contents = nil; // Stackoverflow comment said this eliminates memory leak
+    CGContextRelease(context1);
+    free(bitmapData1);
     return scaledImage;
 }
 
@@ -259,6 +260,7 @@
     BOOL isTest = [[NSPredicate predicateWithFormat:@"SELF contains \"__TEST\""] evaluateWithObject:[url absoluteString]];
     if(isTest)
         return false;
+    int fontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     numberOfPanelsInScrollView++;
     // Render view controller into image
     switchPanelViewController *viewController = [switchPanelViewController alloc];
@@ -278,8 +280,9 @@
     [panelNameLabel setTextColor:[UIColor whiteColor]];
     [panelNameLabel setText:[viewController switchPanelName]];
     [myButton setTitle:[viewController switchPanelName] forState:UIControlStateNormal]; // Use by test code to find buttons
+    [[myButton titleLabel] setFont:[UIFont systemFontOfSize:fontSize]];
     [panelNameLabel setTextAlignment:UITextAlignmentCenter];
-    [panelNameLabel setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
+    [panelNameLabel setFont:[UIFont systemFontOfSize:fontSize]];
     [panelSelectionScrollView addSubview:panelNameLabel];
     [[self switchPanelURLDictionary] setObject:url forKey:[NSValue valueWithNonretainedObject:myButton]];
     return true;
