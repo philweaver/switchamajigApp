@@ -113,9 +113,15 @@
         id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:buttonRect];
         [myButton setBackgroundColor:[UIColor colorWithRed:r green:g blue:b alpha:a]];
-        [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
-        [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)];
         
+        // Associate different actions for the buttons depending on whether or not we're editing
+        if(editingActive) {
+            [myButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)]; 
+            [myButton addTarget:self action:@selector(onButtonSelect:) forControlEvents:(UIControlEventTouchDown)]; 
+        } else {
+            [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
+            [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)];
+        }
         // Read text for switch
         if([textNodes count]) {
             [myButton setTitle:[[textNodes objectAtIndex:0] stringValue] forState:UIControlStateNormal];
@@ -202,6 +208,10 @@
     
     // Display configuration UI
     if(editingActive) {
+        UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(onPinch:)];
+        [myView addGestureRecognizer:pinchRecognizer];
+        lastPinchScale = 1.0;
+        
         CGRect panelNameTextFieldRect = CGRectMake(50, 0, 200, 31);
         panelNameTextField = [[UITextField alloc] initWithFrame:panelNameTextFieldRect];
         [panelNameTextField setText:[self switchPanelName]];
@@ -386,6 +396,49 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         return;
     }
     [confirmDeleteButton setHidden:NO];
+}
+
+- (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event {
+    CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
+    UIControl *control = sender;
+    control.center = point;
+}
+
+- (void)onButtonSelect:(id)sender {
+    currentButton = sender;
+    // Highlight button
+    [currentButton setHighlighted:YES];
+}
+
+- (void)onPinch:(id)sender {
+    UIPinchGestureRecognizer *gestureRecognizer = sender;
+    float scale = [gestureRecognizer scale];
+    if([gestureRecognizer state] == UIGestureRecognizerStateEnded) {
+        lastPinchScale = 1.0;
+    }
+    if(currentButton == nil)
+        return;
+    if([gestureRecognizer numberOfTouches] != 2)
+        return;
+    if([gestureRecognizer state] != UIGestureRecognizerStateChanged) 
+        return;
+    
+    float relativeScale = scale / lastPinchScale;
+    lastPinchScale = scale;
+    CGPoint pt1 = [gestureRecognizer locationOfTouch:0 inView:[self view]];
+    CGPoint pt2 = [gestureRecognizer locationOfTouch:1 inView:[self view]];
+    CGRect buttonRect = [currentButton frame];
+    // Adjust either width or height depending on position of touches
+    if(fabs(pt1.x - pt2.x) > fabs(pt1.y-pt2.y)) {
+        float currentWidth = buttonRect.size.width;
+        buttonRect.size.width = currentWidth * relativeScale;
+        buttonRect.origin.x += (currentWidth - buttonRect.size.width)/2.0;
+    } else {
+        float currentHeight = buttonRect.size.height;
+        buttonRect.size.height = currentHeight * relativeScale;
+        buttonRect.origin.y += (currentHeight - buttonRect.size.height)/2.0;
+    }
+    [currentButton setFrame:buttonRect];
 }
 
 @end

@@ -16,6 +16,8 @@
     BOOL oneButtonNavigation;
     BOOL isBuiltInPanel;
     UIButton *confirmDeleteButton;
+    id currentButton;
+    float lastPinchScale;
     
     // Configuration UI
     UITextField *panelNameTextField;
@@ -28,9 +30,11 @@
 - (void)editPanel:(id)sender;
 - (void)deletePanel:(id)sender;
 - (void)savePanelToPath:(NSURL *)url;
-
 // Configuration UI
 - (void)onPanelNameChange:(id)sender;
+- (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event;
+- (void)onButtonSelect:(id)sender;
+- (void)onPinch:(id)sender;
 
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;
