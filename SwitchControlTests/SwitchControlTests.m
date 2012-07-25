@@ -5,7 +5,7 @@
 //  Created by Phil Weaver on 7/23/11.
 //  Copyright 2012 PAW Solutions. All rights reserved.
 //
-#define RUN_ALL_TESTS 0
+#define RUN_ALL_TESTS 1
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
@@ -452,7 +452,11 @@
     @autoreleasepool {
         [[NSUserDefaults standardUserDefaults] setFloat:buttonSize forKey:@"switchPanelSizePreference"];
         // Update the view, and then run the tests
-        rootViewController = [rootSwitchViewController alloc];
+        UIView *viewToRemove;
+        for(viewToRemove in [[rootViewController view] subviews])
+            [viewToRemove removeFromSuperview];
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];       
+        [rootViewController loadView];
         // Confirm text sizes
         STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
         // Make sure we don't have inappropriate overlaps
@@ -680,7 +684,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
     // Determine the next panel's default name
     NSMutableString *nextPanelName = [[NSMutableString alloc] initWithCapacity:15];
-    int i=1;
+    int i=0;
     NSURL *newFileURL;
     do {
         ++i;
