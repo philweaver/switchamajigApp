@@ -198,11 +198,14 @@
 
     // OK always to create hidden button
     confirmDeleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [confirmDeleteButton setFrame:CGRectMake(412, 704, 200, 44)];
+    [confirmDeleteButton setFrame:CGRectMake(412, 650, 200, 44)];
     [confirmDeleteButton setBackgroundImage:[[UIImage imageNamed:@"iphone_delete_button.png"] stretchableImageWithLeftCapWidth:8.0f topCapHeight:0.0f] forState:UIControlStateNormal];
     [confirmDeleteButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [confirmDeleteButton setTitle:@"Confirm Delete" forState:UIControlStateNormal];
-    [confirmDeleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside];
+    if(editingActive)
+        [confirmDeleteButton addTarget:self action:@selector(deleteSwitch:) forControlEvents:UIControlEventTouchUpInside];
+    else 
+        [confirmDeleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside];
     [confirmDeleteButton setHidden:YES];
     [myView addSubview:confirmDeleteButton];
     
@@ -212,7 +215,7 @@
         [myView addGestureRecognizer:pinchRecognizer];
         lastPinchScale = 1.0;
         
-        CGRect panelNameTextFieldRect = CGRectMake(50, 0, 200, 31);
+        CGRect panelNameTextFieldRect = CGRectMake(25, 0, 200, 44);
         panelNameTextField = [[UITextField alloc] initWithFrame:panelNameTextFieldRect];
         [panelNameTextField setText:[self switchPanelName]];
         [panelNameTextField addTarget:self action:@selector(onPanelNameChange:) forControlEvents:UIControlEventEditingDidEndOnExit];
@@ -223,6 +226,58 @@
         [panelNameTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
         [panelNameTextField setReturnKeyType:UIReturnKeyDone];
         [myView addSubview:panelNameTextField];
+        
+        // Color buttons
+        UIButton *colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [colorButton setFrame:CGRectMake(900, 704, 44, 44)];
+        [colorButton setBackgroundColor:[UIColor redColor]];
+        [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
+        [myView addSubview:colorButton];
+        colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [colorButton setFrame:CGRectMake(800, 704, 44, 44)];
+        [colorButton setBackgroundColor:[UIColor blueColor]];
+        [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
+        [myView addSubview:colorButton];
+        colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [colorButton setFrame:CGRectMake(700, 704, 44, 44)];
+        [colorButton setBackgroundColor:[UIColor greenColor]];
+        [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
+        [myView addSubview:colorButton];
+        colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [colorButton setFrame:CGRectMake(600, 704, 44, 44)];
+        [colorButton setBackgroundColor:[UIColor yellowColor]];
+        [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
+        [myView addSubview:colorButton];
+        colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [colorButton setFrame:CGRectMake(500, 704, 44, 44)];
+        [colorButton setBackgroundColor:[UIColor orangeColor]];
+        [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
+        [myView addSubview:colorButton];
+
+        UIButton *newSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [newSwitchButton setFrame:CGRectMake(350, 704, 100, 44)];
+        [newSwitchButton addTarget:self action:@selector(newSwitch:) forControlEvents:UIControlEventTouchUpInside];
+        [newSwitchButton setTitle:@"New Switch" forState:UIControlStateNormal];
+        [myView addSubview:newSwitchButton];
+
+        UIButton *deleteSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [deleteSwitchButton setFrame:CGRectMake(200, 704, 100, 44)];
+        [deleteSwitchButton addTarget:self action:@selector(deleteSwitch:) forControlEvents:UIControlEventTouchUpInside];
+        [deleteSwitchButton setTitle:@"Delete Switch" forState:UIControlStateNormal];
+        [myView addSubview:deleteSwitchButton];
+        
+        
+        CGRect switchNameTextFieldRect = CGRectMake(250, 0, 200, 44);
+        switchNameTextField = [[UITextField alloc] initWithFrame:switchNameTextFieldRect];
+        [switchNameTextField addTarget:self action:@selector(onSwitchTextChange:) forControlEvents:UIControlEventEditingDidEndOnExit];
+        [switchNameTextField setBackgroundColor:[UIColor whiteColor]];
+        [switchNameTextField setTextColor:[UIColor blackColor]];
+        [switchNameTextField setBorderStyle:UITextBorderStyleRoundedRect];
+        [switchNameTextField setFont:[UIFont systemFontOfSize:14.0f]];
+        [switchNameTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
+        [switchNameTextField setReturnKeyType:UIReturnKeyDone];
+        [myView addSubview:switchNameTextField];
+        
     }
     
 	self.view = myView;
@@ -348,6 +403,9 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         if(([buttonTitle isEqualToString:@"Back"]) || ([buttonTitle isEqualToString:@"Enable Back Button"]) || ([buttonTitle isEqualToString:@"Edit Panel"]) || ([buttonTitle isEqualToString:@"Delete Panel"]) || ([buttonTitle isEqualToString:@"Confirm Delete"])) {
             continue;  
         }
+        // Ignore buttons along the bottom - color changers, etc
+        if([button frame].origin.y > 700)
+            continue;
         [stringToSave appendString:@"\t<panelelement>\n"];
         CGRect frame = [button frame];
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<frame>%d %d %d %d</frame>\n", (int)frame.origin.x, (int)frame.origin.y, (int)frame.size.width, (int)frame.size.height]];
@@ -398,6 +456,28 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
     [confirmDeleteButton setHidden:NO];
 }
 
+- (void)deleteSwitch:(id)sender {
+    [confirmDeleteButton setHidden:YES];
+    if(currentButton == nil)
+        return;
+    if(sender == confirmDeleteButton) {
+        [currentButton removeFromSuperview];
+        return;
+    }
+    [confirmDeleteButton setHidden:NO];
+}
+
+- (void)newSwitch:(id)sender {
+    UIButton *newButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [newButton setFrame:CGRectMake(100,100,100,100)];
+    [newButton setBackgroundColor:[UIColor blueColor]];
+    [newButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)]; 
+    [newButton addTarget:self action:@selector(onButtonSelect:) forControlEvents:(UIControlEventTouchDown)]; 
+    [newButton setTitle:@"Switch" forState:UIControlStateNormal];
+    [newButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [[self view] addSubview:newButton];
+}
+
 - (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event {
     CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
     UIControl *control = sender;
@@ -408,6 +488,8 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
     currentButton = sender;
     // Highlight button
     [currentButton setHighlighted:YES];
+    // Update switch name field
+    [switchNameTextField setText:[currentButton titleForState:UIControlStateNormal]];
 }
 
 - (void)onPinch:(id)sender {
@@ -439,6 +521,20 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         buttonRect.origin.y += (currentHeight - buttonRect.size.height)/2.0;
     }
     [currentButton setFrame:buttonRect];
+}
+
+- (void)onSetColor:(id)sender {
+    if(currentButton == nil)
+        return;
+    UIButton *senderButton = sender;
+    [currentButton setBackgroundColor:[senderButton backgroundColor]];
+}
+
+- (void)onSwitchTextChange:(id)sender {
+    if(currentButton == nil)
+        return;
+    UITextField *testField = sender;
+    [currentButton setTitle:[testField text] forState:UIControlStateNormal];
 }
 
 @end

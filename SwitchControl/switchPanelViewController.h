@@ -21,6 +21,7 @@
     
     // Configuration UI
     UITextField *panelNameTextField;
+    UITextField *switchNameTextField;
 }
 - (IBAction)allowNavigation:(id)sender;
 - (IBAction)disallowNavigation:(id)sender;
@@ -34,7 +35,10 @@
 - (void)onPanelNameChange:(id)sender;
 - (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event;
 - (void)onButtonSelect:(id)sender;
-- (void)onPinch:(id)sender;
+- (void)onSetColor:(id)sender;
+- (void)onSwitchTextChange:(id)sender;
+- (void)deleteSwitch:(id)sender;
+- (void)newSwitch:(id)sender;
 
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;
