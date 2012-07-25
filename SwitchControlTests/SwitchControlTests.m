@@ -5,7 +5,7 @@
 //  Created by Phil Weaver on 7/23/11.
 //  Copyright 2012 PAW Solutions. All rights reserved.
 //
-#define RUN_ALL_TESTS 1
+#define RUN_ALL_TESTS 0
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
@@ -355,7 +355,6 @@
 }
 #endif
 
-
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
     NSArray *theSubviews = [view subviews];
     int numOverlaps = 0;
@@ -428,58 +427,88 @@
     return YES;
 }
 
-- (void)test_001_RootViewController_004_TextAndButtonSizes {
+- (void) gutsOfSizeTestWithTextSize:(float)textSize buttonSize:(float)buttonSize conditionIndex:(int)testConditionIndex {
     const int num_expected_overlaps = 2; // Highlighting overlaps one button and one text label
     const int num_expected_outofbounds = 1; // Highlighting goes outside the scroll view
-    const int numTextSizes = 3;
-    float textSizes[numTextSizes] = {15, 50, 100};
+    [[NSUserDefaults standardUserDefaults] setFloat:textSize forKey:@"textSizePreference"];
+    switch(testConditionIndex) {
+        case 0:
+            // Text size with no help, config, or scan
+            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
+            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
+            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showNetworkConfigButtonPreference"];
+            break;
+        case 1:
+            // Text size with help and config
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showHelpButtonPreference"];
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showNetworkConfigButtonPreference"];
+            break;
+        case 2:
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
+            break;
+        default:
+            STFail(@"Test condition not handled.");
+    }
+    @autoreleasepool {
+        [[NSUserDefaults standardUserDefaults] setFloat:buttonSize forKey:@"switchPanelSizePreference"];
+        // Update the view, and then run the tests
+        rootViewController = [rootSwitchViewController alloc];
+        // Confirm text sizes
+        STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+        // Make sure we don't have inappropriate overlaps
+        int numOverlaps = [SwitchControlTests numberOfSubviewOverlapsInView:[rootViewController view]];
+        STAssertTrue((numOverlaps == num_expected_overlaps), @"Overlapping views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOverlaps, num_expected_overlaps, textSize, testConditionIndex, buttonSize);
+        // Stuff should (generally) be inside its parent view
+        int numOutOfBounds = [SwitchControlTests numberOfSubviewsOutsideParents:[rootViewController view]];
+        STAssertTrue((numOutOfBounds == num_expected_outofbounds), @"Out of bounds views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOutOfBounds, num_expected_outofbounds, textSize, testConditionIndex, buttonSize);
+        NSLog(@"Test iteration complete. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+    }
+
+}
+
+- (void)test_001_RootViewController_004a_TextAndButtonSizesWithTextSize15 {
     const int numTestConditions = 3;
     const int numButtonSizes = 3;
     float buttonSizes[numButtonSizes] = {200, 100, 494};
-    for(int textSizeIndex=0; textSizeIndex < numTextSizes; ++textSizeIndex) {
-        float textSize = textSizes[textSizeIndex];
-        [[NSUserDefaults standardUserDefaults] setFloat:textSize forKey:@"textSizePreference"];
-        for(int testConditionIndex = 0; testConditionIndex < numTestConditions; ++testConditionIndex) {
-            switch(testConditionIndex) {
-                case 0:
-                    // Text size with no help, config, or scan
-                    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
-                    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
-                    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showNetworkConfigButtonPreference"];
-                    break;
-                case 1:
-                    // Text size with help and config
-                    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showHelpButtonPreference"];
-                    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showNetworkConfigButtonPreference"];
-                    break;
-                case 2:
-                    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
-                    break;
-                default:
-                    STFail(@"Test condition not handled.");
-            }
-            for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
-                float buttonSize = buttonSizes[buttonSizeIndex];
-                //NSLog(@"Test iteration start. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
-                @autoreleasepool {
-                    [[NSUserDefaults standardUserDefaults] setFloat:buttonSize forKey:@"switchPanelSizePreference"];
-                    // Update the view, and then run the tests
-                    rootViewController = [rootSwitchViewController alloc];
-                    // Confirm text sizes
-                    STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
-                    // Make sure we don't have inappropriate overlaps
-                    int numOverlaps = [SwitchControlTests numberOfSubviewOverlapsInView:[rootViewController view]];
-                    STAssertTrue((numOverlaps == num_expected_overlaps), @"Overlapping views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOverlaps, num_expected_overlaps, textSize, testConditionIndex, buttonSize);
-                    // Stuff should (generally) be inside its parent view
-                    int numOutOfBounds = [SwitchControlTests numberOfSubviewsOutsideParents:[rootViewController view]];
-                    STAssertTrue((numOutOfBounds == num_expected_outofbounds), @"Out of bounds views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOutOfBounds, num_expected_outofbounds, textSize, testConditionIndex, buttonSize);
-                    NSLog(@"Test iteration complete. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
-                }
-            }
+    float textSize = 15;
+    for(int testConditionIndex = 0; testConditionIndex < numTestConditions; ++testConditionIndex) {
+        for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
+            float buttonSize = buttonSizes[buttonSizeIndex];
+            [self gutsOfSizeTestWithTextSize:textSize buttonSize:buttonSize conditionIndex:testConditionIndex];
         }
     }
-    NSLog(@"Test 004 complete.");
+    NSLog(@"Test 004a complete.");
 }
+
+- (void)test_001_RootViewController_004b_TextAndButtonSizesWithTextSize50 {
+    const int numTestConditions = 3;
+    const int numButtonSizes = 3;
+    float buttonSizes[numButtonSizes] = {200, 100, 494};
+    float textSize = 50;
+    for(int testConditionIndex = 0; testConditionIndex < numTestConditions; ++testConditionIndex) {
+        for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
+            float buttonSize = buttonSizes[buttonSizeIndex];
+            [self gutsOfSizeTestWithTextSize:textSize buttonSize:buttonSize conditionIndex:testConditionIndex];
+        }
+    }
+    NSLog(@"Test 004b complete.");
+}
+
+- (void)test_001_RootViewController_004c_TextAndButtonSizesWithTextSize100 {
+    const int numTestConditions = 3;
+    const int numButtonSizes = 3;
+    float buttonSizes[numButtonSizes] = {200, 100, 494};
+    float textSize = 100;
+    for(int testConditionIndex = 0; testConditionIndex < numTestConditions; ++testConditionIndex) {
+        for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
+            float buttonSize = buttonSizes[buttonSizeIndex];
+            [self gutsOfSizeTestWithTextSize:textSize buttonSize:buttonSize conditionIndex:testConditionIndex];
+        }
+    }
+    NSLog(@"Test 004c complete.");
+}
+
+
 #if RUN_ALL_TESTS
 
 // Confirm that we can launch a switch panel
@@ -753,6 +782,97 @@
 }
 
 
++ (id) findEditColorButtonInView:(UIView *)superview withColor:(UIColor *)color {
+    UIView *view;
+    for(view in [superview subviews]) {
+        if(![view isKindOfClass:[UIButton class]])
+            continue;
+        CGRect frame = [view frame];
+        if(frame.origin.y != 704)
+            continue;
+        UIButton *button = (UIButton *)view;
+        if(([button buttonType] == UIButtonTypeCustom) && ([[button backgroundColor] isEqual:color]))
+            return button;
+    }
+    return nil;
+}
+
+- (void)test_002_SwitchPanelViewController_006_EditingSwitchTextAndColor {
+    // Bring up the yellow panel to edit
+    id yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    switchPanelViewController *viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController editPanel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    // Tap the button
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    id switch1 = [SwitchControlTests findSubviewOf:[viewController view] withText:@"1"];
+    [switch1 sendActionsForControlEvents:UIControlEventTouchDown];
+    // Change the switch name text
+    [viewController->switchNameTextField setText:@"frood"];
+    [viewController->switchNameTextField sendActionsForControlEvents:UIControlEventEditingDidEndOnExit];
+    // Confirm that the text changed
+    STAssertTrue([[switch1 titleForState:UIControlStateNormal] isEqualToString:@"frood"], @"Failed to set switch name");
+    // Change the color to green
+    id colorButton = [SwitchControlTests findEditColorButtonInView:[viewController view] withColor:[UIColor greenColor]];
+    [colorButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    // Verify the the switch is green
+    STAssertTrue([[switch1 backgroundColor] isEqual:[UIColor greenColor]], @"Failed to set color to green");
+    // Change the color to blue
+    colorButton = [SwitchControlTests findEditColorButtonInView:[viewController view] withColor:[UIColor blueColor]];
+    [colorButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue([[switch1 backgroundColor] isEqual:[UIColor blueColor]], @"Failed to set color to blue");
+    // Delete the panel
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController deletePanel:viewController->confirmDeleteButton];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+}
+
+- (void)test_002_SwitchPanelViewController_006_CreateAndDeleteSwitch {
+    // Bring up the yellow panel to edit
+    id yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    switchPanelViewController *viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController editPanel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+
+    // Create a new switch
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [[SwitchControlTests findSubviewOf:[viewController view] withText:@"New Switch"] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    id newSwitch = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Switch"];
+    STAssertNotNil(newSwitch, @"Failed to create new switch");
+    
+    // Tap new button
+    [newSwitch sendActionsForControlEvents:UIControlEventTouchDown];
+    
+    // Confirm delete button not visible
+    STAssertTrue([viewController->confirmDeleteButton isHidden], @"Confirm Delete Button visible before hitting delete");
+    
+    // Hit the delete button
+    [[SwitchControlTests findSubviewOf:[viewController view] withText:@"Delete Switch"] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertFalse([viewController->confirmDeleteButton isHidden], @"Confirm Delete Button not visible after hitting delete");
+    
+    // Make sure button disappears if we hit a different one
+    [newSwitch sendActionsForControlEvents:UIControlEventTouchDown];
+    STAssertTrue([viewController->confirmDeleteButton isHidden], @"Confirm Delete Button didn't disappear on hitting switch");
+    
+    // Now hit both delete and confirm
+    [[SwitchControlTests findSubviewOf:[viewController view] withText:@"Delete Switch"] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [viewController->confirmDeleteButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    
+    newSwitch = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Switch"];
+    STAssertNil(newSwitch, @"Failed to delete new switch");
+    // Delete the panel
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController deletePanel:viewController->confirmDeleteButton];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+}
 #endif
 
 #if 0

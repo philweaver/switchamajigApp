@@ -127,6 +127,7 @@
             [myButton setTitle:[[textNodes objectAtIndex:0] stringValue] forState:UIControlStateNormal];
         } 
         [myButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [[myButton titleLabel] setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
 
         // Associate the actions for pressing the button
         NSValue *value = [NSValue valueWithNonretainedObject:myButton];
@@ -234,22 +235,22 @@
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(800, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(850, 704, 44, 44)];
         [colorButton setBackgroundColor:[UIColor blueColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(700, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(800, 704, 44, 44)];
         [colorButton setBackgroundColor:[UIColor greenColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(600, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(750, 704, 44, 44)];
         [colorButton setBackgroundColor:[UIColor yellowColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(500, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(700, 704, 44, 44)];
         [colorButton setBackgroundColor:[UIColor orangeColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
@@ -440,6 +441,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 
 // Configuration UI
 - (void)onPanelNameChange:(id)sender {
+    [confirmDeleteButton setHidden:YES];
     [self setSwitchPanelName:[panelNameTextField text]];
 }
 
@@ -462,29 +464,34 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         return;
     if(sender == confirmDeleteButton) {
         [currentButton removeFromSuperview];
+        currentButton = nil;
         return;
     }
     [confirmDeleteButton setHidden:NO];
 }
 
 - (void)newSwitch:(id)sender {
+    [confirmDeleteButton setHidden:YES];
     UIButton *newButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [newButton setFrame:CGRectMake(100,100,100,100)];
+    [newButton setFrame:CGRectMake(100,100,400,200)];
     [newButton setBackgroundColor:[UIColor blueColor]];
     [newButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)]; 
     [newButton addTarget:self action:@selector(onButtonSelect:) forControlEvents:(UIControlEventTouchDown)]; 
     [newButton setTitle:@"Switch" forState:UIControlStateNormal];
     [newButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    [[newButton titleLabel] setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
     [[self view] addSubview:newButton];
 }
 
 - (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event {
+    [confirmDeleteButton setHidden:YES];
     CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
     UIControl *control = sender;
     control.center = point;
 }
 
 - (void)onButtonSelect:(id)sender {
+    [confirmDeleteButton setHidden:YES];
     currentButton = sender;
     // Highlight button
     [currentButton setHighlighted:YES];
@@ -493,6 +500,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 }
 
 - (void)onPinch:(id)sender {
+    [confirmDeleteButton setHidden:YES];
     UIPinchGestureRecognizer *gestureRecognizer = sender;
     float scale = [gestureRecognizer scale];
     if([gestureRecognizer state] == UIGestureRecognizerStateEnded) {
@@ -524,6 +532,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 }
 
 - (void)onSetColor:(id)sender {
+    [confirmDeleteButton setHidden:YES];
     if(currentButton == nil)
         return;
     UIButton *senderButton = sender;
@@ -531,6 +540,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 }
 
 - (void)onSwitchTextChange:(id)sender {
+    [confirmDeleteButton setHidden:YES];
     if(currentButton == nil)
         return;
     UITextField *testField = sender;
