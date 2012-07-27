@@ -8,6 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "SwitchControlAppDelegate.h"
+@interface SJUIButtonWithActions : UIButton 
+@property (nonatomic) NSMutableArray *activateActions;
+@property (nonatomic) NSMutableArray *deactivateActions;
+@end
+
 @interface switchPanelViewController : UIViewController{
 @public
     SwitchControlAppDelegate *appDelegate;
@@ -22,6 +27,7 @@
     // Configuration UI
     UITextField *panelNameTextField;
     UITextField *switchNameTextField;
+    UIPopoverController *actionPopover;
 }
 - (IBAction)allowNavigation:(id)sender;
 - (IBAction)disallowNavigation:(id)sender;
@@ -39,11 +45,10 @@
 - (void)onSwitchTextChange:(id)sender;
 - (void)deleteSwitch:(id)sender;
 - (void)newSwitch:(id)sender;
+- (void)defineAction:(id)sender;
 
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;
-@property (nonatomic, strong) NSMutableDictionary *activateButtonDictionary;
-@property (nonatomic, strong) NSMutableDictionary *deactivateButtonDictionary;
 @property BOOL editingActive;
 
 @end

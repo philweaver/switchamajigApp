@@ -10,11 +10,17 @@
 #import "stdio.h"
 #import "../../KissXML/KissXML/DDXMLDocument.h"
 #import "SJUIStatusMessageLabel.h"
+#import "defineActionViewController.h"
+
+@implementation SJUIButtonWithActions
+
+@synthesize activateActions;
+@synthesize deactivateActions;
+
+@end
 
 @implementation switchPanelViewController
 
-@synthesize activateButtonDictionary;
-@synthesize deactivateButtonDictionary;
 @synthesize urlToLoad;
 @synthesize switchPanelName;
 @synthesize editingActive;
@@ -48,8 +54,6 @@
     UIView *myView = [[UIView alloc] initWithFrame:cgRct];
     [myView setBackgroundColor:bgColor];
 	myView.autoresizesSubviews = YES;
-    [self setActivateButtonDictionary:[NSMutableDictionary dictionaryWithCapacity:10]]; 
-    [self setDeactivateButtonDictionary:[NSMutableDictionary dictionaryWithCapacity:10]]; 
     
     NSError *xmlError=nil, *fileError=nil;
     NSString *xmlString = [NSString stringWithContentsOfURL:urlToLoad encoding:NSUTF8StringEncoding error:&fileError];
@@ -70,11 +74,16 @@
     // Display all elements of the switch panel
     DDXMLNode *element;
     for(element in elementNodes) {
+        id myButton = [SJUIButtonWithActions buttonWithType:UIButtonTypeCustom];
         NSArray *frameNodes = [element nodesForXPath:@".//frame" error:&xmlError];
         NSArray *colorNodes = [element nodesForXPath:@".//rgbacolor" error:&xmlError];
         NSArray *textNodes = [element nodesForXPath:@".//switchtext" error:&xmlError];
-        NSArray *activateNodes = [element nodesForXPath:@".//onswitchactivate/actionsequenceondevice" error:&xmlError];
-        NSArray *deactivateNodes = [element nodesForXPath:@".//onswitchdeactivate/actionsequenceondevice" error:&xmlError];
+        NSArray *actionArray = [element nodesForXPath:@".//onswitchactivate/actionsequenceondevice" error:&xmlError];
+        [myButton setActivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
+        [[myButton activateActions] setArray:actionArray];
+        actionArray = [element nodesForXPath:@".//onswitchdeactivate/actionsequenceondevice" error:&xmlError];
+        [myButton setDeactivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
+        [[myButton deactivateActions] setArray:actionArray];
 
         // Read frame
         if([frameNodes count] <= 0) {
@@ -110,7 +119,6 @@
         if(!r_ok || !g_ok || !b_ok || !a_ok)
             continue;
         // Create the specified button
-        id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [myButton setFrame:buttonRect];
         [myButton setBackgroundColor:[UIColor colorWithRed:r green:g blue:b alpha:a]];
         
@@ -129,11 +137,6 @@
         [myButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [[myButton titleLabel] setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
 
-        // Associate the actions for pressing the button
-        NSValue *value = [NSValue valueWithNonretainedObject:myButton];
-        [[self activateButtonDictionary] setObject:activateNodes forKey:value];
-        [[self deactivateButtonDictionary] setObject:deactivateNodes forKey:value];
-        
         [myView addSubview:myButton];
     }
     
@@ -256,17 +259,28 @@
         [myView addSubview:colorButton];
 
         UIButton *newSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [newSwitchButton setFrame:CGRectMake(350, 704, 100, 44)];
+        [newSwitchButton setFrame:CGRectMake(175, 704, 100, 44)];
         [newSwitchButton addTarget:self action:@selector(newSwitch:) forControlEvents:UIControlEventTouchUpInside];
         [newSwitchButton setTitle:@"New Switch" forState:UIControlStateNormal];
         [myView addSubview:newSwitchButton];
 
         UIButton *deleteSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [deleteSwitchButton setFrame:CGRectMake(200, 704, 100, 44)];
+        [deleteSwitchButton setFrame:CGRectMake(50, 704, 100, 44)];
         [deleteSwitchButton addTarget:self action:@selector(deleteSwitch:) forControlEvents:UIControlEventTouchUpInside];
         [deleteSwitchButton setTitle:@"Delete Switch" forState:UIControlStateNormal];
         [myView addSubview:deleteSwitchButton];
         
+        UIButton *pressActionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [pressActionButton setFrame:CGRectMake(300, 704, 150, 44)];
+        [pressActionButton addTarget:self action:@selector(defineAction:) forControlEvents:UIControlEventTouchUpInside];
+        [pressActionButton setTitle:@"Action For Touch" forState:UIControlStateNormal];
+        [myView addSubview:pressActionButton];
+        
+        UIButton *releaseActionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [releaseActionButton setFrame:CGRectMake(475, 704, 150, 44)];
+        [releaseActionButton addTarget:self action:@selector(defineAction:) forControlEvents:UIControlEventTouchUpInside];
+        [releaseActionButton setTitle:@"Action For Release" forState:UIControlStateNormal];
+        [myView addSubview:releaseActionButton];
         
         CGRect switchNameTextFieldRect = CGRectMake(250, 0, 200, 44);
         switchNameTextField = [[UITextField alloc] initWithFrame:switchNameTextFieldRect];
@@ -301,8 +315,7 @@
 // Handlers for switches activated/deactivated. Send XML node information to delegate.
 - (IBAction)onSwitchActivated:(id)sender {
     [self disallowNavigation:sender];
-    NSValue *value = [NSValue valueWithNonretainedObject:sender];
-    NSArray *actions = [[self activateButtonDictionary] objectForKey:value];
+    NSArray *actions = [sender activateActions];
     if(actions == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
@@ -315,8 +328,7 @@
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
     [self disallowNavigation:sender];
-    NSValue *value = [NSValue valueWithNonretainedObject:sender];
-    NSArray *actions = [[self deactivateButtonDictionary] objectForKey:value];
+    NSArray *actions = [sender deactivateActions];
     if(actions == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
@@ -398,7 +410,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
     for(view in [panelView subviews]) {
         if(![view isKindOfClass:[UIButton class]])
             continue; // Only look at buttons
-        UIButton *button = (UIButton *)view;
+        SJUIButtonWithActions *button = (SJUIButtonWithActions *)view;
         // Don't save UI buttons
         NSString *buttonTitle = [button titleForState:UIControlStateNormal];
         if(([buttonTitle isEqualToString:@"Back"]) || ([buttonTitle isEqualToString:@"Enable Back Button"]) || ([buttonTitle isEqualToString:@"Edit Panel"]) || ([buttonTitle isEqualToString:@"Delete Panel"]) || ([buttonTitle isEqualToString:@"Confirm Delete"])) {
@@ -415,16 +427,15 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<rgbacolor>%3.1f %3.1f %3.1f %3.1f</rgbacolor>\n", r, g, b, a]];
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<switchtext>%@</switchtext>\n", [button titleForState:UIControlStateNormal]]];
         // Store actions for switch activate and deactivate
-        NSValue *value = [NSValue valueWithNonretainedObject:button];
         [stringToSave appendString:@"\t\t<onswitchactivate>\n"];
-        NSArray *actions = [[self activateButtonDictionary] objectForKey:value];
+        NSArray *actions = [button activateActions];
         DDXMLNode *action;
         for(action in actions) {
             [stringToSave appendString:[NSString stringWithFormat:@"\t\t\t%@\n", [action XMLString]]];
         }
         [stringToSave appendString:@"\t\t</onswitchactivate>\n"];
         [stringToSave appendString:@"\t\t<onswitchdeactivate>\n"];
-        actions = [[self deactivateButtonDictionary] objectForKey:value];
+        actions = [button deactivateActions];
         for(action in actions) {
             [stringToSave appendString:[NSString stringWithFormat:@"\t\t\t%@\n", [action XMLString]]];
         }
@@ -472,7 +483,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 
 - (void)newSwitch:(id)sender {
     [confirmDeleteButton setHidden:YES];
-    UIButton *newButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    SJUIButtonWithActions *newButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [newButton setFrame:CGRectMake(100,100,400,200)];
     [newButton setBackgroundColor:[UIColor blueColor]];
     [newButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)]; 
@@ -480,6 +491,8 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
     [newButton setTitle:@"Switch" forState:UIControlStateNormal];
     [newButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [[newButton titleLabel] setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
+    [newButton setActivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
+    [newButton setDeactivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
     [[self view] addSubview:newButton];
 }
 
@@ -545,6 +558,24 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         return;
     UITextField *testField = sender;
     [currentButton setTitle:[testField text] forState:UIControlStateNormal];
+}
+
+- (void)defineAction:(id)sender {
+    [confirmDeleteButton setHidden:YES];
+    if(currentButton == nil)
+        return;
+    UIButton *senderButton = sender;
+    NSArray *friendlyNames = [[appDelegate friendlyNameSwitchamajigDictionary] allKeys];
+    NSMutableArray *actions;
+    if([[senderButton titleForState:UIControlStateNormal] isEqualToString:@"Action For Touch"])
+        actions = [currentButton activateActions];
+    else {
+        actions = [currentButton deactivateActions];
+    }
+    defineActionViewController *newViewController = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:friendlyNames];
+    actionPopover = [[UIPopoverController alloc] initWithContentViewController:newViewController];
+    [actionPopover setPopoverContentSize:CGSizeMake(470, 500)];
+    [actionPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
 @end

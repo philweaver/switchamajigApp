@@ -25,6 +25,8 @@
 		AD921B01157D507A00940981 /* libSwitchamajigDriver.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B00157D507A00940981 /* libSwitchamajigDriver.a */; };
 		AD921B04157D6CA100940981 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B03157D6CA000940981 /* CFNetwork.framework */; };
 		AD921B06157D6CAC00940981 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B05157D6CAC00940981 /* Security.framework */; };
+		ADB1EE2215C0D34E003BABDC /* defineActionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */; };
+		ADB1EE2315C0D34E003BABDC /* defineActionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */; };
 		ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
 		ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF113DB539C00448025 /* Foundation.framework */; };
 		ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BF313DB539C00448025 /* CoreGraphics.framework */; };
@@ -88,6 +90,8 @@
 		AD921B00157D507A00940981 /* libSwitchamajigDriver.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSwitchamajigDriver.a; path = "../SwitchamajigDriver/build/Release-iphoneos/libSwitchamajigDriver.a"; sourceTree = "<group>"; };
 		AD921B03157D6CA000940981 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		AD921B05157D6CAC00940981 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		ADB1EE2015C0D34E003BABDC /* defineActionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defineActionViewController.h; sourceTree = "<group>"; };
+		ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = defineActionViewController.m; sourceTree = "<group>"; };
 		ADB75BEB13DB539C00448025 /* SwitchControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitchControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADB75BEF13DB539C00448025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		ADB75BF113DB539C00448025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -209,6 +213,8 @@
 		ADB75BF513DB539C00448025 /* SwitchControl */ = {
 			isa = PBXGroup;
 			children = (
+				ADB1EE2015C0D34E003BABDC /* defineActionViewController.h */,
+				ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */,
 				ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */,
 				ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */,
 				ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */,
@@ -401,6 +407,7 @@
 				AD86623414B567AB00C5860D /* configViewController.m in Sources */,
 				AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */,
 				ADD3AEC3158D22CA0067602A /* SJUIStatusMessageLabel.m in Sources */,
+				ADB1EE2215C0D34E003BABDC /* defineActionViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,6 +416,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ADB75C1A13DB539C00448025 /* SwitchControlTests.m in Sources */,
+				ADB1EE2315C0D34E003BABDC /* defineActionViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
