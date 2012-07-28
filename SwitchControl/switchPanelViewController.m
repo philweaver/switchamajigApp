@@ -74,7 +74,7 @@
     // Display all elements of the switch panel
     DDXMLNode *element;
     for(element in elementNodes) {
-        id myButton = [SJUIButtonWithActions buttonWithType:UIButtonTypeCustom];
+        SJUIButtonWithActions *myButton = [SJUIButtonWithActions buttonWithType:UIButtonTypeCustom];
         NSArray *frameNodes = [element nodesForXPath:@".//frame" error:&xmlError];
         NSArray *colorNodes = [element nodesForXPath:@".//rgbacolor" error:&xmlError];
         NSArray *textNodes = [element nodesForXPath:@".//switchtext" error:&xmlError];
@@ -483,7 +483,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 
 - (void)newSwitch:(id)sender {
     [confirmDeleteButton setHidden:YES];
-    SJUIButtonWithActions *newButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    SJUIButtonWithActions *newButton = [SJUIButtonWithActions buttonWithType:UIButtonTypeCustom];
     [newButton setFrame:CGRectMake(100,100,400,200)];
     [newButton setBackgroundColor:[UIColor blueColor]];
     [newButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)]; 

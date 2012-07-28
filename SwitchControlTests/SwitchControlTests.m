@@ -49,15 +49,12 @@
 @implementation SwitchControlTests
 
 - (void) reloadRootViewController {
-    // Initialize the root view controller
-    [app_delegate setNavigationController:[[UINavigationController alloc] initWithRootViewController:[[rootSwitchViewController alloc] initWithNibName:nil bundle:nil]]];
-    [[app_delegate window] setRootViewController: [app_delegate navigationController]];
-    [app_delegate.window makeKeyAndVisible];  
-    UIView *newView = [rootViewController view];
-    newView = newView;
-    nav_controller = [app_delegate navigationController];
-    rootViewController = [[nav_controller viewControllers] objectAtIndex:0];
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
+    // Update the view, and then run the tests
+    UIView *viewToRemove;
+    for(viewToRemove in [[rootViewController view] subviews])
+        [viewToRemove removeFromSuperview];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];       
+    [rootViewController loadView];
 }
 
 - (void)setUp
@@ -353,7 +350,6 @@
     selectFrame = [[rootViewController selectButton] frame];
     STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
 }
-#endif
 
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
     NSArray *theSubviews = [view subviews];
@@ -512,8 +508,6 @@
     NSLog(@"Test 004c complete.");
 }
 
-
-#if RUN_ALL_TESTS
 
 // Confirm that we can launch a switch panel
 - (void)test_001_RootViewController_005_LaunchSwitchPanel {
@@ -834,8 +828,9 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
+#endif
 
-- (void)test_002_SwitchPanelViewController_006_CreateAndDeleteSwitch {
+- (void)test_002_SwitchPanelViewController_007_CreateAndDeleteSwitch {
     // Bring up the yellow panel to edit
     id yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
     [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
@@ -877,6 +872,8 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
+#if RUN_ALL_TESTS
+
 #endif
 
 #if 0
