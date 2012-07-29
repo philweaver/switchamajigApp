@@ -205,16 +205,18 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
 
 // UIPickerViewDelegate
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    if((row == 1) || (row == 2)) {
-        // Display the switch number buttons
-        for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
-        {
-            [switchButtons[i] setHidden:NO];
-        }
-    } else {
-        for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
-        {
-            [switchButtons[i] setHidden:YES];
+    if(component == 1) {
+        if((row == 1) || (row == 2)) {
+            // Display the switch number buttons
+            for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
+            {
+                [switchButtons[i] setHidden:NO];
+            }
+        } else {
+            for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
+            {
+                [switchButtons[i] setHidden:YES];
+            }
         }
     }
     [self updateActions];

@@ -8,6 +8,7 @@
 #define RUN_ALL_TESTS 1
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
+#import "defineActionViewController.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -828,7 +829,6 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
-#endif
 
 - (void)test_002_SwitchPanelViewController_007_CreateAndDeleteSwitch {
     // Bring up the yellow panel to edit
@@ -872,9 +872,158 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
-#if RUN_ALL_TESTS
 
+- (void)test_002_SwitchPanelViewController_008_DefineActions {
+    // Bring up the yellow panel to edit
+    id yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    switchPanelViewController *viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController editPanel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];    
+    // Tap the button
+    yellowButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"1"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchDown];
+    // Tap the actionForTouch button
+    id touchActionButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Action For Touch"];
+    [touchActionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    // Verify that the defineAction panel launched
+    STAssertTrue([viewController->actionPopover isPopoverVisible], @"Popover did not display for 'Action For Touch'");
+    // Confirm that the panel is configured to change the action sequence for the button
+    defineActionViewController *defineActionVC = (defineActionViewController *) [viewController->actionPopover contentViewController];
+    STAssertTrue([defineActionVC actions] == [yellowButton activateActions], @"Actions for touch not set properly");
+    // Dismiss the popover
+    [viewController->actionPopover dismissPopoverAnimated:NO];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    // Tap the actionForRelease button
+    id releaseActionButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Action For Release"];
+    [releaseActionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    // Verify that the defineAction panel launched
+    STAssertTrue([viewController->actionPopover isPopoverVisible], @"Popover did not display for 'Action For Release'");
+    // Confirm that the panel is configured to change the action sequence for the button
+    defineActionVC = (defineActionViewController *) [viewController->actionPopover contentViewController];
+    STAssertTrue([defineActionVC actions] == [yellowButton deactivateActions], @"Actions for release not set properly");
+    // Clean up
+    [viewController->actionPopover dismissPopoverAnimated:NO];
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController deletePanel:viewController->confirmDeleteButton];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+}
+
+- (void)test_003_defineActionViewController_001_Initialization {
+    // Create and initialize with no friendly names or actions
+    NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
+    NSMutableArray *names = [[NSMutableArray alloc] initWithCapacity:5];
+    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    // Confirm that currently have only "Default", and that "No Action" is selected
+    [defineVC loadView];
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 1, @"With no friendly names, defineActionPicker should show only one value: 'Default'");
+    STAssertTrue([defineVC->actionPicker selectedRowInComponent:0] == 0, @"Default value not selected when no friendly names");
+    STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:0 forComponent:0] isEqualToString:@"Default"], @"With no friendly names, defineActionPicker should show only one value: 'Default'");
+    STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"No Action"], @"Must show 'No Action' when none defined in XML");
+    for(int i=0; i < 6; ++i) {
+        STAssertTrue([defineVC->switchButtons[i] isHidden], @"Switch buttons not hidden for no action");
+    }
+
+    // Add a couple of names to the friendly list, and create a "switch on" action
+    [names addObject:@"hoopy"];
+    [names addObject:@"frood"];
+    NSString *xmlString = @"<actionsequenceondevice><friendlyname>Default</friendlyname> <actionsequence> <turnSwitchesOn>1 3</turnSwitchesOn> </actionsequence></actionsequenceondevice>";
+    DDXMLDocument *document = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:nil];
+    [actions addObject:[[document children] objectAtIndex:0]];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    [defineVC loadView];
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 3, @"With two friendly names, must have three values in picker including 'Default'");
+    STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:0] forComponent:0] isEqualToString:@"Default"], @"Friendly name 'Default' not selected as specified in xml");
+    STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"Turn Switches On"], @"'Turn Switches On' action not selected when in action sequence");
+    int switchMask = 0;
+    for(int i=0; i < 6; ++i) {
+        STAssertFalse([defineVC->switchButtons[i] isHidden], @"Switch buttons hidden for switches on");
+        if([[defineVC->switchButtons[i] backgroundColor] isEqual:[UIColor redColor]]) 
+            switchMask |= (1 << i);
+    }
+    STAssertTrue(switchMask == 5, @"Switch mask wrong for turn switches on. Should be 5 instead is %d", switchMask);
+    
+    // Repeat for turn switches off
+    xmlString = @"<actionsequenceondevice><friendlyname>frood</friendlyname> <actionsequence> <turnSwitchesOff>2 4 5 6</turnSwitchesOff> </actionsequence></actionsequenceondevice>";
+    document = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:nil];
+    [actions removeAllObjects];
+    [actions addObject:[[document children] objectAtIndex:0]];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    [defineVC loadView];
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 3, @"With two friendly names, must have three values in picker including 'Default'");
+    STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:0] forComponent:0] isEqualToString:@"frood"], @"Friendly name 'frood' not selected as specified in xml");
+    STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"Turn Switches Off"], @"'Turn Switches Off' action not selected when in action sequence");
+    switchMask = 0;
+    for(int i=0; i < 6; ++i) {
+        STAssertFalse([defineVC->switchButtons[i] isHidden], @"Switch buttons hidden for switches on");
+        if([[defineVC->switchButtons[i] backgroundColor] isEqual:[UIColor redColor]]) 
+            switchMask |= (1 << i);
+    }
+    STAssertTrue(switchMask == 58, @"Switch mask wrong for turn switches on. Should be 58 instead is %d", switchMask);
+
+    // Confirm that complex action sequence is interpreted as no action
+    xmlString = @"<actionsequenceondevice><friendlyname>frood</friendlyname> <actionsequence> <delay>1.0</delay><turnSwitchesOff>2 4 5 6</turnSwitchesOff> </actionsequence></actionsequenceondevice>";
+    document = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:nil];
+    [actions removeAllObjects];
+    [actions addObject:[[document children] objectAtIndex:0]];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    [defineVC loadView];
+    STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"No Action"], @"Must show 'No Action' when XML command is complex");
+}
 #endif
+
+- (void)test_003_defineActionViewController_002_UpdateNoActionAndSwitches {
+    // Create and initialize with no friendly names or actions
+    NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
+    NSMutableArray *names = [[NSMutableArray alloc] initWithCapacity:5];
+    [names addObject:@"hoopy"];
+    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    [defineVC loadView];
+    // Select Default and no action
+    [defineVC->actionPicker selectRow:0 inComponent:0 animated:NO];
+    [defineVC->actionPicker selectRow:0 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:0 inComponent:1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    // There should now be an action
+    STAssertTrue([actions count], @"Actions count isn't 1 with default sjig and no action");
+    NSString *expectedAction = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence></actionsequence></actionsequenceondevice>";
+    NSString *actionString = [[actions objectAtIndex:0] XMLString];
+    STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for noaction. Expected %@ but got %@", expectedAction, actionString);
+    // Select different switchamajig and the turnswitcheson
+    [defineVC->actionPicker selectRow:1 inComponent:0 animated:NO];
+    [defineVC->actionPicker selectRow:1 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:1 inComponent:1];
+    actionString = [[actions objectAtIndex:0] XMLString];
+    expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOn></turnSwitchesOn></actionsequence></actionsequenceondevice>";
+    STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitcheson with no switches. Expected %@ but got %@", expectedAction, actionString);
+    // Set a couple of switches
+    [defineVC->switchButtons[0] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [defineVC->switchButtons[4] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    actionString = [[actions objectAtIndex:0] XMLString];
+    expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOn>1 5 </turnSwitchesOn></actionsequence></actionsequenceondevice>";
+    STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitcheson with switches 1 and 4. Expected %@ but got %@", expectedAction, actionString);
+    [defineVC->actionPicker selectRow:2 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:2 inComponent:1];
+    actionString = [[actions objectAtIndex:0] XMLString];
+    expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOff>1 5 </turnSwitchesOff></actionsequence></actionsequenceondevice>";
+    STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitchesoff with switches 1 and 4. Expected %@ but got %@", expectedAction, actionString);
+    // Change switch selection
+    [defineVC->switchButtons[0] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [defineVC->switchButtons[1] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [defineVC->switchButtons[5] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    actionString = [[actions objectAtIndex:0] XMLString];
+    expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOff>2 5 6 </turnSwitchesOff></actionsequence></actionsequenceondevice>";
+    STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitchesoff with switches 2, 5, and 6. Expected %@ but got %@", expectedAction, actionString);
+}
 
 #if 0
 // Implement this once configuration working

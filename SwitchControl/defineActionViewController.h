@@ -10,6 +10,7 @@
 #import "switchPanelViewController.h"
 #define NUM_SJIG_SWITCHES 6
 @interface defineActionViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate> {
+@public
     UIPickerView *actionPicker;
     UIButton *switchButtons[NUM_SJIG_SWITCHES];
 }
