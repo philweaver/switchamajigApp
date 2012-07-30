@@ -322,6 +322,8 @@
     STAssertNotNil([rootViewController selectButton], @"Scan Button nil when scanning enabled");
 }
 
+#if 0
+// Scanning not supported
 - (void)test_001_RootViewController_003_ScanningOptions
 {
     // Enable scanning, select button on left and green, scan button yellow
@@ -351,7 +353,7 @@
     selectFrame = [[rootViewController selectButton] frame];
     STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
 }
-
+#endif
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
     NSArray *theSubviews = [view subviews];
     int numOverlaps = 0;
@@ -482,7 +484,7 @@
 }
 
 - (void)test_001_RootViewController_004b_TextAndButtonSizesWithTextSize50 {
-    const int numTestConditions = 3;
+    const int numTestConditions = 2; // Was 3 for scanning
     const int numButtonSizes = 3;
     float buttonSizes[numButtonSizes] = {200, 100, 494};
     float textSize = 50;

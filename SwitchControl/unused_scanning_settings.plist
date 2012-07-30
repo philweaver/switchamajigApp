@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Type</key>
+	<string>PSGroupSpecifier</string>
+	<key>Title</key>
+	<string>Scanning</string>
+	<key>New item</key>
+	<dict>
+		<key>Type</key>
+		<string>PSToggleSwitchSpecifier</string>
+		<key>Title</key>
+		<string>Enable Scanning</string>
+		<key>Key</key>
+		<string>enableScanningPreference</string>
+		<key>DefaultValue</key>
+		<false/>
+	</dict>
+	<key>New item - 2</key>
+	<dict>
+		<key>Type</key>
+		<string>PSMultiValueSpecifier</string>
+		<key>Title</key>
+		<string>Scan Button Color</string>
+		<key>Key</key>
+		<string>scanButtonColorPreference</string>
+		<key>DefaultValue</key>
+		<real>0</real>
+		<key>Values</key>
+		<array>
+			<integer>0</integer>
+			<integer>1</integer>
+			<integer>2</integer>
+			<integer>3</integer>
+			<integer>4</integer>
+		</array>
+		<key>Titles</key>
+		<array>
+			<string>Green</string>
+			<string>Red</string>
+			<string>Blue</string>
+			<string>Yellow</string>
+			<string>Orange</string>
+		</array>
+	</dict>
+	<key>New item - 3</key>
+	<dict>
+		<key>Type</key>
+		<string>PSMultiValueSpecifier</string>
+		<key>Title</key>
+		<string>Select Button Color</string>
+		<key>Key</key>
+		<string>selectButtonColorPreference</string>
+		<key>DefaultValue</key>
+		<integer>1</integer>
+		<key>Values</key>
+		<array>
+			<integer>0</integer>
+			<integer>1</integer>
+			<integer>2</integer>
+			<integer>3</integer>
+			<integer>4</integer>
+		</array>
+		<key>Titles</key>
+		<array>
+			<string>Green</string>
+			<string>Red</string>
+			<string>Blue</string>
+			<string>Yellow</string>
+			<string>Orange</string>
+		</array>
+	</dict>
+	<key>New item - 4</key>
+	<dict>
+		<key>Type</key>
+		<string>PSMultiValueSpecifier</string>
+		<key>Title</key>
+		<string>Select Button On</string>
+		<key>Key</key>
+		<string>selectButtonOnLeftPreference</string>
+		<key>DefaultValue</key>
+		<integer>1</integer>
+		<key>Values</key>
+		<array>
+			<integer>0</integer>
+			<integer>1</integer>
+		</array>
+		<key>Titles</key>
+		<array>
+			<string>Right</string>
+			<string>Left</string>
+		</array>
+	</dict>
+</dict>
+</plist>

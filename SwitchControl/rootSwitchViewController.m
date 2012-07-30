@@ -56,7 +56,7 @@
     [[NSUserDefaults standardUserDefaults] setFloat:494 forKey:@"switchPanelSizePreference"];
 #endif
     panelButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
-    bool scanning = [[NSUserDefaults standardUserDefaults] integerForKey:@"enableScanningPreference"];
+    bool scanning = false; // [[NSUserDefaults standardUserDefaults] integerForKey:@"enableScanningPreference"];
     int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
     [[self view] setBackgroundColor:[UIColor blackColor]];
