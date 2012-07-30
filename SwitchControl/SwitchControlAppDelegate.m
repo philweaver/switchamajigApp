@@ -507,7 +507,9 @@ char *commands[] = {
         return;
     }
     if([listener isKindOfClass:[SwitchamajigControllerDeviceListener class]]) {
-        driver = [SwitchamajigControllerDeviceDriver alloc];
+        SwitchamajigControllerDeviceDriver *sjcdriver = [SwitchamajigControllerDeviceDriver alloc];
+        [sjcdriver setUseUDP:[[NSUserDefaults standardUserDefaults] boolForKey:@"useUDPWithSwitchamajigControllerPreference"]];
+        driver = sjcdriver;
     }
     else {
         // Unrecognized
