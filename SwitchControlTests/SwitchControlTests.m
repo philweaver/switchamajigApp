@@ -294,10 +294,11 @@
 
     //[rootViewController viewWillAppear:YES];
     STAssertTrue(nav_controller.navigationBarHidden, @"Navigation bar not hidden in root view after help.");
-    // Confirm that help button does not appear when scanning enabled
+    /* Confirm that help button does not appear when scanning enabled
+    Scanning disabled
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
     [self reloadRootViewController];
-    STAssertNil([rootViewController helpButton], @"Scan Button nil when scanning enabled");
+    STAssertNil([rootViewController helpButton], @"Scan Button nil when scanning enabled"); */
     // Confirm that help button does not appear when preference say not to
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showHelpButtonPreference"];
@@ -306,6 +307,8 @@
 
 }
 
+#if 0
+// Scanning not supported
 - (void)test_001_RootViewController_002_ScanningEnabled
 {
     // Disable scanning
@@ -322,8 +325,6 @@
     STAssertNotNil([rootViewController selectButton], @"Scan Button nil when scanning enabled");
 }
 
-#if 0
-// Scanning not supported
 - (void)test_001_RootViewController_003_ScanningOptions
 {
     // Enable scanning, select button on left and green, scan button yellow
@@ -789,7 +790,7 @@
         if(![view isKindOfClass:[UIButton class]])
             continue;
         CGRect frame = [view frame];
-        if(frame.origin.y != 704)
+        if(frame.origin.x != 980)
             continue;
         UIButton *button = (UIButton *)view;
         if(([button buttonType] == UIButtonTypeCustom) && ([[button backgroundColor] isEqual:color]))
@@ -916,7 +917,67 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
+#endif
 
+- (void)test_002_SwitchPanelViewController_009_ImagesOnSwitch {
+    // Bring up the yellow panel to edit
+    SJUIButtonWithActions *yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    switchPanelViewController *viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController editPanel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];    
+    // Tap the button
+    yellowButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"1"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchDown];
+
+    // Determine the next panel's default name
+    NSMutableString *nextImageName = [[NSMutableString alloc] initWithCapacity:15];
+    int i=0;
+    NSURL *newFileURL;
+    do {
+        ++i;
+        [nextImageName setString:[NSString stringWithFormat:@"Image %d", i]];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.jpg", nextImageName]]];
+    } while ([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]]);
+    
+    // Create an image and prepare to send it to the image picker delegate method
+    UIImage *testImage = [UIImage imageNamed:@"iphone_delete_button.png"];
+    NSDictionary *testImageDictionary = [NSDictionary dictionaryWithObject:testImage forKey:UIImagePickerControllerEditedImage];
+    [viewController imagePickerController:nil didFinishPickingMediaWithInfo:testImageDictionary];
+    
+    // Confirm that the URL now exists
+    STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ does not exist after adding image to button", [newFileURL path]);
+    // Confirm that the URL is in the button
+    STAssertTrue([[yellowButton imageFilePath] isEqualToString:[newFileURL path]], @"New image path %@ does not match button URL %@", [yellowButton imageFilePath], newFileURL);
+    
+    // Delete the switch
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchDown];
+    [viewController deleteSwitch:viewController->confirmDeleteButton];
+    // Confirm that the URL disappeared
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ still exists after deleting button", [newFileURL path]);
+    
+    // Create a new switch
+    [viewController newSwitch:nil];
+    SJUIButtonWithActions *newButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Switch"];    
+    [newButton sendActionsForControlEvents:UIControlEventTouchDown];
+    [viewController imagePickerController:nil didFinishPickingMediaWithInfo:testImageDictionary];
+    STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ did not reappear after adding image to new button", [newFileURL path]);
+    
+    // Delete the panel
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController deletePanel:viewController->confirmDeleteButton];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ did not get deleted when deleting panel", [newFileURL path]);
+}
+
+
+#if RUN_ALL_TESTS
 - (void)test_003_defineActionViewController_001_Initialization {
     // Create and initialize with no friendly names or actions
     NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
@@ -981,7 +1042,6 @@
     [defineVC loadView];
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"No Action"], @"Must show 'No Action' when XML command is complex");
 }
-#endif
 
 - (void)test_003_defineActionViewController_002_UpdateNoActionAndSwitches {
     // Create and initialize with no friendly names or actions
@@ -1026,6 +1086,7 @@
     expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOff>2 5 6 </turnSwitchesOff></actionsequence></actionsequenceondevice>";
     STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitchesoff with switches 2, 5, and 6. Expected %@ but got %@", expectedAction, actionString);
 }
+#endif
 
 #if 0
 // Implement this once configuration working

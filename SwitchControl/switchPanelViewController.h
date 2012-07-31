@@ -11,9 +11,10 @@
 @interface SJUIButtonWithActions : UIButton 
 @property (nonatomic) NSMutableArray *activateActions;
 @property (nonatomic) NSMutableArray *deactivateActions;
+@property NSString *imageFilePath;
 @end
 
-@interface switchPanelViewController : UIViewController{
+@interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
 @public
     SwitchControlAppDelegate *appDelegate;
     id backButton;
@@ -21,13 +22,14 @@
     BOOL oneButtonNavigation;
     BOOL isBuiltInPanel;
     UIButton *confirmDeleteButton;
-    id currentButton;
+    SJUIButtonWithActions *currentButton;
     float lastPinchScale;
     
     // Configuration UI
     UITextField *panelNameTextField;
     UITextField *switchNameTextField;
     UIPopoverController *actionPopover;
+    UIPopoverController *imagePopover;
 }
 - (IBAction)allowNavigation:(id)sender;
 - (IBAction)disallowNavigation:(id)sender;
@@ -46,6 +48,7 @@
 - (void)deleteSwitch:(id)sender;
 - (void)newSwitch:(id)sender;
 - (void)defineAction:(id)sender;
+- (void)chooseImage:(id)sender;
 
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;

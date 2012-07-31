@@ -16,7 +16,7 @@
 
 @synthesize activateActions;
 @synthesize deactivateActions;
-
+@synthesize imageFilePath;
 @end
 
 @implementation switchPanelViewController
@@ -79,6 +79,7 @@
         NSArray *colorNodes = [element nodesForXPath:@".//rgbacolor" error:&xmlError];
         NSArray *textNodes = [element nodesForXPath:@".//switchtext" error:&xmlError];
         NSArray *actionArray = [element nodesForXPath:@".//onswitchactivate/actionsequenceondevice" error:&xmlError];
+        NSArray *imageNodes = [element nodesForXPath:@".//image" error:&xmlError];
         [myButton setActivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
         [[myButton activateActions] setArray:actionArray];
         actionArray = [element nodesForXPath:@".//onswitchdeactivate/actionsequenceondevice" error:&xmlError];
@@ -103,6 +104,14 @@
             continue;
         CGRect buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
 
+        // Image
+        if([imageNodes count]) {
+            NSString *imageNodePath = [[imageNodes objectAtIndex:0] stringValue];
+            [myButton setImageFilePath:imageNodePath];
+            UIImage *image = [UIImage imageWithContentsOfFile:imageNodePath];
+            [myButton setBackgroundImage:image forState:UIControlStateNormal];
+        }
+        
         // Read color
         if([colorNodes count] <= 0) {
             NSLog(@"No color found.\n");
@@ -233,27 +242,27 @@
         
         // Color buttons
         UIButton *colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(900, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 704, 44, 44)];
         [colorButton setBackgroundColor:[UIColor redColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(850, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 654, 44, 44)];
         [colorButton setBackgroundColor:[UIColor blueColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(800, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 604, 44, 44)];
         [colorButton setBackgroundColor:[UIColor greenColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(750, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 554, 44, 44)];
         [colorButton setBackgroundColor:[UIColor yellowColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(700, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 504, 44, 44)];
         [colorButton setBackgroundColor:[UIColor orangeColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
@@ -281,6 +290,12 @@
         [releaseActionButton addTarget:self action:@selector(defineAction:) forControlEvents:UIControlEventTouchUpInside];
         [releaseActionButton setTitle:@"Action For Release" forState:UIControlStateNormal];
         [myView addSubview:releaseActionButton];
+        
+        UIButton *chooseImageButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [chooseImageButton setFrame:CGRectMake(650, 704, 150, 44)];
+        [chooseImageButton addTarget:self action:@selector(chooseImage:) forControlEvents:UIControlEventTouchUpInside];
+        [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
+        [myView addSubview:chooseImageButton];
         
         CGRect switchNameTextFieldRect = CGRectMake(250, 0, 200, 44);
         switchNameTextField = [[UITextField alloc] initWithFrame:switchNameTextFieldRect];
@@ -362,13 +377,13 @@
     }
 }
 
-NSURL *GetURLWithNoConflictWithName(NSString *name);
-NSURL *GetURLWithNoConflictWithName(NSString *name) {
+NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension);
+NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     unsigned int i=0;
     NSURL *newFileURL;
     do {
         ++i;
-        NSString *fileName = [NSString stringWithFormat:@"%@ %d.xml", name, i];
+        NSString *fileName = [NSString stringWithFormat:@"%@ %d.%@", name, i, extension];
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:fileName]];
@@ -380,7 +395,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 - (void)editPanel:(id)sender {
     // If this is a built-in panel, save it to a new file that we'll edit
     if(isBuiltInPanel) {
-        urlToLoad = GetURLWithNoConflictWithName(@"Panel");
+        urlToLoad = GetURLWithNoConflictWithName(@"Panel", @"xml");
         // Create a new name for the panel
         [self setSwitchPanelName:[[urlToLoad lastPathComponent] stringByDeletingPathExtension]];
         [self savePanelToPath:urlToLoad];
@@ -416,8 +431,10 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         if(([buttonTitle isEqualToString:@"Back"]) || ([buttonTitle isEqualToString:@"Enable Back Button"]) || ([buttonTitle isEqualToString:@"Edit Panel"]) || ([buttonTitle isEqualToString:@"Delete Panel"]) || ([buttonTitle isEqualToString:@"Confirm Delete"])) {
             continue;  
         }
-        // Ignore buttons along the bottom - color changers, etc
+        // Ignore buttons along the bottom and on the right - color changers, etc
         if([button frame].origin.y > 700)
+            continue;
+        if([button frame].origin.x > 950)
             continue;
         [stringToSave appendString:@"\t<panelelement>\n"];
         CGRect frame = [button frame];
@@ -426,6 +443,9 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         [[button backgroundColor] getRed:&r green:&g blue:&b alpha:&a];
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<rgbacolor>%3.1f %3.1f %3.1f %3.1f</rgbacolor>\n", r, g, b, a]];
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<switchtext>%@</switchtext>\n", [button titleForState:UIControlStateNormal]]];
+        if([button imageFilePath]) {
+            [stringToSave appendString:[NSString stringWithFormat:@"\t\t<image>%@</image>\n", [button imageFilePath]]];
+        }
         // Store actions for switch activate and deactivate
         [stringToSave appendString:@"\t\t<onswitchactivate>\n"];
         NSArray *actions = [button activateActions];
@@ -463,6 +483,14 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
         if(fileError) {
             NSLog(@"Error deleting panel. Url = %@, error = %@", urlToLoad, fileError);
         }
+        // Clean up after each switch - particularly images
+        UIView *thisView;
+        for(thisView in [[self view] subviews]) {
+            if([thisView isKindOfClass:[SJUIButtonWithActions class]]) {
+                currentButton = (SJUIButtonWithActions *) thisView;
+                [self deleteSwitch:confirmDeleteButton];
+            }
+        }
         [self.navigationController popViewControllerAnimated:YES];
         return;
     }
@@ -470,10 +498,20 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
 }
 
 - (void)deleteSwitch:(id)sender {
-    [confirmDeleteButton setHidden:YES];
+    if(confirmDeleteButton != nil) 
+        [confirmDeleteButton setHidden:YES];
     if(currentButton == nil)
         return;
+    if(![currentButton isKindOfClass:[SJUIButtonWithActions class]]) {
+        NSLog(@"deleteSwitch: currentButton is not nil but also not a SJUIButtonWithActions");
+        return;
+    }
     if(sender == confirmDeleteButton) {
+        // Remove any image file this button references
+        NSError *fileError;
+        [[NSFileManager defaultManager] removeItemAtPath:[currentButton imageFilePath] error:&fileError];
+        if(fileError)
+            NSLog(@"Error deleting image at %@: %@", [currentButton imageFilePath], fileError);
         [currentButton removeFromSuperview];
         currentButton = nil;
         return;
@@ -578,4 +616,42 @@ NSURL *GetURLWithNoConflictWithName(NSString *name) {
     [actionPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
+- (void)chooseImage:(id)sender {
+    [confirmDeleteButton setHidden:YES];
+    if(currentButton == nil)
+        return;
+    if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary])
+        return;
+    UIImagePickerController *mediaUI = [[UIImagePickerController alloc] init];
+    mediaUI.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+    mediaUI.allowsEditing = YES;
+    mediaUI.delegate = self;
+    imagePopover = [[UIPopoverController alloc] initWithContentViewController:mediaUI];
+    [imagePopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    
+}
+
+- (void) imagePickerController: (UIImagePickerController *) picker didFinishPickingMediaWithInfo: (NSDictionary *) info {
+    UIImage *imageToUse;
+    UIImage *editedImage = (UIImage *) [info objectForKey:
+                               UIImagePickerControllerEditedImage];
+    UIImage *originalImage = (UIImage *) [info objectForKey:
+                                 UIImagePickerControllerOriginalImage];
+    if (editedImage) {
+        imageToUse = editedImage;
+    } else {
+        imageToUse = originalImage;
+    }
+    
+    [currentButton setBackgroundImage:imageToUse forState:UIControlStateNormal];
+    // Choose a file name for the image and assign it to the button
+    NSURL *imageURL = GetURLWithNoConflictWithName(@"Image", @"jpg");
+    [currentButton setImageFilePath:[imageURL path]];
+    NSData *imageData = UIImageJPEGRepresentation(imageToUse, 0.9);
+    [imageData writeToURL:imageURL atomically:YES]; 
+}
+
+- (void) imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [imagePopover dismissPopoverAnimated:YES];
+}
 @end

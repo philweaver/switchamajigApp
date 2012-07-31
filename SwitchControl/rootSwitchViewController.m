@@ -260,6 +260,10 @@
     BOOL isTest = [[NSPredicate predicateWithFormat:@"SELF contains \"__TEST\""] evaluateWithObject:[url absoluteString]];
     if(isTest)
         return false;
+    // Only do xml files
+    BOOL isXml = [[NSPredicate predicateWithFormat:@"SELF contains \".xml\""] evaluateWithObject:[url absoluteString]];
+    if(!isXml)
+        return false;
     int fontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     numberOfPanelsInScrollView++;
     // Render view controller into image
@@ -321,7 +325,9 @@
     for(filename in DocumentDirectoryContents) {
         NSString *fullpath = [documentsDirectory stringByAppendingPathComponent:filename];
         url = [NSURL fileURLWithPath:fullpath];
-        [self addPanelButtonToScrollViewFromUrl:url atOrigin:CGPointMake(current_button_x, current_button_y) withButtonSize:CGSizeMake(selectButtonWidth, panelButtonHeight) andTextSize:textSize];
+        bool success = [self addPanelButtonToScrollViewFromUrl:url atOrigin:CGPointMake(current_button_x, current_button_y) withButtonSize:CGSizeMake(selectButtonWidth, panelButtonHeight) andTextSize:textSize];
+        if(!success)
+            continue;
         current_button_y += panelButtonHeight + textSize.height + button_spacing;
         if(current_button_y + panelButtonHeight + textSize.height >= [panelSelectionScrollView bounds].size.height) {
             current_button_y = 0;

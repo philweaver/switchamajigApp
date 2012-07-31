@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0012991455E28D00BBEE91 /* switchamajig_50.png */; };
 		AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD00129A1455E28D00BBEE91 /* switchamajig_72.png */; };
+		AD09604E15C728A4003F4212 /* unused_scanning_settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */; };
 		AD17D5EE1573521E0080A828 /* libKissXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD17D5ED1573521E0080A828 /* libKissXML.a */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
@@ -70,6 +71,7 @@
 /* Begin PBXFileReference section */
 		AD0012991455E28D00BBEE91 /* switchamajig_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_50.png; sourceTree = "<group>"; };
 		AD00129A1455E28D00BBEE91 /* switchamajig_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_72.png; sourceTree = "<group>"; };
+		AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = unused_scanning_settings.plist; sourceTree = "<group>"; };
 		AD17D5ED1573521E0080A828 /* libKissXML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKissXML.a; path = "../KissXML/build/Release-iphoneos/libKissXML.a"; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 				AD86623314B567AB00C5860D /* configViewController.xib */,
 				AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */,
 				AD83006214E068C6007E5773 /* socket_switchamajig1_cfg.hpp */,
+				AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */,
 			);
 			path = SwitchControl;
 			sourceTree = "<group>";
@@ -363,6 +366,7 @@
 				AD554844154F318A008C246D /* ir_5_basic.xml in Resources */,
 				AD68FCEC15A6A57200A7E7DF /* __TEST001.xml in Resources */,
 				AD84EAD415BCAE5D00C27938 /* iphone_delete_button.png in Resources */,
+				AD09604E15C728A4003F4212 /* unused_scanning_settings.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
