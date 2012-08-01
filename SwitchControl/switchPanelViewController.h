@@ -30,6 +30,7 @@
     UITextField *switchNameTextField;
     UIPopoverController *actionPopover;
     UIPopoverController *imagePopover;
+    UIButton *chooseImageButton;
 }
 - (IBAction)allowNavigation:(id)sender;
 - (IBAction)disallowNavigation:(id)sender;

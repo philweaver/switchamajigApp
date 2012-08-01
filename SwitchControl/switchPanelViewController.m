@@ -291,7 +291,7 @@
         [releaseActionButton setTitle:@"Action For Release" forState:UIControlStateNormal];
         [myView addSubview:releaseActionButton];
         
-        UIButton *chooseImageButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        chooseImageButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [chooseImageButton setFrame:CGRectMake(650, 704, 150, 44)];
         [chooseImageButton addTarget:self action:@selector(chooseImage:) forControlEvents:UIControlEventTouchUpInside];
         [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
@@ -548,6 +548,11 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [currentButton setHighlighted:YES];
     // Update switch name field
     [switchNameTextField setText:[currentButton titleForState:UIControlStateNormal]];
+    if([currentButton backgroundImageForState:UIControlStateNormal])
+        [chooseImageButton setTitle:@"Remove Image" forState:UIControlStateNormal];
+    else {
+        [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
+    }
 }
 
 - (void)onPinch:(id)sender {
@@ -620,6 +625,15 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [confirmDeleteButton setHidden:YES];
     if(currentButton == nil)
         return;
+    if([currentButton backgroundImageForState:UIControlStateNormal]) {
+        // Remove the image
+        NSError *fileError;
+        [[NSFileManager defaultManager] removeItemAtPath:[currentButton imageFilePath] error:&fileError];
+        [currentButton setBackgroundImage:nil forState:UIControlStateNormal];
+        [currentButton setImageFilePath:nil];
+        [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
+        return;
+    }
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary])
         return;
     UIImagePickerController *mediaUI = [[UIImagePickerController alloc] init];
@@ -628,7 +642,6 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     mediaUI.delegate = self;
     imagePopover = [[UIPopoverController alloc] initWithContentViewController:mediaUI];
     [imagePopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
-    
 }
 
 - (void) imagePickerController: (UIImagePickerController *) picker didFinishPickingMediaWithInfo: (NSDictionary *) info {
@@ -649,6 +662,8 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [currentButton setImageFilePath:[imageURL path]];
     NSData *imageData = UIImageJPEGRepresentation(imageToUse, 0.9);
     [imageData writeToURL:imageURL atomically:YES]; 
+    [imagePopover dismissPopoverAnimated:YES];
+    [chooseImageButton setTitle:@"Remove Image" forState:UIControlStateNormal];
 }
 
 - (void) imagePickerControllerDidCancel:(UIImagePickerController *)picker {

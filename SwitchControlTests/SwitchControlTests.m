@@ -944,6 +944,8 @@
         newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.jpg", nextImageName]]];
     } while ([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]]);
     
+    UIButton *chooseImageButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Choose Image"];
+    STAssertNotNil(chooseImageButton, @"No Choose Image Button");
     // Create an image and prepare to send it to the image picker delegate method
     UIImage *testImage = [UIImage imageNamed:@"iphone_delete_button.png"];
     NSDictionary *testImageDictionary = [NSDictionary dictionaryWithObject:testImage forKey:UIImagePickerControllerEditedImage];
@@ -953,6 +955,21 @@
     STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ does not exist after adding image to button", [newFileURL path]);
     // Confirm that the URL is in the button
     STAssertTrue([[yellowButton imageFilePath] isEqualToString:[newFileURL path]], @"New image path %@ does not match button URL %@", [yellowButton imageFilePath], newFileURL);
+    // Confirm that the button says "Remove Image"
+    NSString *currentTitle = [chooseImageButton titleForState:UIControlStateNormal];
+    STAssertTrue([currentTitle isEqualToString:@"Remove Image"], @"Choose image button didn't switch to remove image when image added. Title is '%@'", currentTitle);
+    
+    // Delete the image
+    [chooseImageButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    // Confirm that the image is gone
+    STAssertNil([yellowButton backgroundImageForState:UIControlStateNormal], @"Removing image didn't eliminate image from button");
+    // Confirm that image was deleted
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"Image still in file system after being removed", [newFileURL path]);
+    // Confirm that the button again says "Choose Image"
+    STAssertTrue([[chooseImageButton titleForState:UIControlStateNormal] isEqualToString:@"Choose Image"], @"Choose image button didn't switch to choose image when image removed");
+    [viewController imagePickerController:nil didFinishPickingMediaWithInfo:testImageDictionary];
+    STAssertNotNil([yellowButton backgroundImageForState:UIControlStateNormal], @"Image still nil after adding it again");
+   
     
     // Delete the switch
     [yellowButton sendActionsForControlEvents:UIControlEventTouchDown];
