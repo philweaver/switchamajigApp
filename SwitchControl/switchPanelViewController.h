@@ -8,13 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "SwitchControlAppDelegate.h"
+#import "SJUIRecordAudioViewController.h"
 @interface SJUIButtonWithActions : UIButton 
 @property (nonatomic) NSMutableArray *activateActions;
 @property (nonatomic) NSMutableArray *deactivateActions;
 @property NSString *imageFilePath;
+@property NSString *audioFilePath;
 @end
 
-@interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>{
+@interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, SJUIRecordAudioViewControllerDelegate, UIPopoverControllerDelegate>{
 @public
     SwitchControlAppDelegate *appDelegate;
     id backButton;
@@ -30,7 +32,10 @@
     UITextField *switchNameTextField;
     UIPopoverController *actionPopover;
     UIPopoverController *imagePopover;
+    UIPopoverController *audioPopover;
     UIButton *chooseImageButton;
+    UIButton *recordAudioButton;
+    AVAudioPlayer *player;
 }
 - (IBAction)allowNavigation:(id)sender;
 - (IBAction)disallowNavigation:(id)sender;
@@ -50,6 +55,7 @@
 - (void)newSwitch:(id)sender;
 - (void)defineAction:(id)sender;
 - (void)chooseImage:(id)sender;
+- (void)recordAudio:(id)sender;
 
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;

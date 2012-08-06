@@ -10,6 +10,8 @@
 		AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0012991455E28D00BBEE91 /* switchamajig_50.png */; };
 		AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD00129A1455E28D00BBEE91 /* switchamajig_72.png */; };
 		AD09604E15C728A4003F4212 /* unused_scanning_settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */; };
+		AD09605215C9FBED003F4212 /* SJUIRecordAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD09605115C9FBED003F4212 /* SJUIRecordAudioViewController.m */; };
+		AD09605415CA0AE7003F4212 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD09605315CA0AE6003F4212 /* AVFoundation.framework */; };
 		AD17D5EE1573521E0080A828 /* libKissXML.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD17D5ED1573521E0080A828 /* libKissXML.a */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
@@ -72,6 +74,9 @@
 		AD0012991455E28D00BBEE91 /* switchamajig_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_50.png; sourceTree = "<group>"; };
 		AD00129A1455E28D00BBEE91 /* switchamajig_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_72.png; sourceTree = "<group>"; };
 		AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = unused_scanning_settings.plist; sourceTree = "<group>"; };
+		AD09605015C9FBED003F4212 /* SJUIRecordAudioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJUIRecordAudioViewController.h; sourceTree = "<group>"; };
+		AD09605115C9FBED003F4212 /* SJUIRecordAudioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJUIRecordAudioViewController.m; sourceTree = "<group>"; };
+		AD09605315CA0AE6003F4212 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		AD17D5ED1573521E0080A828 /* libKissXML.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libKissXML.a; path = "../KissXML/build/Release-iphoneos/libKissXML.a"; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
@@ -135,6 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD09605415CA0AE7003F4212 /* AVFoundation.framework in Frameworks */,
 				AD921B06157D6CAC00940981 /* Security.framework in Frameworks */,
 				AD921B04157D6CA100940981 /* CFNetwork.framework in Frameworks */,
 				AD921B01157D507A00940981 /* libSwitchamajigDriver.a in Frameworks */,
@@ -163,6 +169,7 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				AD09605315CA0AE6003F4212 /* AVFoundation.framework */,
 				AD84EAD315BCAE5D00C27938 /* iphone_delete_button.png */,
 				AD921B05157D6CAC00940981 /* Security.framework */,
 				AD921B03157D6CA000940981 /* CFNetwork.framework */,
@@ -232,6 +239,8 @@
 				ADBA89B713E0D09500A89CB6 /* rootSwitchViewController.h */,
 				AD3DD729141B1DF100DB8AEB /* switchPanelViewController.h */,
 				AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */,
+				AD09605015C9FBED003F4212 /* SJUIRecordAudioViewController.h */,
+				AD09605115C9FBED003F4212 /* SJUIRecordAudioViewController.m */,
 				AD86623114B567AB00C5860D /* configViewController.h */,
 				AD86623214B567AB00C5860D /* configViewController.m */,
 				AD86623314B567AB00C5860D /* configViewController.xib */,
@@ -412,6 +421,7 @@
 				AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */,
 				ADD3AEC3158D22CA0067602A /* SJUIStatusMessageLabel.m in Sources */,
 				ADB1EE2215C0D34E003BABDC /* defineActionViewController.m in Sources */,
+				AD09605215C9FBED003F4212 /* SJUIRecordAudioViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,6 +17,7 @@
 @synthesize activateActions;
 @synthesize deactivateActions;
 @synthesize imageFilePath;
+@synthesize audioFilePath;
 @end
 
 @implementation switchPanelViewController
@@ -80,6 +81,7 @@
         NSArray *textNodes = [element nodesForXPath:@".//switchtext" error:&xmlError];
         NSArray *actionArray = [element nodesForXPath:@".//onswitchactivate/actionsequenceondevice" error:&xmlError];
         NSArray *imageNodes = [element nodesForXPath:@".//image" error:&xmlError];
+        NSArray *audioNodes = [element nodesForXPath:@".//audioforswitchactivate" error:&xmlError];
         [myButton setActivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
         [[myButton activateActions] setArray:actionArray];
         actionArray = [element nodesForXPath:@".//onswitchdeactivate/actionsequenceondevice" error:&xmlError];
@@ -110,6 +112,12 @@
             [myButton setImageFilePath:imageNodePath];
             UIImage *image = [UIImage imageWithContentsOfFile:imageNodePath];
             [myButton setBackgroundImage:image forState:UIControlStateNormal];
+        }
+        
+        // Audio
+        if([audioNodes count]) {
+            NSString *audioNodePath = [[audioNodes objectAtIndex:0] stringValue];
+            [myButton setAudioFilePath:audioNodePath];
         }
         
         // Read color
@@ -297,6 +305,12 @@
         [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
         [myView addSubview:chooseImageButton];
         
+        recordAudioButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [recordAudioButton setFrame:CGRectMake(825, 704, 150, 44)];
+        [recordAudioButton addTarget:self action:@selector(recordAudio:) forControlEvents:UIControlEventTouchUpInside];
+        [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
+        [myView addSubview:recordAudioButton];
+        
         CGRect switchNameTextFieldRect = CGRectMake(250, 0, 200, 44);
         switchNameTextField = [[UITextField alloc] initWithFrame:switchNameTextFieldRect];
         [switchNameTextField addTarget:self action:@selector(onSwitchTextChange:) forControlEvents:UIControlEventEditingDidEndOnExit];
@@ -330,7 +344,8 @@
 // Handlers for switches activated/deactivated. Send XML node information to delegate.
 - (IBAction)onSwitchActivated:(id)sender {
     [self disallowNavigation:sender];
-    NSArray *actions = [sender activateActions];
+    SJUIButtonWithActions *button = (SJUIButtonWithActions *)sender;
+    NSArray *actions = [button activateActions];
     if(actions == nil) {
         UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Switch error!" message:@"Dictionary lookup failed (code bug)."  delegate:nil cancelButtonTitle:@"OK"  otherButtonTitles:nil];  
         [message show];  
@@ -339,6 +354,24 @@
     DDXMLNode *action;
     for(action in actions) {
         [appDelegate performActionSequence:action];
+    }
+    if([button audioFilePath]) {
+        // Play sound
+        if(player)
+            [player stop];
+        NSError *sessionError;
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
+        if(sessionError)
+            NSLog(@"SJUIRecordAudioViewController: Audio session error: %@", sessionError);
+        NSError *playError;
+        player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:[button audioFilePath]] error:&playError];
+        if(playError) {
+            NSLog(@"Play error: %@", playError);
+            return;
+        }
+        player.numberOfLoops = 0;
+        [player play];
     }
 }
 - (IBAction)onSwitchDeactivated:(id)sender {
@@ -446,6 +479,9 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         if([button imageFilePath]) {
             [stringToSave appendString:[NSString stringWithFormat:@"\t\t<image>%@</image>\n", [button imageFilePath]]];
         }
+        if([button audioFilePath]) {
+            [stringToSave appendString:[NSString stringWithFormat:@"\t\t<audioforswitchactivate>%@</audioforswitchactivate>\n", [button audioFilePath]]];
+        }
         // Store actions for switch activate and deactivate
         [stringToSave appendString:@"\t\t<onswitchactivate>\n"];
         NSArray *actions = [button activateActions];
@@ -512,6 +548,10 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         [[NSFileManager defaultManager] removeItemAtPath:[currentButton imageFilePath] error:&fileError];
         if(fileError)
             NSLog(@"Error deleting image at %@: %@", [currentButton imageFilePath], fileError);
+        // Remove any audio file as well
+        [[NSFileManager defaultManager] removeItemAtPath:[currentButton audioFilePath] error:&fileError];
+        if(fileError)
+            NSLog(@"Error deleting image at %@: %@", [currentButton audioFilePath], fileError);
         [currentButton removeFromSuperview];
         currentButton = nil;
         return;
@@ -552,6 +592,28 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         [chooseImageButton setTitle:@"Remove Image" forState:UIControlStateNormal];
     else {
         [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
+    }
+    if([[NSFileManager defaultManager] fileExistsAtPath:[currentButton audioFilePath]]) {
+        // Play sound when button is selected
+        if(player)
+            [player stop];
+        NSError *sessionError;
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayback error:&sessionError];
+        if(sessionError)
+            NSLog(@"SJUIRecordAudioViewController: Audio session error: %@", sessionError);
+        NSError *playError;
+        player = [[AVAudioPlayer alloc] initWithContentsOfURL:[NSURL fileURLWithPath:[currentButton audioFilePath]] error:&playError];
+        if(playError) {
+            NSLog(@"Play error: %@", playError);
+            return;
+        }
+        player.numberOfLoops = 0;
+        [player play];
+        
+        [recordAudioButton setTitle:@"Delete Sound" forState:UIControlStateNormal];
+    } else {
+        [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
     }
 }
 
@@ -617,7 +679,6 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     }
     defineActionViewController *newViewController = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:friendlyNames];
     actionPopover = [[UIPopoverController alloc] initWithContentViewController:newViewController];
-    [actionPopover setPopoverContentSize:CGSizeMake(470, 500)];
     [actionPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
@@ -644,6 +705,29 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [imagePopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
+- (void)recordAudio:(id)sender {
+    [confirmDeleteButton setHidden:YES];
+    if(currentButton == nil)
+        return;
+    if([currentButton audioFilePath]) {
+        // Remove the audio file
+        NSError *fileError;
+        [[NSFileManager defaultManager] removeItemAtPath:[currentButton audioFilePath] error:&fileError];
+        [currentButton setAudioFilePath:nil];
+        [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
+        return;
+    }
+    if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary])
+        return;
+    NSURL *audioURL = GetURLWithNoConflictWithName(@"Audio", @"caf");
+    SJUIRecordAudioViewController *audioViewController = [[SJUIRecordAudioViewController alloc] initWithURL:audioURL andDelegate:self];
+    audioPopover = [[UIPopoverController alloc] initWithContentViewController:audioViewController];
+    [currentButton setAudioFilePath:[audioURL path]];
+    [audioPopover setDelegate:self];
+    [audioPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+}
+
+
 - (void) imagePickerController: (UIImagePickerController *) picker didFinishPickingMediaWithInfo: (NSDictionary *) info {
     UIImage *imageToUse;
     UIImage *editedImage = (UIImage *) [info objectForKey:
@@ -662,11 +746,33 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [currentButton setImageFilePath:[imageURL path]];
     NSData *imageData = UIImageJPEGRepresentation(imageToUse, 0.9);
     [imageData writeToURL:imageURL atomically:YES]; 
+    [imagePopover setPopoverContentSize:CGSizeMake(200, 250)];
     [imagePopover dismissPopoverAnimated:YES];
     [chooseImageButton setTitle:@"Remove Image" forState:UIControlStateNormal];
 }
 
 - (void) imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [imagePopover dismissPopoverAnimated:YES];
+}
+
+- (void) SJUIRecordAudioViewControllerReadyForDismissal:(id)viewController {
+    [audioPopover dismissPopoverAnimated:YES];
+    [self popoverControllerDidDismissPopover:audioPopover];
+}
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+    //NSLog(@"switchPanelViewController: popoverControllerDidDismissPopover");
+    // The only popover that we get this for is the audio select
+    // Check if we have valid audio for the switch
+    if(!currentButton)
+        return;
+    if(![currentButton audioFilePath])
+        return;
+    if([[NSFileManager defaultManager] fileExistsAtPath:[currentButton audioFilePath]]) {
+        [recordAudioButton setTitle:@"Delete Sound" forState:UIControlStateNormal];
+    } else {
+        [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
+        [currentButton setAudioFilePath:nil];
+    }
 }
 @end

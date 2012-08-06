@@ -917,7 +917,6 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
-#endif
 
 - (void)test_002_SwitchPanelViewController_009_ImagesOnSwitch {
     // Bring up the yellow panel to edit
@@ -992,7 +991,84 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
+#endif
 
+- (void)test_002_SwitchPanelViewController_009_AudioForSwitch {
+    // Bring up the yellow panel to edit
+    SJUIButtonWithActions *yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    switchPanelViewController *viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController editPanel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    // Tap the button
+    yellowButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"1"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchDown];
+    
+    // Determine the next panel's default name
+    NSMutableString *nextImageName = [[NSMutableString alloc] initWithCapacity:15];
+    int i=0;
+    NSURL *newFileURL;
+    do {
+        ++i;
+        [nextImageName setString:[NSString stringWithFormat:@"Audio %d", i]];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.caf", nextImageName]]];
+    } while ([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]]);
+    
+    UIButton *recordSoundButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Record Sound"];
+    STAssertNotNil(recordSoundButton, @"No Record Sound Button");
+    // Tap the record button and create a dummy file
+    [recordSoundButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    NSData *junkData = [NSData dataWithBytes:"abcdefg" length:7];
+    [junkData writeToFile:[newFileURL path] atomically:YES];
+    STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"Failed to create audio file %@", [newFileURL path]);
+    [viewController SJUIRecordAudioViewControllerReadyForDismissal:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    // Confirm that the button's path is set up and the audio now says to delete
+    STAssertTrue([[yellowButton audioFilePath] isEqualToString:[newFileURL path]], @"Audio path not configued properly");
+    NSString *currentTitle = [recordSoundButton titleForState:UIControlStateNormal];
+    STAssertTrue([currentTitle isEqualToString:@"Delete Sound"], @"Sound button didn't switch to delete after sound file created. Current title is %@", currentTitle);
+    
+    // Delete the image
+    [recordSoundButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    // Confirm that the image is gone
+    STAssertNil([yellowButton audioFilePath], @"Removing audio didn't eliminate path from button");
+    // Confirm that image was deleted
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"Audio still in file system after being removed. file = %@", [newFileURL path]);
+    // Confirm that the button again says "Choose Image"
+    STAssertTrue([[recordSoundButton titleForState:UIControlStateNormal] isEqualToString:@"Record Sound"], @"Record sound button didn't switch to Record Sound when audio removed");
+    
+    // Add the audio again in order to delete it with the switch
+    [recordSoundButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    [junkData writeToFile:[newFileURL path] atomically:YES];
+    [viewController SJUIRecordAudioViewControllerReadyForDismissal:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchDown];
+    [viewController deleteSwitch:viewController->confirmDeleteButton];
+    // Confirm that the URL disappeared
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New audio path %@ still exists after deleting button", [newFileURL path]);
+    
+    // Create a new switch
+    [viewController newSwitch:nil];
+    SJUIButtonWithActions *newButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Switch"];
+    [newButton sendActionsForControlEvents:UIControlEventTouchDown];
+    [recordSoundButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [junkData writeToFile:[newFileURL path] atomically:YES];
+    [viewController SJUIRecordAudioViewControllerReadyForDismissal:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    // Delete the panel
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController deletePanel:viewController->confirmDeleteButton];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New audio path %@ did not get deleted when deleting panel", [newFileURL path]);
+}
 
 #if RUN_ALL_TESTS
 - (void)test_003_defineActionViewController_001_Initialization {
