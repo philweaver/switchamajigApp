@@ -177,11 +177,18 @@
     } else {
         float backButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
         float backButtonWidth = backButtonHeight * 1.5;
-        backButtonRect = CGRectMake(0, 0, backButtonWidth, backButtonHeight);
+        int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
+        [[backButton titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+        CGSize backTextSize = [@"Back" sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
+        if(backButtonHeight < backTextSize.height)
+            backButtonHeight = backTextSize.height;
+        if(backButtonWidth < backTextSize.width)
+            backButtonWidth = backTextSize.width;
+        backButtonRect = CGRectMake(512-backButtonWidth/2, 0, backButtonWidth, backButtonHeight);
         [backButton setEnabled:YES];
     }
     [backButton setFrame:backButtonRect];
-    [backButton setTitle:[NSString stringWithCString:"Back" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
+    [backButton setTitle:@"Back" forState:UIControlStateNormal];
     [backButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [backButton addTarget:self action:@selector(goBack:) forControlEvents:UIControlEventTouchUpInside];
     [myView addSubview:backButton];

@@ -30,15 +30,15 @@
 		</dict>
 		<dict>
 			<key>MinimumValue</key>
-			<integer>15</integer>
+			<integer>20</integer>
 			<key>Type</key>
 			<string>PSSliderSpecifier</string>
 			<key>DefaultValue</key>
-			<integer>15</integer>
+			<integer>20</integer>
 			<key>Key</key>
 			<string>textSizePreference</string>
 			<key>MaximumValue</key>
-			<integer>100</integer>
+			<integer>75</integer>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -50,15 +50,15 @@
 		</dict>
 		<dict>
 			<key>MinimumValue</key>
-			<integer>100</integer>
+			<integer>44</integer>
 			<key>Type</key>
 			<string>PSSliderSpecifier</string>
 			<key>DefaultValue</key>
-			<integer>100</integer>
+			<integer>44</integer>
 			<key>Key</key>
 			<string>switchPanelSizePreference</string>
 			<key>MaximumValue</key>
-			<integer>496</integer>
+			<integer>400</integer>
 		</dict>
 		<dict>
 			<key>Type</key>

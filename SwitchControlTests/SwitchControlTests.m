@@ -405,6 +405,8 @@
             UIButton *button = (UIButton *)subView;
             title = [button titleForState:UIControlStateNormal];
             fontSize = [[[button titleLabel] font] pointSize];
+            if([title isEqualToString:@"Help"] || [title isEqualToString:@"Configure Network Settings"])
+                continue;
             //NSLog(@" Subview is button. Title = %@, fontsize = %f", title, fontSize);
         }
         if([subView isKindOfClass:[UILabel class]]) {
@@ -471,10 +473,10 @@
 }
 
 - (void)test_001_RootViewController_004a_TextAndButtonSizesWithTextSize15 {
-    const int numTestConditions = 3;
+    const int numTestConditions = 2;
     const int numButtonSizes = 3;
-    float buttonSizes[numButtonSizes] = {200, 100, 494};
-    float textSize = 15;
+    float buttonSizes[numButtonSizes] = {400, 100, 44};
+    float textSize = 20;
     for(int testConditionIndex = 0; testConditionIndex < numTestConditions; ++testConditionIndex) {
         for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
             float buttonSize = buttonSizes[buttonSizeIndex];
@@ -487,7 +489,7 @@
 - (void)test_001_RootViewController_004b_TextAndButtonSizesWithTextSize50 {
     const int numTestConditions = 2; // Was 3 for scanning
     const int numButtonSizes = 3;
-    float buttonSizes[numButtonSizes] = {200, 100, 494};
+    float buttonSizes[numButtonSizes] = {400, 100, 44};
     float textSize = 50;
     for(int testConditionIndex = 0; testConditionIndex < numTestConditions; ++testConditionIndex) {
         for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
@@ -499,10 +501,10 @@
 }
 
 - (void)test_001_RootViewController_004c_TextAndButtonSizesWithTextSize100 {
-    const int numTestConditions = 3;
+    const int numTestConditions = 2;
     const int numButtonSizes = 3;
-    float buttonSizes[numButtonSizes] = {200, 100, 494};
-    float textSize = 100;
+    float buttonSizes[numButtonSizes] = {400, 100, 44};
+    float textSize = 75;
     for(int testConditionIndex = 0; testConditionIndex < numTestConditions; ++testConditionIndex) {
         for(int buttonSizeIndex = 0; buttonSizeIndex < numButtonSizes; ++buttonSizeIndex) {
             float buttonSize = buttonSizes[buttonSizeIndex];

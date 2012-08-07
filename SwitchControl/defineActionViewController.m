@@ -29,12 +29,14 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         [self setActions:actionsInit];
         [self setFriendlyNames:[[NSMutableArray alloc] initWithCapacity:5]];
         [[self friendlyNames] setArray:friendlyNamesInit];
+        [self setContentSizeForViewInPopover:CGSizeMake(470, 400)];
     }
     return self;
 }
 
 - (void)loadView {
-    CGRect cgRct = CGRectMake(0, 0, 470, 768);
+    CGSize viewSize = [self contentSizeForViewInPopover];
+    CGRect cgRct = CGRectMake(0, 0, viewSize.width, viewSize.height);
     UIView *myView = [[UIView alloc] initWithFrame:cgRct];
     [self setView:myView];
     [myView setBackgroundColor:[UIColor blackColor]];
@@ -80,7 +82,21 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         [switchButtons[i] setHidden:YES];
         [myView addSubview:switchButtons[i]];
     }
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(50, 10, 150, 44)];
+    [label setBackgroundColor:[UIColor blackColor]];
+    [label setTextColor:[UIColor whiteColor]];
+    [label setText:@"Choose Device"];
+    [label setTextAlignment:UITextAlignmentCenter];
+    [label setFont:[UIFont systemFontOfSize:20]];
+    [myView addSubview:label];
     
+    label = [[UILabel alloc] initWithFrame:CGRectMake(225, 10, 150, 44)];
+    [label setBackgroundColor:[UIColor blackColor]];
+    [label setTextColor:[UIColor whiteColor]];
+    [label setText:@"Choose Action"];
+    [label setTextAlignment:UITextAlignmentCenter];
+    [label setFont:[UIFont systemFontOfSize:20]];
+    [myView addSubview:label];
     // Determine initial action
     if([[self actions] count] == 1) { // Only support a single action for now
         action = [[self actions] objectAtIndex:0];

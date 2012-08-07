@@ -103,33 +103,38 @@
         }
         [[self view] addSubview:[self selectButton]];
     } else {
-        int spaceOnButtomForExtraButtons = 0;
+        int spaceOnBottomForExtraButtons = 0;
         BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showHelpButtonPreference"];
         BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showNetworkConfigButtonPreference"];
         if(displayHelpButton || displayNetworkConfigButton) {
+            /* Don't make config and text buttons resizable
             spaceOnButtomForExtraButtons = panelButtonHeight;
-            scrollPanelHeight -= spaceOnButtomForExtraButtons;
-            if(scrollPanelHeight < (panelButtonHeight + textHeight)) {
+             */
+            spaceOnBottomForExtraButtons = 50;
+            scrollPanelHeight -= spaceOnBottomForExtraButtons;
+            /* if(scrollPanelHeight < (panelButtonHeight + textHeight)) {
                 // Reduce button size to make room for one row of buttons and text
                 panelButtonHeight = (FRAME_HEIGHT-border-button_spacing - 2*textHeight)/2;
                 scrollPanelHeight = panelButtonHeight + textHeight;
-                spaceOnButtomForExtraButtons = panelButtonHeight;
-            }
+                spaceOnBottomForExtraButtons = panelButtonHeight;
+            } */
         }
         
         // Set width of help and config buttons
-        int helpConfigButtonWidth = (panelButtonHeight > 200) ? panelButtonHeight : 200;
+        int helpConfigButtonWidth = 250; // (panelButtonHeight > 200) ? panelButtonHeight : 200;
         if(displayNetworkConfigButton) {
             NSString *configText = @"Configure Network Settings";
             [self setConfigButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+            /* Don't make config and text buttons resizable
             CGSize configTextSize = [configText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
             if(configTextSize.width > helpConfigButtonWidth)
                 helpConfigButtonWidth = configTextSize.width;
             if(helpConfigButtonWidth > FRAME_WIDTH/2)
                 helpConfigButtonWidth = FRAME_WIDTH/2;
-            [[self configButton] setFrame:CGRectMake(0, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
+             */
+            [[self configButton] setFrame:CGRectMake(0, [self view].bounds.size.height-spaceOnBottomForExtraButtons, helpConfigButtonWidth, spaceOnBottomForExtraButtons)];
             [[self configButton] setTitle:configText forState:UIControlStateNormal];
-            [[[self configButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+            [[[self configButton] titleLabel] setFont:[UIFont systemFontOfSize:20/*textFontSize*/]];
             [[self configButton] addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside]; 
             [[self view] addSubview:[self configButton]];
         }
@@ -141,9 +146,9 @@
                 helpConfigButtonWidth = helpTextSize.width;
             if(helpConfigButtonWidth > FRAME_WIDTH/2)
                 helpConfigButtonWidth = FRAME_WIDTH/2;
-            [[self helpButton] setFrame:CGRectMake(FRAME_WIDTH-helpConfigButtonWidth, [self view].bounds.size.height-spaceOnButtomForExtraButtons, helpConfigButtonWidth, spaceOnButtomForExtraButtons)];
+            [[self helpButton] setFrame:CGRectMake(FRAME_WIDTH-helpConfigButtonWidth, [self view].bounds.size.height-spaceOnBottomForExtraButtons, helpConfigButtonWidth, spaceOnBottomForExtraButtons)];
             [[self helpButton] setTitle:@"Help" forState:UIControlStateNormal];
-            [[[self helpButton] titleLabel] setFont:[UIFont systemFontOfSize:textFontSize]];
+            [[[self helpButton] titleLabel] setFont:[UIFont systemFontOfSize:20/*textFontSize*/]];
             [[self helpButton] addTarget:self action:@selector(display_help:) forControlEvents:UIControlEventTouchUpInside]; 
             [[self view] addSubview:[self helpButton]];
         }
@@ -259,6 +264,10 @@
     // Skip test panels
     BOOL isTest = [[NSPredicate predicateWithFormat:@"SELF contains \"__TEST\""] evaluateWithObject:[url absoluteString]];
     if(isTest)
+        return false;
+    // Skip IR panel
+    BOOL isIR = [[NSPredicate predicateWithFormat:@"SELF contains \"ir_5_basic\""] evaluateWithObject:[url absoluteString]];
+    if(isIR)
         return false;
     // Only do xml files
     BOOL isXml = [[NSPredicate predicateWithFormat:@"SELF contains \".xml\""] evaluateWithObject:[url absoluteString]];
