@@ -38,7 +38,7 @@
 @end
 
 @implementation MockSwitchamajigDriver
-- (void)issueCommandFromXMLNode:(DDXMLNode *)command {
+- (void)issueCommandFromXMLNode:(DDXMLNode *)command error:(NSError **)err {
     //NSLog(@"Mock driver command issued. count = %d", [commandsReceived count]);
     //NSLog(@"Command = %@", [command XMLString]);
     [commandsReceived addObject:[command XMLString]];

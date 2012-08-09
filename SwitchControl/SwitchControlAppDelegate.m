@@ -75,6 +75,7 @@
     //[netServiceBrowser searchForServicesOfType:@"_http._tcp." inDomain:@""];
     friendlyNameDictionaryIndex = 0;
     [self setStatusMessages:[[NSMutableArray alloc] initWithCapacity:5]];
+    listenerDevicesToIgnore = 0;
     return YES;
 }
 
@@ -492,7 +493,9 @@ char *commands[] = {
     for (friendlyName in friendlyNames) {
         [self addStatusAlertMessage:[NSString stringWithFormat:@"Disconnected from %@",friendlyName]  withColor:[UIColor redColor] displayForSeconds:5.0];
     }
-    [self removeDriver:deviceDriver];
+    [statusInfoLock lock];
+    [[self friendlyNameSwitchamajigDictionary] removeObjectsForKeys:friendlyNames];
+    [statusInfoLock unlock];
 }
 
 - (SwitchamajigControllerDeviceDriver *) firstSwitchamajigControllerDriver {
