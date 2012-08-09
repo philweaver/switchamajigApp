@@ -135,7 +135,8 @@
             [[self configButton] setFrame:CGRectMake(0, [self view].bounds.size.height-spaceOnBottomForExtraButtons, helpConfigButtonWidth, spaceOnBottomForExtraButtons)];
             [[self configButton] setTitle:configText forState:UIControlStateNormal];
             [[[self configButton] titleLabel] setFont:[UIFont systemFontOfSize:20/*textFontSize*/]];
-            [[self configButton] addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside]; 
+            [[self configButton] addTarget:self action:@selector(config_pressed:) forControlEvents:UIControlEventTouchUpInside];
+            //[[self configButton] setEnabled:([appDelegate firstSwitchamajigControllerDriver] != nil)];
             [[self view] addSubview:[self configButton]];
         }
         if(displayHelpButton) {
@@ -415,48 +416,17 @@
     [self.navigationController pushViewController:helpViewCtrl animated:YES];
 }
 - (void)config_pressed:(id)sender {
-    //[[self navigationController] setNavigationBarHidden:NO];
-    configViewController *configViewCtrl = [[configViewController alloc] initWithNibName:@"configViewController" bundle:nil];
-    [configViewCtrl setModalPresentationStyle:UIModalPresentationFormSheet];
-    [configViewCtrl setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
-    configViewCtrl->appDelegate = appDelegate;
-#if 0
-// REDESIGN
-    configViewCtrl->switchName = [NSString stringWithString:(NSString*)CFArrayGetValueAtIndex([appDelegate switchNameArray], [appDelegate active_switch_index])];
-#endif
-    [self presentModalViewController:configViewCtrl animated:YES];
-}
-
-- (void) switch_names_updated:(NSNotification *) notification {
-    [self performSelectorOnMainThread:@selector(reload_switch_name_table) withObject:nil waitUntilDone:NO];
-}
-- (void) reload_switch_name_table {
-}
-
-// Code to support table displaying the names of the switches discovered during detect
-- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 0;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
-    if(cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"Cell"];
+    SwitchamajigControllerDeviceDriver *driver = [appDelegate firstSwitchamajigControllerDriver];
+    if(driver) {
+        NSString *name = [[[appDelegate friendlyNameSwitchamajigDictionary] allKeysForObject:driver] objectAtIndex:0];
+        configViewController *configViewCtrl = [[configViewController alloc] initWithNibName:@"configViewController" bundle:nil];
+        [configViewCtrl setModalPresentationStyle:UIModalPresentationFormSheet];
+        [configViewCtrl setModalTransitionStyle:UIModalTransitionStyleCoverVertical];
+        [configViewCtrl setDriver:driver];
+        configViewCtrl->appDelegate = appDelegate;
+        configViewCtrl->switchName = name;
+        [self presentModalViewController:configViewCtrl animated:YES];
     }
-    return cell;
-}
-
-// Support for connecting to a switch when its name is selected from the table
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [appDelegate connect_to_switch:indexPath.row protocol:0 retries:10 showMessagesOnError:YES];
-    if([appDelegate switch_socket])
-        [appDelegate sendSwitchState];
-
-    [self reload_switch_name_table];
 }
 
 

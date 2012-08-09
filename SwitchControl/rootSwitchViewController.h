@@ -17,8 +17,6 @@
     int numberOfPanelsInScrollView;
     int indexOfCurrentScanSelection;
 }
-- (void) switch_names_updated:(NSNotification *) notification;
-- (void) reload_switch_name_table;
 - (void) ResetScrollPanel;
 - (void) initializeScrollPanelWithTextSize:(CGSize)textSize;
 - (void) launchSwitchPanel:(id)sender;

@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "SwitchControlAppDelegate.h"
-#import "socket_switchamajig1_cfg.hpp"
 
 #define MAX_AVAIL_NETWORKS 20
 
@@ -17,7 +16,6 @@
     SwitchControlAppDelegate *appDelegate;
     NSString *switchName;
     int num_avail_wifi; 
-    struct switchamajig1_network_info availableNetworks[MAX_AVAIL_NETWORKS];
     BOOL nowEnteringPassphrase;
     BOOL nowConfirmingConfig;
 }
@@ -50,5 +48,5 @@
 @property (retain, nonatomic) IBOutlet UITextField *NetworkNameText;
 @property (retain, nonatomic) IBOutlet UIButton *ConfigureNetworkButton;
 @property (retain, nonatomic) IBOutlet UIButton *ScanNetworkButton;
-
+@property SwitchamajigControllerDeviceDriver *driver;
 @end

@@ -19,6 +19,7 @@
 @synthesize NetworkNameText;
 @synthesize ConfigureNetworkButton;
 @synthesize ScanNetworkButton;
+@synthesize driver;
 @synthesize wifiNameDictionary = _wifiNameDictionary;
 
 - (void)viewDidUnload
@@ -67,21 +68,6 @@
     [ConfigureNetworkButton setEnabled:NO];
     [ScanActivityIndicator stopAnimating];
     [ScanActivityIndicator setHidesWhenStopped:YES];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wifi_list_updated:) name:@"wifi_list_was_updated" object:nil];
-    // Open TCP socket
-    if(![appDelegate switch_socket]) {
-        [appDelegate connect_to_switch:[appDelegate active_switch_index] protocol:IPPROTO_TCP retries:5 showMessagesOnError:NO];
-        if(![appDelegate switch_socket]) {
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config Error"  
-                                                              message:@"Unable to configure Switchamajig (connect)."  
-                                                             delegate:self  
-                                                    cancelButtonTitle:@"OK"  
-                                                    otherButtonTitles:nil];
-            [message show];  
-            [self performSelectorOnMainThread:@selector(Cancel:) withObject:nil waitUntilDone:NO];
-            return;
-        }
-    }
     // Scanning almost never works
     [ScanNetworkButton setHidden:YES];
     [wifiNameTable setHidden:YES];
@@ -98,48 +84,18 @@
     }
     if(nowEnteringPassphrase) {
         nowEnteringPassphrase = NO;
-        // Stuff the new network info
-        struct switchamajig1_network_info newInfo;
-        newInfo.channel = (int) [datePicker selectedRowInComponent:0] + 1;
-        NSString *nameWithDollars = [[NetworkNameText text] stringByReplacingOccurrencesOfString:@" " withString:@"$"];
-        strncpy(newInfo.ssid, [nameWithDollars UTF8String], sizeof(newInfo.ssid));
-        NSString *phraseWithDollars = [[[alertView textFieldAtIndex:0] text] stringByReplacingOccurrencesOfString:@" " withString:@"$"];
-        if(![phraseWithDollars length])
-            strncpy(newInfo.passphrase, "none", sizeof(newInfo.passphrase));
-        else
-            strncpy(newInfo.passphrase, [phraseWithDollars cStringUsingEncoding:NSUTF8StringEncoding], sizeof(newInfo.passphrase));
-#if 0
-        // Require the user to prove that configuration is intentional
-        NSString *passphraseRequest = @"Selecting network ";
-        NSString *messageText = [passphraseRequest stringByAppendingString:networkName];
-        nowEnteringPassphrase = NO;
-        nowConfirmingConfig = YES;
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:messageText  
-                                                          message:@"Controller will now attempt to move from its current network to the new one. If it fails, it will set up a \'Switchamajig\' network. The iPad must be on the same network in order to communicate with the Controller. Please type \'yes\' below to continue."  
-                                                         delegate:self  
-                                                cancelButtonTitle:@"Cancel"  
-                                                otherButtonTitles:@"Continue",nil];
-        [message setAlertViewStyle:UIAlertViewStylePlainTextInput];
-        [message show];  
-        [message release];
-        return;
-    }
-    if(nowConfirmingConfig) {
-        nowConfirmingConfig = NO;
-#endif
-        bool status = switchamajig1_enter_command_mode([appDelegate switch_socket]);
-        if(status)
-            status = switchamajig1_set_netinfo([appDelegate switch_socket], &newInfo);
-        if(status)
-            status = switchamajig1_save([appDelegate switch_socket]);
-        if(status)
-            status = switchamajig1_exit_command_mode([appDelegate switch_socket]);
-        if(status)
-            status = switchamajig1_write_eeprom([appDelegate switch_socket], 0, 0);
-        if(status)
-            status = switchamajig1_reset([appDelegate switch_socket]);
-
-        if(!status) {
+        // Create the network config command
+        NSError *err;
+        NSString *xmlCommand = [NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r <configureDeviceNetworking ssid=\"%@\" channel=\"%d\" passphrase=\"%@\"></configureDeviceNetworking>", [NetworkNameText text], (int) [datePicker selectedRowInComponent:0] + 1, [[alertView textFieldAtIndex:0] text]];
+        DDXMLDocument *xmlCommandDoc = [[DDXMLDocument alloc] initWithXMLString:xmlCommand options:0 error:&err];
+        DDXMLNode *commandNode = [[xmlCommandDoc children] objectAtIndex:0];
+        NSLog(@"Setting network info with xml command %@", xmlCommand);
+        if(!xmlCommandDoc) {
+            NSLog(@"Failed to create xml doc. %@", err);
+        }
+        [driver issueCommandFromXMLNode:commandNode error:&err];
+        if(err) {
+            NSLog(@"Config error: %@", err);
             UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"  
                                                               message:@"Failed to set new network name."  
                                                              delegate:self  
@@ -166,15 +122,7 @@
 - (IBAction)Cancel:(id)sender {
     // We may have changed the name or network settings of this device, so close our connection to it and
     // clear our information about switches from our dictionary
-    [[appDelegate statusInfoLock] lock];
-    [[appDelegate friendlyNameSwitchamajigDictionary] removeAllObjects];
-    [appDelegate setActive_switch_index:-1];
-    if([appDelegate switch_socket]) {
-        close([appDelegate switch_socket]);
-        [appDelegate setSwitch_socket:0];
-    }
-    [[appDelegate statusInfoLock] unlock];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
+    [appDelegate removeDriver:[self driver]];
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -235,12 +183,13 @@
         return;
     }
     [NetworkNameText setText:networkName];
-    [datePicker selectRow:(availableNetworks[networkIndex].channel - 1) inComponent:0 animated:YES];
+    //[datePicker selectRow:(availableNetworks[networkIndex].channel - 1) inComponent:0 animated:YES];
     [ConfigureNetworkButton setEnabled:YES];
 }
 
 // Provide options for walking in 
 - (void)Background_Thread_To_Detect_Wifi {
+#if 0
     @autoreleasepool {
         [[self wifiDataLock] lock];
         [[self wifiNameDictionary] removeAllObjects];    
@@ -271,6 +220,7 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:@"wifi_list_was_updated" object:nil];
         [self performSelectorOnMainThread:@selector(EnableUIAfterScan) withObject:nil waitUntilDone:NO];
     }
+#endif
     return;
 }
 
@@ -293,20 +243,25 @@
 - (IBAction)ChangeName:(id)sender {
     // Replace spaces with dollar signs
     NSString *nameWithDollars = [[SwitchamajigNameText text] stringByReplacingOccurrencesOfString:@" " withString:@"$"];
-    const char *newName = [nameWithDollars UTF8String];
-    
-    bool status = switchamajig1_enter_command_mode([appDelegate switch_socket]);
-    if(status)
-        status = switchamajig1_set_name([appDelegate switch_socket], newName);
-    if(status)
-        status = switchamajig1_save([appDelegate switch_socket]);
-    if(!status) {
-        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Name Change Failed"  
-                                                          message:@"Failed to change name."  
-                                                         delegate:self  
-                                                cancelButtonTitle:@"OK"  
+   
+    // Create the setDeviceName command
+    NSError *err;
+    NSString *xmlCommand = [NSString stringWithFormat:@"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r <setDeviceName>%@</setDeviceName>", nameWithDollars];
+    DDXMLDocument *xmlCommandDoc = [[DDXMLDocument alloc] initWithXMLString:xmlCommand options:0 error:&err];
+    NSLog(@"Setting device name with xml command %@", xmlCommand);
+    if(!xmlCommandDoc) {
+        NSLog(@"Failed to create xml doc. %@", err);
+    }
+    DDXMLNode *commandNode = [[xmlCommandDoc children] objectAtIndex:0];
+    [driver issueCommandFromXMLNode:commandNode error:&err];
+    if(err) {
+        NSLog(@"Config error: %@", err);
+        UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Config error!"
+                                                          message:@"Failed to set device name."
+                                                         delegate:self
+                                                cancelButtonTitle:@"OK"
                                                 otherButtonTitles:nil];
-        [message show];  
+        [message show];
     }
     // Clear the last switch info file
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);

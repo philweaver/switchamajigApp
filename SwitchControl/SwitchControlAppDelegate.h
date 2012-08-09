@@ -27,6 +27,7 @@
     SwitchamajigControllerDeviceListener *sjigControllerListener;
     int friendlyNameDictionaryIndex;
     NSTimer *statusMessageTimer;
+    int listenerDevicesToIgnore;
 }
 - (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice;
 - (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
@@ -35,6 +36,9 @@
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds;
 - (void) statusMessageCallback;
 - (void) executeActionSequence:(NSArray *)threadInfoArray;
+- (SwitchamajigControllerDeviceDriver *) firstSwitchamajigControllerDriver;
+- (void)removeDriver:(SwitchamajigDriver *)driver;
+
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchStateLock;

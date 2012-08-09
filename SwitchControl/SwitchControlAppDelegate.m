@@ -375,7 +375,8 @@ char *commands[] = {
             
             // Send command to driver
             NSLog(@"Issuing command %@", [action XMLString]);
-            [driver issueCommandFromXMLNode:action];
+            NSError *error;
+            [driver issueCommandFromXMLNode:action error:&error];
         }
     }
 }
@@ -491,14 +492,39 @@ char *commands[] = {
     for (friendlyName in friendlyNames) {
         [self addStatusAlertMessage:[NSString stringWithFormat:@"Disconnected from %@",friendlyName]  withColor:[UIColor redColor] displayForSeconds:5.0];
     }
-    [statusInfoLock lock];
-    [[self friendlyNameSwitchamajigDictionary] removeObjectsForKeys:friendlyNames];
-    [statusInfoLock unlock];
+    [self removeDriver:deviceDriver];
 }
 
+- (SwitchamajigControllerDeviceDriver *) firstSwitchamajigControllerDriver {
+    SwitchamajigControllerDeviceDriver *firstDriver = nil;
+    [statusInfoLock lock];
+    NSArray *friendlyNames = [[self friendlyNameSwitchamajigDictionary] allKeys];
+    NSString *name;
+    for(name in friendlyNames) {
+        SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:name];
+        if([driver isKindOfClass:[SwitchamajigControllerDeviceDriver class]]) {
+            firstDriver = (SwitchamajigControllerDeviceDriver *)driver;
+            break;
+        }
+    }
+    [statusInfoLock unlock];
+    return firstDriver;
+}
+
+- (void)removeDriver:(SwitchamajigDriver *)driver {
+    [statusInfoLock lock];
+    NSArray *friendlyNames = [[self friendlyNameSwitchamajigDictionary] allKeysForObject:driver];
+    [[self friendlyNameSwitchamajigDictionary] removeObjectsForKeys:friendlyNames];
+    [statusInfoLock unlock];
+    listenerDevicesToIgnore = 1; // Total hack to avoid race condition
+}
 
 // SwitchamajigDeviceListenerDelegate
 - (void) SwitchamajigDeviceListenerFoundDevice:(id)listener hostname:(NSString*)hostname friendlyname:(NSString*)friendlyname {
+    if(listenerDevicesToIgnore) {
+        --listenerDevicesToIgnore;
+        return;
+    }
     [statusInfoLock lock];
     SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyname];
     // Don't constantly reinitialize drivers
