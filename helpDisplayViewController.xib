@@ -2,19 +2,19 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1296</int>
-		<string key="IBDocument.SystemVersion">11D50b</string>
-		<string key="IBDocument.InterfaceBuilderVersion">2182</string>
-		<string key="IBDocument.AppKitVersion">1138.32</string>
-		<string key="IBDocument.HIToolboxVersion">568.00</string>
+		<string key="IBDocument.SystemVersion">11E53</string>
+		<string key="IBDocument.InterfaceBuilderVersion">2549</string>
+		<string key="IBDocument.AppKitVersion">1138.47</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">1179</string>
+			<string key="NS.object.0">1498</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<string>IBProxyObject</string>
-			<string>IBUIView</string>
 			<string>IBUITextView</string>
+			<string>IBUIView</string>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -75,23 +75,29 @@ eW914oCZcmUgc2Vjb25kcyBhd2F5IGZyb20gYmVpbmcgc2V0IHVwLiBQcmVzcyB0aGUgV1BTIGJ1dHRv
 biBvbiB0aGUgd2lyZWxlc3Mgcm91dGVyIGFuZCBob2xkIGRvd24gdGhlIGJ1dHRvbiBvbiB0aGUgU3dp
 dGNoYW1hamlnIGZvciB0ZW4gc2Vjb25kcy4gV2hlbiB0aGUgaW5kaWNhdG9yIGxpZ2h0IHR1cm5zIHll
 bGxvdywgeW914oCZcmUgZG9uZS4NDTMg4oCTIElmIHlvdSdyZSBydW5uaW5nIGlPUyA1LjAgb3IgYWJv
-dmUsIHlvdSBjYW4gY29uZmlndXJlIHRoZSBTd2l0Y2hhbWFqaWcgZnJvbSB0aGlzIGFwcC4gQ29ubmVj
-dCB0byBpdCB3aXRoIGVpdGhlciBtZXRob2QgKDEpIG9yICgyKSBhYm92ZSwgYW5kIHNlbGVjdCAiQ29u
-ZmlnLiIgWW91IGNhbiB0aGVuIGVudGVyIHRoZSBuZXR3b3JrIG5hbWUgYW5kIGNoYW5uZWwgbnVtYmVy
-LiBPbmNlIHlvdSBwcmVzcyB0aGUgYnV0dG9uIHRvIHN3aXRjaCB0byBhIG5ldyBuZXR3b3JrLCB0aGlz
-IGFwcCB3aWxsIGxvc2UgY29udGFjdCB3aXRoIHRoZSBTd2l0Y2hhbWFqaWcgdW50aWwgeW91IG1vdmUg
-dGhlIGlQYWQgdG8gdGhlIHNhbWUgbmV0d29yayBhcyB0aGUgU3dpdGNoYW1hamlnLiBJZiB0aGUgU3dp
-dGNoYW1hamlnIGZhaWxzIHRvIGNvbm5lY3QgdG8gdGhlIG5ldyBuZXR3b3JrLCBpdCB3aWxsIGluc3Rl
-YWQgYWNjZXB0IGRpcmVjdCBjb25uZWN0aW9ucyBhcyBkZXNjcmliZWQgYWJvdmUgaW4gKDEpLg0NT25j
-ZSB5b3VyIGlQYWQgYW5kIFN3aXRjaGFtYWppZyBhcmUgb24gdGhlIHNhbWUgbmV0d29yaywgcnVuIHRo
-ZSBhcHAuIEl0IHNob3VsZCBmaW5kIHlvdXIgU3dpdGNoYW1hamlnIHdpdGhpbiBmaWZ0ZWVuIHNlY29u
-ZHMuIFRhcCB0aGUgbmFtZSB0byBjb25uZWN0LiBUaGVuIHNlbGVjdCBhIHN3aXRjaCBwYW5lbCBjb25m
-aWd1cmF0aW9uIGFuZCBoYXZlIGZ1biENDVJlbWVtYmVyIHRoYXQgdGhlIFN3aXRjaGFtYWppZyBpcyBp
-bnRlbmRlZCBmb3IgdG95cyBhbmQgb3RoZXIgc21hbGwgZGV2aWNlcy4gRG9uJ3QgdXNlIGl0IHRvIGNv
-bnRyb2wgYSBkZXZpY2UgY2FwYWJsZSBvZiBjYXVzaW5nIGluanVyeSwgc3VjaCBhcyBhIHBvd2VyIHdo
-ZWVsY2hhaXIgb3Igb3RoZXIgaGVhdnkgbWFjaGluZXJ5LiBGb3IgdGhlIHNha2Ugb2Ygc2FmZXR5LCBh
-c3N1bWUgdGhhdCBhbnkgc3dpdGNoIHBvcnQgY291bGQgdHVybiBvbiBvciBvZmYgYXQgYW55IHRpbWUu
-A</bytes>
+dmUgYW5kIGhhdmUgZW5hYmxlZCAiU2hvdyBOZXR3b3JrIENvbmZpZyBCdXR0b24iIGluIHRoZSBhcHAg
+c2V0dGluZ3MsIHlvdSBjYW4gY29uZmlndXJlIHRoZSBTd2l0Y2hhbWFqaWcgQ29udHJvbGxlciBmcm9t
+IHRoaXMgYXBwLiBDb25uZWN0IHRvIGl0IHdpdGggZWl0aGVyIG1ldGhvZCAoMSkgb3IgKDIpIGFib3Zl
+LCBhbmQgc2VsZWN0ICJDb25maWcuIiBZb3UgY2FuIHRoZW4gZW50ZXIgdGhlIG5ldHdvcmsgbmFtZSBh
+bmQgY2hhbm5lbCBudW1iZXIuIE9uY2UgeW91IHByZXNzIHRoZSBidXR0b24gdG8gc3dpdGNoIHRvIGEg
+bmV3IG5ldHdvcmssIHRoaXMgYXBwIHdpbGwgbG9zZSBjb250YWN0IHdpdGggdGhlIFN3aXRjaGFtYWpp
+ZyB1bnRpbCB5b3UgbW92ZSB0aGUgaVBhZCB0byB0aGUgc2FtZSBuZXR3b3JrIGFzIHRoZSBTd2l0Y2hh
+bWFqaWcuIElmIHRoZSBTd2l0Y2hhbWFqaWcgZmFpbHMgdG8gY29ubmVjdCB0byB0aGUgbmV3IG5ldHdv
+cmssIGl0IHdpbGwgaW5zdGVhZCBhY2NlcHQgZGlyZWN0IGNvbm5lY3Rpb25zIGFzIGRlc2NyaWJlZCBh
+Ym92ZSBpbiAoMSkuDQ1PbmNlIHlvdXIgaVBhZCBhbmQgU3dpdGNoYW1hamlnIGFyZSBvbiB0aGUgc2Ft
+ZSBuZXR3b3JrLCBydW4gdGhlIGFwcC4gSXQgc2hvdWxkIGZpbmQgeW91ciBTd2l0Y2hhbWFqaWcgd2l0
+aGluIGZpZnRlZW4gc2Vjb25kcy4gCgpUaGVyZSBhcmUgc2V2ZXJhbCB1c2VmdWwgc2V0dGluZ3MgZm9y
+IHRoaXMgYXBwLiBJZiB5b3UgZW5hYmxlIGVkaXRpbmcgb2Ygc3dpdGNoIHBhbmVscywgeW91IGNhbiBk
+ZWZpbmUgeW91ciBvd24gc3dpdGNoIHBhbmVscywgYW5kIGFkZCBpbWFnZXMgYW5kIHNvdW5kIHRvIHRo
+ZW0uIAoKVG8gZW5hYmxlIGEgcGVyc29uIHdpdGggc3BlY2lhbCBuZWVkcyB0byB1c2UgdGhpcyBhcHAg
+aW5kZXBlbmRlbnRseSwgaW4gdGhlIHNldHRpbmdzIHlvdSBjYW4gZGlzYWJsZSBkaXNwbGF5IG9mIHRo
+aXMgaGVscCBzY3JlZW4sIG5ldHdvcmsgY29uZmlndXJhdGlvbiwgYW5kIHBhbmVsIGVkaXRpbmcuIFRo
+ZXJlIGFyZSBhbHNvIHNldHRpbmdzIHRvIGNoYW5nZSB0aGUgc2l6ZSBvZiB0aGUgbmF2aWdhdGlvbiBi
+dXR0b25zIGFuZCB0aGUgdGV4dC4gCgpSZW1lbWJlciB0aGF0IHRoZSBTd2l0Y2hhbWFqaWcgaXMgaW50
+ZW5kZWQgZm9yIHRveXMgYW5kIG90aGVyIHNtYWxsIGRldmljZXMuIERvbid0IHVzZSBpdCB0byBjb250
+cm9sIGEgZGV2aWNlIGNhcGFibGUgb2YgY2F1c2luZyBpbmp1cnksIHN1Y2ggYXMgYSBwb3dlciB3aGVl
+bGNoYWlyIG9yIG90aGVyIGhlYXZ5IG1hY2hpbmVyeS4gRm9yIHRoZSBzYWtlIG9mIHNhZmV0eSwgYXNz
+dW1lIHRoYXQgYW55IHN3aXRjaCBwb3J0IGNvdWxkIHR1cm4gb24gb3Igb2ZmIGF0IGFueSB0aW1lLg</bytes>
 						</object>
 						<object class="IBUITextInputTraits" key="IBUITextInputTraits">
 							<int key="IBUIAutocapitalizationType">2</int>
@@ -239,6 +245,6 @@ A</bytes>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-		<string key="IBCocoaTouchPluginVersion">1179</string>
+		<string key="IBCocoaTouchPluginVersion">1498</string>
 	</data>
 </archive>
