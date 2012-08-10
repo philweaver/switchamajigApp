@@ -502,6 +502,7 @@
 				PRODUCT_NAME = Switchamajig;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
@@ -530,6 +531,7 @@
 				PRODUCT_NAME = Switchamajig;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 2;
 				VALIDATE_PRODUCT = NO;
 			};
@@ -545,6 +547,7 @@
 				INFOPLIST_FILE = "SwitchControl/SwitchControl-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 2;
 				"USER_HEADER_SEARCH_PATHS[arch=*]" = "$(BUILT_PRODUCTS_DIR)";
 				WRAPPER_EXTENSION = app;
@@ -561,6 +564,7 @@
 				INFOPLIST_FILE = "SwitchControl/SwitchControl-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 2;
 				"USER_HEADER_SEARCH_PATHS[arch=*]" = "$(BUILT_PRODUCTS_DIR)";
 				WRAPPER_EXTENSION = app;
