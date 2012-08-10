@@ -480,7 +480,17 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         CGRect frame = [button frame];
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<frame>%d %d %d %d</frame>\n", (int)frame.origin.x, (int)frame.origin.y, (int)frame.size.width, (int)frame.size.height]];
         CGFloat r, g, b, a;
+        // iOS 5.0 allows getRed green blue, but for earlier releases we need this strange thing
+#if 0
         [[button backgroundColor] getRed:&r green:&g blue:&b alpha:&a];
+#else
+        CGColorRef color = [[button backgroundColor] CGColor];
+        const CGFloat *components = CGColorGetComponents(color);
+        r = components[0];
+        g = components[1];
+        b = components[2];
+        a = components[3];
+#endif
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<rgbacolor>%3.1f %3.1f %3.1f %3.1f</rgbacolor>\n", r, g, b, a]];
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<switchtext>%@</switchtext>\n", [button titleForState:UIControlStateNormal]]];
         if([button imageFilePath]) {
