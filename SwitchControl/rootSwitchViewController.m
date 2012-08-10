@@ -122,7 +122,8 @@
         
         // Set width of help and config buttons
         int helpConfigButtonWidth = 250; // (panelButtonHeight > 200) ? panelButtonHeight : 200;
-        if(displayNetworkConfigButton) {
+        if(displayNetworkConfigButton && [UIAlertView instancesRespondToSelector:@selector(setAlertViewStyle:)])
+        {
             NSString *configText = @"Configure Network Settings";
             [self setConfigButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
             /* Don't make config and text buttons resizable
