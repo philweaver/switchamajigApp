@@ -11,11 +11,12 @@
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
 @interface defineActionViewController ()
 - (void) toggleSwitchButton:(id)sender;
+- (NSString*) generateIrXmlCommand;
 @end
 
 @implementation defineActionViewController
 @synthesize actions;
-@synthesize friendlyNames;
+NSArray *filterBrands(NSArray *bigListOfBrands);
 
 // There's probably a cleaner way, but here we are
 #define NUM_ACTIONS 4
@@ -24,16 +25,19 @@
 #define INDEX_FOR_IRCOMMAND 3
 NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn Switches Off", @"IR Command"};
 
-- (id) initWithActions:(NSMutableArray *)actionsInit andFriendlyNames:(NSArray *)friendlyNamesInit {
+- (id) initWithActions:(NSMutableArray *)actionsInit appDelegate:(SwitchControlAppDelegate *)appDelegate {
     self = [super init];
     if(self != nil) {
         [self setActions:actionsInit];
-        [self setFriendlyNames:[[NSMutableArray alloc] initWithCapacity:5]];
-        [[self friendlyNames] setArray:friendlyNamesInit];
+        [self setAppDelegate:appDelegate];
         [self setContentSizeForViewInPopover:CGSizeMake(600, 600)];
+        [[appDelegate statusInfoLock] lock];
+        friendlyNamesArray = [[NSMutableArray alloc] initWithArray:[[appDelegate friendlyNameSwitchamajigDictionary] allKeys]];
+        [[appDelegate statusInfoLock] unlock];
     }
     return self;
 }
+
 
 - (void)loadView {
     CGSize viewSize = [self contentSizeForViewInPopover];
@@ -44,8 +48,8 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     NSInteger startingFriendlyNameIndex = 0;
 
     // Add default and current friendly name to list of friendly names if not already there
-    if(![[self friendlyNames] containsObject:@"Default"])
-        [[self friendlyNames] insertObject:@"Default" atIndex:0];
+    if(![friendlyNamesArray containsObject:@"Default"])
+        [friendlyNamesArray insertObject:@"Default" atIndex:0];
     NSError *xmlError;
     DDXMLNode *action;
     for(action in [self actions]) {
@@ -53,9 +57,9 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         DDXMLNode *friendlyNameNode;
         for(friendlyNameNode in friendlyNamesDDXML) {
             NSString *friendlyName = [friendlyNameNode stringValue];
-            NSInteger indexOfNameNode = [[self friendlyNames] indexOfObject:friendlyName];
+            NSInteger indexOfNameNode = [friendlyNamesArray indexOfObject:friendlyName];
             if(indexOfNameNode == NSNotFound) {
-                [[self friendlyNames] insertObject:friendlyName atIndex:1];
+                [friendlyNamesArray insertObject:friendlyName atIndex:1];
                 startingFriendlyNameIndex = 1;
             } else {
                 startingFriendlyNameIndex = indexOfNameNode;
@@ -85,7 +89,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         [myView addSubview:switchButtons[i]];
     }
     // IR command chooser
-    brands = [SwitchamajigIRDeviceDriver getIRDatabaseBrands];
+    brands = filterBrands([SwitchamajigIRDeviceDriver getIRDatabaseBrands]);
     irPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 250, 600, 100)];
     [irPicker setDelegate:self];
     [irPicker setDataSource:self];
@@ -93,6 +97,20 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [irPicker selectRow:0 inComponent:0 animated:NO];
     [irPicker setHidden:YES];
     [myView addSubview:irPicker];
+    filterBrandButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [filterBrandButton setFrame:CGRectMake(50, 450, 150, 44)];
+    [filterBrandButton setTitle:@"Show More Brands" forState:UIControlStateNormal];
+    [filterBrandButton addTarget:self action:@selector(filterBrandToggle:) forControlEvents:UIControlEventTouchUpInside];
+    [filterBrandButton setHidden:YES];
+    [myView addSubview:filterBrandButton];
+
+    testIrButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [testIrButton setFrame:CGRectMake(250, 500, 100, 44)];
+    [testIrButton setTitle:@"Test Command" forState:UIControlStateNormal];
+    [testIrButton addTarget:self action:@selector(testIRCommand:) forControlEvents:UIControlEventTouchUpInside];
+    [testIrButton setHidden:YES];
+    [myView addSubview:testIrButton];
+
     
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(50, 10, 150, 44)];
     [label setBackgroundColor:[UIColor blackColor]];
@@ -102,7 +120,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [label setFont:[UIFont systemFontOfSize:20]];
     [myView addSubview:label];
     
-    label = [[UILabel alloc] initWithFrame:CGRectMake(225, 10, 150, 44)];
+    label = [[UILabel alloc] initWithFrame:CGRectMake(200, 10, 200, 44)];
     [label setBackgroundColor:[UIColor blackColor]];
     [label setTextColor:[UIColor whiteColor]];
     [label setText:@"Choose Action"];
@@ -182,6 +200,40 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [self updateActions];
 }
 
+- (void) filterBrandToggle:(id)sender {
+    NSString *currentBrand = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0];
+    if([[filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"]) {
+        [filterBrandButton setTitle:@"Show Fewer Brands" forState:UIControlStateNormal];
+        brands = [SwitchamajigIRDeviceDriver getIRDatabaseBrands];
+    } else {
+        [filterBrandButton setTitle:@"Show More Brands" forState:UIControlStateNormal];
+        brands = filterBrands([SwitchamajigIRDeviceDriver getIRDatabaseBrands]);
+    }
+    int brandIndex = [brands indexOfObject:currentBrand];
+    [irPicker reloadComponent:0];
+    [irPicker selectRow:brandIndex inComponent:0 animated:NO];
+}
+
+-(void) testIRCommand:(id)sender {
+    NSString *irXmlCommand = [self generateIrXmlCommand];
+    NSError *xmlError;
+    DDXMLDocument *action = [[DDXMLDocument alloc] initWithXMLString:irXmlCommand options:0 error:&xmlError];
+    if(action == nil) {
+        NSLog(@"testIRCommand: Failed to create action XML. Error = %@. String = %@.\n", xmlError, irXmlCommand);
+        return;
+    }
+    DDXMLNode *actionNode = [[action children] objectAtIndex:0];
+    NSString *friendlyName = [self pickerView:actionPicker titleForRow:[actionPicker selectedRowInComponent:0] forComponent:0];
+    [[[self appDelegate] statusInfoLock] lock];
+    SwitchamajigDriver *driver = [[[self appDelegate] friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
+    if(driver) {
+        if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
+            NSError *error;
+            [driver issueCommandFromXMLNode:actionNode error:&error];
+        }
+    }
+    [[[self appDelegate] statusInfoLock] unlock];
+}
 
 // UIPickerViewDataSource
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
@@ -191,6 +243,15 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         return 3;
     NSLog(@"defineActionViewController: numberOfComponentsInPickerView: PickerView unrecognized.");
     return 0;
+}
+
+- (NSString*) generateIrXmlCommand {
+    NSString *brand = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0];
+    NSString *device = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1];
+    NSString *function = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:2] forComponent:2];
+    NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function onDevice:device forBrand:brand];
+    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, function, irCommand];
+    return irXmlCommand;
 }
 
 - (void) updateActions {
@@ -218,11 +279,8 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         [xmlString appendString:@"</turnSwitchesOff>"];
     }
     if(actionIndex == INDEX_FOR_IRCOMMAND) {
-        NSString *brand = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0];
-        NSString *device = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1];
-        NSString *function = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:2] forComponent:2];
-        NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function onDevice:device forBrand:brand];
-        [xmlString appendString:[NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, function, irCommand]];
+        NSString *irXmlCommand = [self generateIrXmlCommand];
+        [xmlString appendString:irXmlCommand];
     }
 
     [xmlString appendString:@"</actionsequence>"];
@@ -241,7 +299,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
     if(pickerView == actionPicker) {
         if(component == 0)
-            return [[self friendlyNames] count];
+            return [friendlyNamesArray count];
         return NUM_ACTIONS;
     }
     if(pickerView == irPicker) {
@@ -260,11 +318,26 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
 // UIPickerViewDelegate
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
     if(pickerView == actionPicker) {
+        if(component == 0) {
+            // Show testIR button if the current driver can handle it and we are already showing IR options.
+            [testIrButton setHidden:YES];
+            NSString *friendlyName = [self pickerView:pickerView titleForRow:row forComponent:0];
+            [[[self appDelegate] statusInfoLock] lock];
+            SwitchamajigDriver *driver = [[[self appDelegate] friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
+            if(driver) {
+                if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
+                    if([[self pickerView:actionPicker titleForRow:[actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:actionArray[INDEX_FOR_IRCOMMAND]])
+                        [testIrButton setHidden:NO];
+                }
+            }
+            [[[self appDelegate] statusInfoLock] unlock];
+        }
         if(component == 1) {
             // Hide everything
             for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
                 [switchButtons[i] setHidden:YES];
             [irPicker setHidden:YES];
+            [filterBrandButton setHidden:YES];
             switch (row) {
                 case 1:
                 case 2:
@@ -273,6 +346,16 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                     break;
                 case 3:
                     [irPicker setHidden:NO];
+                    [filterBrandButton setHidden:NO];
+                    NSString *friendlyName = [self pickerView:pickerView titleForRow:[actionPicker selectedRowInComponent:0] forComponent:0];
+                    [[[self appDelegate] statusInfoLock] lock];
+                    SwitchamajigDriver *driver = [[[self appDelegate] friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
+                    if(driver) {
+                        if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
+                            [testIrButton setHidden:NO];
+                        }
+                    }
+                    [[[self appDelegate] statusInfoLock] unlock];
            }
         }
         [self updateActions];
@@ -297,7 +380,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     if(pickerView == actionPicker) {
         if(component == 0) {
             // Friendly names
-            return [[self friendlyNames] objectAtIndex:row];
+            return [friendlyNamesArray objectAtIndex:row];
         }
         return actionArray[row];
     }
@@ -320,10 +403,39 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         return 250;
     }
     if(pickerView == irPicker) {
+        if(component == 2)
+            return 200;
         return 160;
     }
     NSLog(@"defineActionViewController: pickerView widthForComponent: PickerView unrecognized.");
     return 0;
 }
 
+NSArray *filterBrands(NSArray *bigListOfBrands) {
+    NSMutableArray *filteredBrands = [[NSMutableArray alloc] initWithCapacity:10];
+    NSString *brand;
+    for(brand in bigListOfBrands) {
+        if([brand isEqualToString:@"Panasonic"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Sony"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Samsung"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Philips"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Tivo"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Time Warner"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Comcast"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Sharp"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Sanyo"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Scientific Atlanta"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Roku"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"RCA"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Motorola"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"DirecTV"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Dish"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Coby"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"LG"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Kenwood"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Pioneer"]) [filteredBrands addObject:brand];
+        if([brand isEqualToString:@"Apple"]) [filteredBrands addObject:brand];
+    }
+    return filteredBrands;
+}
 @end

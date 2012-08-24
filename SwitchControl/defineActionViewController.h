@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "switchPanelViewController.h"
+#import "SwitchControlAppDelegate.h"
 #define NUM_SJIG_SWITCHES 6
 @interface defineActionViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate> {
 @public
@@ -17,8 +18,11 @@
     NSArray *brands;
     NSArray *devices;
     NSArray *functions;
+    UIButton *filterBrandButton;
+    UIButton *testIrButton;
+    NSMutableArray *friendlyNamesArray;
 }
-- (id) initWithActions:(NSMutableArray *)actionsInit andFriendlyNames:(NSArray *)friendlyNamesInit;
+- (id) initWithActions:(NSMutableArray *)actionsInit appDelegate:(SwitchControlAppDelegate *)appDelegate;
 @property (nonatomic, strong) NSMutableArray *actions;
-@property (nonatomic, strong) NSMutableArray *friendlyNames;
+@property (nonatomic, strong) SwitchControlAppDelegate *appDelegate;
 @end

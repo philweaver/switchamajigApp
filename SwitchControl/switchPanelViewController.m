@@ -687,14 +687,13 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     if(currentButton == nil)
         return;
     UIButton *senderButton = sender;
-    NSArray *friendlyNames = [[appDelegate friendlyNameSwitchamajigDictionary] allKeys];
     NSMutableArray *actions;
     if([[senderButton titleForState:UIControlStateNormal] isEqualToString:@"Action For Touch"])
         actions = [currentButton activateActions];
     else {
         actions = [currentButton deactivateActions];
     }
-    defineActionViewController *newViewController = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:friendlyNames];
+    defineActionViewController *newViewController = [[defineActionViewController alloc] initWithActions:actions appDelegate:appDelegate];
     actionPopover = [[UIPopoverController alloc] initWithContentViewController:newViewController];
     [actionPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
