@@ -25,6 +25,7 @@
     int switch_state;
     NSNetServiceBrowser *netServiceBrowser;
     SwitchamajigControllerDeviceListener *sjigControllerListener;
+    SwitchamajigIRDeviceListener *sjigIRListener;
     int friendlyNameDictionaryIndex;
     NSTimer *statusMessageTimer;
     int listenerDevicesToIgnore;

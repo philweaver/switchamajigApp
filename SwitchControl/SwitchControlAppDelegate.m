@@ -62,20 +62,28 @@
     [self.window makeKeyAndVisible];  
     // Listen for Switchamajigs
     sjigControllerListener = [[SwitchamajigControllerDeviceListener alloc] initWithDelegate:self];
+    sjigIRListener = [[SwitchamajigIRDeviceListener alloc] initWithDelegate:self];
     //  Initialize switch state
     [self setSwitch_socket:-1];
     switch_state = 0;
     [self setSwitchStateLock:[[NSLock alloc] init]];
     // Create browser to listen for Bonjour services
-    netServiceBrowser = [[NSNetServiceBrowser alloc] init];
-    [netServiceBrowser setDelegate:self];
-    [netServiceBrowser searchForServicesOfType:@"_sqp._tcp." inDomain:@""];
+    //netServiceBrowser = [[NSNetServiceBrowser alloc] init];
+    //[netServiceBrowser setDelegate:self];
+    //[netServiceBrowser searchForServicesOfType:@"_sqp._tcp." inDomain:@""];
     // Prepare to run status timer
     statusMessageTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
     //[netServiceBrowser searchForServicesOfType:@"_http._tcp." inDomain:@""];
     friendlyNameDictionaryIndex = 0;
     [self setStatusMessages:[[NSMutableArray alloc] initWithCapacity:5]];
     listenerDevicesToIgnore = 0;
+    // Add IR database
+    NSString *irDatabasePath = [[NSBundle mainBundle] pathForResource:@"IRDB" ofType:@"sqlite"];
+    NSError *error;
+    [SwitchamajigIRDeviceDriver loadIRCodeDatabase:irDatabasePath error:&error];
+    if(error) {
+        NSLog(@"Error loading IR database: %@", error);
+    }
     return YES;
 }
 
@@ -540,7 +548,10 @@ char *commands[] = {
         [sjcdriver setUseUDP:[[NSUserDefaults standardUserDefaults] boolForKey:@"useUDPWithSwitchamajigControllerPreference"]];
         driver = sjcdriver;
     }
-    else {
+    else if([listener isKindOfClass:[SwitchamajigIRDeviceListener class]]) {
+        SwitchamajigIRDeviceDriver *sjirdriver = [SwitchamajigIRDeviceDriver alloc];
+        driver = sjirdriver;
+    } else {
         // Unrecognized
         NSLog(@"SwitchamajigDeviceListenerFoundDevice: Unrecognized listener");
         [statusInfoLock unlock];

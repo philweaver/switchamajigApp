@@ -8,7 +8,7 @@
 
 #import "defineActionViewController.h"
 #import "../../KissXML/KissXML/DDXMLDocument.h"
-
+#import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
 @interface defineActionViewController ()
 - (void) toggleSwitchButton:(id)sender;
 @end
@@ -18,10 +18,11 @@
 @synthesize friendlyNames;
 
 // There's probably a cleaner way, but here we are
-#define NUM_ACTIONS 3
+#define NUM_ACTIONS 4
 #define INDEX_FOR_TURNSWITCHESON 1
 #define INDEX_FOR_TURNSWITCHESOFF 2
-NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn Switches Off"};
+#define INDEX_FOR_IRCOMMAND 3
+NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn Switches Off", @"IR Command"};
 
 - (id) initWithActions:(NSMutableArray *)actionsInit andFriendlyNames:(NSArray *)friendlyNamesInit {
     self = [super init];
@@ -29,7 +30,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         [self setActions:actionsInit];
         [self setFriendlyNames:[[NSMutableArray alloc] initWithCapacity:5]];
         [[self friendlyNames] setArray:friendlyNamesInit];
-        [self setContentSizeForViewInPopover:CGSizeMake(470, 400)];
+        [self setContentSizeForViewInPopover:CGSizeMake(600, 600)];
     }
     return self;
 }
@@ -63,13 +64,14 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     }
 
     // Initialize Picker
-    actionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(50, 50, 370, 100)];
+    actionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 50, 600, 100)];
     [actionPicker setDelegate:self];
     [actionPicker setDataSource:self];
     [actionPicker setShowsSelectionIndicator:YES];
     [actionPicker selectRow:startingFriendlyNameIndex inComponent:0 animated:NO];
     [myView addSubview:actionPicker];
     
+    // Switches for turn switches on/off
     int x = 55, y = 225;
     for(int i=0; i < NUM_SJIG_SWITCHES; ++i) {
         switchButtons[i] = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -82,6 +84,16 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         [switchButtons[i] setHidden:YES];
         [myView addSubview:switchButtons[i]];
     }
+    // IR command chooser
+    brands = [SwitchamajigIRDeviceDriver getIRDatabaseBrands];
+    irPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 250, 600, 100)];
+    [irPicker setDelegate:self];
+    [irPicker setDataSource:self];
+    [irPicker setShowsSelectionIndicator:YES];
+    [irPicker selectRow:0 inComponent:0 animated:NO];
+    [irPicker setHidden:YES];
+    [myView addSubview:irPicker];
+    
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(50, 10, 150, 44)];
     [label setBackgroundColor:[UIColor blackColor]];
     [label setTextColor:[UIColor whiteColor]];
@@ -173,7 +185,12 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
 
 // UIPickerViewDataSource
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
-    return 2;
+    if(pickerView == actionPicker)
+        return 2;
+    if(pickerView == irPicker)
+        return 3;
+    NSLog(@"defineActionViewController: numberOfComponentsInPickerView: PickerView unrecognized.");
+    return 0;
 }
 
 - (void) updateActions {
@@ -200,6 +217,14 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         }
         [xmlString appendString:@"</turnSwitchesOff>"];
     }
+    if(actionIndex == INDEX_FOR_IRCOMMAND) {
+        NSString *brand = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0];
+        NSString *device = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1];
+        NSString *function = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:2] forComponent:2];
+        NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function onDevice:device forBrand:brand];
+        [xmlString appendString:[NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, function, irCommand]];
+    }
+
     [xmlString appendString:@"</actionsequence>"];
     [xmlString appendString:@"</actionsequenceondevice>"];
     NSError *xmlError;
@@ -214,43 +239,91 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-    if(component == 0)
-        return [[self friendlyNames] count];
-    return NUM_ACTIONS;
+    if(pickerView == actionPicker) {
+        if(component == 0)
+            return [[self friendlyNames] count];
+        return NUM_ACTIONS;
+    }
+    if(pickerView == irPicker) {
+        if(component == 0)
+            return [brands count];
+        if(component == 1)
+            return [devices count];
+        if(component == 2)
+            return [functions count];
+        return 0;
+    }
+    NSLog(@"defineActionViewController: pickerView numberOfRowsInComponent: PickerView unrecognized.");
+    return 0;
 }
 
 // UIPickerViewDelegate
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
-    if(component == 1) {
-        if((row == 1) || (row == 2)) {
-            // Display the switch number buttons
+    if(pickerView == actionPicker) {
+        if(component == 1) {
+            // Hide everything
             for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
-            {
-                [switchButtons[i] setHidden:NO];
-            }
-        } else {
-            for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
-            {
                 [switchButtons[i] setHidden:YES];
-            }
+            [irPicker setHidden:YES];
+            switch (row) {
+                case 1:
+                case 2:
+                    for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
+                        [switchButtons[i] setHidden:YES];
+                    break;
+                case 3:
+                    [irPicker setHidden:NO];
+           }
         }
+        [self updateActions];
+    } else if(pickerView == irPicker){
+        if(component == 0) {
+            devices = [SwitchamajigIRDeviceDriver getIRDatabaseDevicesForBrand:[self pickerView:irPicker titleForRow:row forComponent:0]];
+            [irPicker reloadComponent:1];
+            [irPicker selectRow:0 inComponent:1 animated:NO];
+        } else if(component == 1) {
+            functions = [SwitchamajigIRDeviceDriver getIRDatabaseFunctionsOnDevice:[self pickerView:irPicker titleForRow:row forComponent:1] forBrand:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0]];
+            [irPicker reloadComponent:2];
+            [irPicker selectRow:0 inComponent:2 animated:NO];
+        } if(component == 2) {
+            [self updateActions];
+        }
+        return;
     }
-    [self updateActions];
+    NSLog(@"defineActionViewController: pickerView didSelectRow: PickerView unrecognized.");
 }
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
-    if(component == 0) {
-        // Friendly names
-        return [[self friendlyNames] objectAtIndex:row];
+    if(pickerView == actionPicker) {
+        if(component == 0) {
+            // Friendly names
+            return [[self friendlyNames] objectAtIndex:row];
+        }
+        return actionArray[row];
     }
-    return actionArray[row];
+    if(pickerView == irPicker) {
+        if(component == 0)
+            return [brands objectAtIndex:row];
+        if(component == 1)
+            return [devices objectAtIndex:row];
+        if(component == 2)
+            return [functions objectAtIndex:row];
+        return nil;
+    }
+    NSLog(@"defineActionViewController: pickerView titleForRow: PickerView unrecognized.");
+    return nil;
 }
 
 
 - (CGFloat)pickerView:(UIPickerView *)pickerView widthForComponent:(NSInteger)component {
-    if(component == 0)
-        return 150;
-    return 200;
+    if(pickerView == actionPicker) {
+        return 250;
+    }
+    if(pickerView == irPicker) {
+        return 160;
+    }
+    NSLog(@"defineActionViewController: pickerView widthForComponent: PickerView unrecognized.");
+    return 0;
 }
 
 @end

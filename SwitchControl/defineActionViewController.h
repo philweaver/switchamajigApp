@@ -12,7 +12,11 @@
 @interface defineActionViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate> {
 @public
     UIPickerView *actionPicker;
+    UIPickerView *irPicker;
     UIButton *switchButtons[NUM_SJIG_SWITCHES];
+    NSArray *brands;
+    NSArray *devices;
+    NSArray *functions;
 }
 - (id) initWithActions:(NSMutableArray *)actionsInit andFriendlyNames:(NSArray *)friendlyNamesInit;
 @property (nonatomic, strong) NSMutableArray *actions;
