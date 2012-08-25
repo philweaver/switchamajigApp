@@ -18,6 +18,7 @@
     NSArray *brands;
     NSArray *devices;
     NSArray *functions;
+    NSArray *irCommands;
     UIButton *filterBrandButton;
     UIButton *testIrButton;
     NSMutableArray *friendlyNamesArray;
