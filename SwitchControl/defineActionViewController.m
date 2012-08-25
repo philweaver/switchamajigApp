@@ -240,23 +240,11 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
 - (NSString*) generateIrXmlCommand {
     NSString *brand = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0];
     NSString *device = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1];
-    NSString *function = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:2] forComponent:2];
-    if(!irCommands || ![irCommands count]) {
-        NSLog(@"defineActionViewController: generateIrXmlCommand: irCommands is either nil or has 0 elements");
-        return nil;
-    }
-    int commandIndex;
-    if([irCommands count] == 1)
-        commandIndex = 0;
-    else {
-        commandIndex = [irPicker selectedRowInComponent:3];
-        if(commandIndex >= [irCommands count]) {
-            NSLog(@"defineActionViewController: generateIrXmlCommand: commandIndex out of bounds [bug!]");
-            commandIndex = 0;
-        }
-    }
-    NSString *irCommand = [irCommands objectAtIndex:commandIndex];
-    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@:%d\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, function, commandIndex, irCommand];
+    NSString *codeset = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:2] forComponent:2];
+    NSString *function = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:3] forComponent:3];
+    NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeset onDevice:device forBrand:brand];
+    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, codeset, function, irCommand];
+    NSLog(@"irCommand = %@", irCommand);
     return irXmlCommand;
 }
 
@@ -325,9 +313,9 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         if(component == 1)
             return [devices count];
         if(component == 2)
-            return [functions count];
+            return [codeSets count];
         if(component == 3)
-            return [irCommands count];
+            return [functions count];
         return 0;
     }
     NSLog(@"defineActionViewController: pickerView numberOfRowsInComponent: PickerView unrecognized.");
@@ -386,12 +374,12 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             [irPicker selectRow:0 inComponent:1 animated:NO];
             [self pickerView:irPicker didSelectRow:0 inComponent:1];
         } else if(component == 1) {
-            functions = [SwitchamajigIRDeviceDriver getIRDatabaseFunctionsOnDevice:[self pickerView:irPicker titleForRow:row forComponent:1] forBrand:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0]];
+            codeSets = [SwitchamajigIRDeviceDriver getIRDatabaseCodeSetsOnDevice:[self pickerView:irPicker titleForRow:row forComponent:1] forBrand:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0]];
             [irPicker reloadComponent:2];
             [irPicker selectRow:0 inComponent:2 animated:NO];
             [self pickerView:irPicker didSelectRow:0 inComponent:2];
         } else if(component == 2) {
-            irCommands = [SwitchamajigIRDeviceDriver irCodesForFunction:[self pickerView:irPicker titleForRow:row forComponent:2] onDevice:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1] forBrand:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0]];
+            functions = [SwitchamajigIRDeviceDriver getIRDatabaseFunctionsInCodeSet:[self pickerView:irPicker titleForRow:row forComponent:2] onDevice:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1] forBrand:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0]];
             [irPicker reloadComponent:3];
             [irPicker selectRow:0 inComponent:3 animated:NO];
             [self pickerView:irPicker didSelectRow:0 inComponent:3];
@@ -425,13 +413,17 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             return nil;
         }
         if(component == 2) {
+            if([codeSets count]>row)
+                return [codeSets objectAtIndex:row];
+            NSLog(@"defineActionViewController: pickerView titleForRow out of bounds for codesets");
+            return nil;
+        }
+        if(component == 3){
             if([functions count]>row)
                 return [functions objectAtIndex:row];
             NSLog(@"defineActionViewController: pickerView titleForRow out of bounds for functions");
             return nil;
         }
-        if(component == 3)
-            return [NSString stringWithFormat:@"%d", row+1];
         return nil;
     }
     NSLog(@"defineActionViewController: pickerView titleForRow: PickerView unrecognized.");
@@ -446,9 +438,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         return 250;
     }
     if(pickerView == irPicker) {
-        if(component == 3)
-            return 50;
-        return 250;
+        return 200;
     }
     NSLog(@"defineActionViewController: pickerView widthForComponent: PickerView unrecognized.");
     return 0;

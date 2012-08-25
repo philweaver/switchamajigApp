@@ -17,8 +17,8 @@
     UIButton *switchButtons[NUM_SJIG_SWITCHES];
     NSArray *brands;
     NSArray *devices;
+    NSArray *codeSets;
     NSArray *functions;
-    NSArray *irCommands;
     UIButton *filterBrandButton;
     UIButton *testIrButton;
     NSMutableArray *friendlyNamesArray;
