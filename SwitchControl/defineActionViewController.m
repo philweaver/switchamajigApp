@@ -17,6 +17,7 @@
 @implementation defineActionViewController
 @synthesize actions;
 NSArray *filterBrands(NSArray *bigListOfBrands);
+NSArray *filterFunctions(NSArray *bigListOfFunctions);
 
 // There's probably a cleaner way, but here we are
 #define NUM_ACTIONS 4
@@ -68,12 +69,27 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     }
 
     // Initialize Picker
-    actionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 50, 600, 100)];
+    actionPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(100, 50, 600, 162)];
     [actionPicker setDelegate:self];
     [actionPicker setDataSource:self];
     [actionPicker setShowsSelectionIndicator:YES];
     [actionPicker selectRow:startingFriendlyNameIndex inComponent:0 animated:NO];
     [myView addSubview:actionPicker];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(100, 6, 300, 44)];
+    [label setBackgroundColor:[UIColor blackColor]];
+    [label setTextColor:[UIColor whiteColor]];
+    [label setText:@"Choose Device"];
+    [label setTextAlignment:UITextAlignmentCenter];
+    [label setFont:[UIFont systemFontOfSize:20]];
+    [myView addSubview:label];
+    
+    label = [[UILabel alloc] initWithFrame:CGRectMake(400, 6, 300, 44)];
+    [label setBackgroundColor:[UIColor blackColor]];
+    [label setTextColor:[UIColor whiteColor]];
+    [label setText:@"Choose Action"];
+    [label setTextAlignment:UITextAlignmentCenter];
+    [label setFont:[UIFont systemFontOfSize:20]];
+    [myView addSubview:label];
     
     // Switches for turn switches on/off
     int x = 55, y = 225;
@@ -90,7 +106,21 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     }
     // IR command chooser
     brands = filterBrands([SwitchamajigIRDeviceDriver getIRDatabaseBrands]);
-    irPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 250, 800, 100)];
+    filterBrandButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [filterBrandButton setFrame:CGRectMake(25, 462, 200, 44)];
+    [filterBrandButton setTitle:@"Show More Brands" forState:UIControlStateNormal];
+    [filterBrandButton addTarget:self action:@selector(filterBrandToggle:) forControlEvents:UIControlEventTouchUpInside];
+    [filterBrandButton setHidden:YES];
+    [myView addSubview:filterBrandButton];
+    
+    filterFunctionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [filterFunctionButton setFrame:CGRectMake(575, 462, 200, 44)];
+    [filterFunctionButton setTitle:@"Show More Functions" forState:UIControlStateNormal];
+    [filterFunctionButton addTarget:self action:@selector(filterFunctionToggle:) forControlEvents:UIControlEventTouchUpInside];
+    [filterFunctionButton setHidden:YES];
+    [myView addSubview:filterFunctionButton];
+    
+    irPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 300, 800, 162)];
     [irPicker setDelegate:self];
     [irPicker setDataSource:self];
     [irPicker setShowsSelectionIndicator:YES];
@@ -98,13 +128,15 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [self pickerView:irPicker didSelectRow:0 inComponent:0];
     [irPicker setHidden:YES];
     [myView addSubview:irPicker];
-    filterBrandButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [filterBrandButton setFrame:CGRectMake(50, 450, 150, 44)];
-    [filterBrandButton setTitle:@"Show More Brands" forState:UIControlStateNormal];
-    [filterBrandButton addTarget:self action:@selector(filterBrandToggle:) forControlEvents:UIControlEventTouchUpInside];
-    [filterBrandButton setHidden:YES];
-    [myView addSubview:filterBrandButton];
-    
+
+    irPickerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 250, 800, 44)];
+    [irPickerLabel setBackgroundColor:[UIColor blackColor]];
+    [irPickerLabel setTextColor:[UIColor whiteColor]];
+    [irPickerLabel setText:@"Brand                         Device                         Code Set                Function"];
+    [irPickerLabel setTextAlignment:UITextAlignmentCenter];
+    [irPickerLabel setFont:[UIFont systemFontOfSize:20]];
+    [irPickerLabel setHidden:YES];
+    [myView addSubview:irPickerLabel];
 
     testIrButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [testIrButton setFrame:CGRectMake(250, 500, 100, 44)];
@@ -114,21 +146,6 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [myView addSubview:testIrButton];
 
     
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(50, 10, 150, 44)];
-    [label setBackgroundColor:[UIColor blackColor]];
-    [label setTextColor:[UIColor whiteColor]];
-    [label setText:@"Choose Device"];
-    [label setTextAlignment:UITextAlignmentCenter];
-    [label setFont:[UIFont systemFontOfSize:20]];
-    [myView addSubview:label];
-    
-    label = [[UILabel alloc] initWithFrame:CGRectMake(200, 10, 200, 44)];
-    [label setBackgroundColor:[UIColor blackColor]];
-    [label setTextColor:[UIColor whiteColor]];
-    [label setText:@"Choose Action"];
-    [label setTextAlignment:UITextAlignmentCenter];
-    [label setFont:[UIFont systemFontOfSize:20]];
-    [myView addSubview:label];
     // Determine initial action
     if([[self actions] count] == 1) { // Only support a single action for now
         action = [[self actions] objectAtIndex:0];
@@ -212,8 +229,32 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         brands = filterBrands([SwitchamajigIRDeviceDriver getIRDatabaseBrands]);
     }
     int brandIndex = [brands indexOfObject:currentBrand];
+    if(brandIndex == NSNotFound)
+        brandIndex = 0;
     [irPicker reloadComponent:0];
     [irPicker selectRow:brandIndex inComponent:0 animated:NO];
+    [self pickerView:irPicker didSelectRow:brandIndex inComponent:0];
+}
+
+- (void) filterFunctionToggle:(id)sender {
+    NSString *brand = [self getCurrentBrand];
+    NSString *device = [self getCurrentDevice];
+    NSString *codeSet = [self getCurrentCodeSet];
+    NSString *function = [self getCurrentFunction];
+    functions = [SwitchamajigIRDeviceDriver getIRDatabaseFunctionsInCodeSet:codeSet onDevice:device forBrand:brand];
+    NSString *currentTitle = [filterFunctionButton titleForState:UIControlStateNormal];
+    if([currentTitle isEqualToString:@"Show More Functions"]) {
+        [filterFunctionButton setTitle:@"Show Fewer Functions" forState:UIControlStateNormal];
+    } else {
+        [filterFunctionButton setTitle:@"Show More Functions" forState:UIControlStateNormal];
+        functions = filterFunctions(functions);
+    }
+    int functionIndex = [functions indexOfObject:function];
+    if(functionIndex == NSNotFound)
+        functionIndex = 0;
+    [irPicker reloadComponent:3];
+    [irPicker selectRow:functionIndex inComponent:3 animated:NO];
+    [self pickerView:irPicker didSelectRow:functionIndex inComponent:3];
 }
 
 -(void) testIRCommand:(id)sender {
@@ -237,11 +278,37 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [[[self appDelegate] statusInfoLock] unlock];
 }
 
+-(NSString *) getCurrentBrand {
+    return [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0];
+}
+
+-(NSString *) getCurrentDevice {
+    return [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1];
+}
+
+-(NSString *) getCurrentCodeSet {
+    int codesetIndex = [irPicker selectedRowInComponent:2];
+    if([codeSets count] <= codesetIndex) {
+        NSLog(@"getCurrentCodeSet: Crashing bug: codeSetIndex out of bounds.");
+        return nil;
+    }
+    return [codeSets objectAtIndex:codesetIndex];
+}
+
+-(NSString *) getCurrentFunction {
+    int functionIndex = [irPicker selectedRowInComponent:3];
+    if([functions count] <= functionIndex) {
+        NSLog(@"getCurrentFunction: Crashing bug: functionIndex out of bounds.");
+        return nil;
+    }
+    return [functions objectAtIndex:functionIndex];
+}
+
 - (NSString*) generateIrXmlCommand {
-    NSString *brand = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0];
-    NSString *device = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1];
-    NSString *codeset = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:2] forComponent:2];
-    NSString *function = [self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:3] forComponent:3];
+    NSString *brand = [self getCurrentBrand];
+    NSString *device = [self getCurrentDevice];
+    NSString *codeset = [self getCurrentCodeSet];
+    NSString *function = [self getCurrentFunction];
     NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeset onDevice:device forBrand:brand];
     NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, codeset, function, irCommand];
     NSLog(@"irCommand = %@", irCommand);
@@ -344,7 +411,9 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
                 [switchButtons[i] setHidden:YES];
             [irPicker setHidden:YES];
+            [irPickerLabel setHidden:YES];
             [filterBrandButton setHidden:YES];
+            [filterFunctionButton setHidden:YES];
             switch (row) {
                 case INDEX_FOR_TURNSWITCHESON:
                 case INDEX_FOR_TURNSWITCHESOFF:
@@ -353,7 +422,9 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                     break;
                 case INDEX_FOR_IRCOMMAND:
                     [irPicker setHidden:NO];
+                    [irPickerLabel setHidden:NO];
                     [filterBrandButton setHidden:NO];
+                    [filterFunctionButton setHidden:NO];
                     NSString *friendlyName = [self pickerView:pickerView titleForRow:[actionPicker selectedRowInComponent:0] forComponent:0];
                     [[[self appDelegate] statusInfoLock] lock];
                     SwitchamajigDriver *driver = [[[self appDelegate] friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
@@ -379,7 +450,14 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             [irPicker selectRow:0 inComponent:2 animated:NO];
             [self pickerView:irPicker didSelectRow:0 inComponent:2];
         } else if(component == 2) {
-            functions = [SwitchamajigIRDeviceDriver getIRDatabaseFunctionsInCodeSet:[self pickerView:irPicker titleForRow:row forComponent:2] onDevice:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1] forBrand:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0]];
+            if([codeSets count] <= row) {
+                NSLog(@"defineActionViewController:didSelectRow: row out of bounds for codeSets [bug]");
+                return;
+            }
+            NSString *codeSet = [codeSets objectAtIndex:row];
+            functions = [SwitchamajigIRDeviceDriver getIRDatabaseFunctionsInCodeSet:codeSet onDevice:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:1] forComponent:1] forBrand:[self pickerView:irPicker titleForRow:[irPicker selectedRowInComponent:0] forComponent:0]];
+            if([[filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"])
+                functions = filterFunctions(functions);
             [irPicker reloadComponent:3];
             [irPicker selectRow:0 inComponent:3 animated:NO];
             [self pickerView:irPicker didSelectRow:0 inComponent:3];
@@ -413,14 +491,17 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             return nil;
         }
         if(component == 2) {
-            if([codeSets count]>row)
-                return [codeSets objectAtIndex:row];
+            if([codeSets count]>row) {
+                //return [codeSets objectAtIndex:row];
+                // The code set names are obscure and take up too much horizontal space
+                return [NSString stringWithFormat:@"Code Set %d", row+1];
+            }
             NSLog(@"defineActionViewController: pickerView titleForRow out of bounds for codesets");
             return nil;
         }
         if(component == 3){
             if([functions count]>row)
-                return [functions objectAtIndex:row];
+                return [[functions objectAtIndex:row] capitalizedString];
             NSLog(@"defineActionViewController: pickerView titleForRow out of bounds for functions");
             return nil;
         }
@@ -438,7 +519,12 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         return 250;
     }
     if(pickerView == irPicker) {
-        return 200;
+        switch(component) {
+            case 0: return 200;
+            case 1: return 225;
+            case 2: return 125;
+            case 3: return 200;
+        }
     }
     NSLog(@"defineActionViewController: pickerView widthForComponent: PickerView unrecognized.");
     return 0;
@@ -471,4 +557,40 @@ NSArray *filterBrands(NSArray *bigListOfBrands) {
     }
     return filteredBrands;
 }
+
+NSArray *filterFunctions(NSArray *bigListOfFunctions) {
+    NSMutableArray *filteredFunctions = [[NSMutableArray alloc] initWithCapacity:10];
+    NSString *function;
+    for(function in bigListOfFunctions) {
+        if([function isEqualToString:@"POWER TOGGLE"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"POWER ON/OFF"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"PLAY"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"PAUSE"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"STOP"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"NEXT"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"PREVIOUS"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"FORWARD"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"REVERSE"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"OPEN CLOSE"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"PLAY PAUSE"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"SELECT"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"ENTER"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"OPEN"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"CANCEL"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"VOLUME UP"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"VOLUME DOWN"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"CHANNEL UP"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"CHANNEL DOWN"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"PREVIOUS CHANNEL"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"EJECT"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"HOME"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"OPEN/CLOSE"]) [filteredFunctions addObject:function];
+        if([function isEqualToString:@"PLAY/PAUSE"]) [filteredFunctions addObject:function];
+    }
+    // If we've overfiltered, just leave the big list alone
+    if([filteredFunctions count])
+        return filteredFunctions;
+    return bigListOfFunctions;
+}
+
 @end

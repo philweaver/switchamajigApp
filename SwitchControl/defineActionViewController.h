@@ -14,12 +14,14 @@
 @public
     UIPickerView *actionPicker;
     UIPickerView *irPicker;
+    UILabel *irPickerLabel;
     UIButton *switchButtons[NUM_SJIG_SWITCHES];
     NSArray *brands;
     NSArray *devices;
     NSArray *codeSets;
     NSArray *functions;
     UIButton *filterBrandButton;
+    UIButton *filterFunctionButton;
     UIButton *testIrButton;
     NSMutableArray *friendlyNamesArray;
 }
