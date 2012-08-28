@@ -993,7 +993,6 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
-#endif
 
 - (void)test_002_SwitchPanelViewController_009_AudioForSwitch {
     // Bring up the yellow panel to edit
@@ -1071,13 +1070,15 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New audio path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
+#endif
 
-#if RUN_ALL_TESTS
+#if 1
 - (void)test_003_defineActionViewController_001_Initialization {
     // Create and initialize with no friendly names or actions
     NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
-    NSMutableArray *names = [[NSMutableArray alloc] initWithCapacity:5];
-    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    SwitchControlAppDelegate *dummy_app_delegate = [SwitchControlAppDelegate alloc];
+    [dummy_app_delegate setFriendlyNameSwitchamajigDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     // Confirm that currently have only "Default", and that "No Action" is selected
     [defineVC loadView];
     STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 1, @"With no friendly names, defineActionPicker should show only one value: 'Default'");
@@ -1089,15 +1090,29 @@
     }
 
     // Add a couple of names to the friendly list, and create a "switch on" action
-    [names addObject:@"hoopy"];
-    [names addObject:@"frood"];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy1" forKey:@"hoopy"];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy2" forKey:@"frood"];
     NSString *xmlString = @"<actionsequenceondevice><friendlyname>Default</friendlyname> <actionsequence> <turnSwitchesOn>1 3</turnSwitchesOn> </actionsequence></actionsequenceondevice>";
-    DDXMLDocument *document = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:nil];
-    [actions addObject:[[document children] objectAtIndex:0]];
-    defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    NSError *xmlError;
+    DDXMLDocument *document = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:&xmlError];
+    if(xmlError)
+        NSLog(@"XML error creating document: %@", xmlError);
+    //NSLog(@"xmlString: %@", xmlString);
+    //NSLog(@"document XMLString: %@", [document XMLString]);
+    DDXMLNode *docChild = [[document children] objectAtIndex:0];
+    //NSLog(@"actions count before = %d", [actions count]);
+    [actions removeAllObjects];
+    [actions addObject:docChild];
+    //NSLog(@"actions count after = %d", [actions count]);
+    //[actions addObject:[[document children] objectAtIndex:0]];
+    //NSLog(@"docchild: %@", [docChild XMLString]);
+    //NSLog(@"action[0]: %@", [[actions objectAtIndex:0] XMLString]);
+    //DDXMLNode *arrayValue = [actions objectAtIndex:0];
+    //NSLog(@"Value from array = %@", [arrayValue XMLString]);
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     [defineVC loadView];
-    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 3, @"With two friendly names, must have three values in picker including 'Default'");
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 3, @"With two friendly names, must have three values in picker including 'Default' Instead have %d", [defineVC->actionPicker numberOfRowsInComponent:0]);
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:0] forComponent:0] isEqualToString:@"Default"], @"Friendly name 'Default' not selected as specified in xml");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"Turn Switches On"], @"'Turn Switches On' action not selected when in action sequence");
     int switchMask = 0;
@@ -1113,7 +1128,7 @@
     document = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:nil];
     [actions removeAllObjects];
     [actions addObject:[[document children] objectAtIndex:0]];
-    defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     [defineVC loadView];
     STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 3, @"With two friendly names, must have three values in picker including 'Default'");
@@ -1132,7 +1147,7 @@
     document = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:nil];
     [actions removeAllObjects];
     [actions addObject:[[document children] objectAtIndex:0]];
-    defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     [defineVC loadView];
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"No Action"], @"Must show 'No Action' when XML command is complex");
@@ -1141,9 +1156,10 @@
 - (void)test_003_defineActionViewController_002_UpdateNoActionAndSwitches {
     // Create and initialize with no friendly names or actions
     NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
-    NSMutableArray *names = [[NSMutableArray alloc] initWithCapacity:5];
-    [names addObject:@"hoopy"];
-    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions andFriendlyNames:names];
+    SwitchControlAppDelegate *dummy_app_delegate = [SwitchControlAppDelegate alloc];
+    [dummy_app_delegate setFriendlyNameSwitchamajigDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy1" forKey:@"hoopy"];
+    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [defineVC loadView];
     // Select Default and no action
     [defineVC->actionPicker selectRow:0 inComponent:0 animated:NO];

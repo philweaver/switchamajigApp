@@ -124,8 +124,6 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [irPicker setDelegate:self];
     [irPicker setDataSource:self];
     [irPicker setShowsSelectionIndicator:YES];
-    [irPicker selectRow:0 inComponent:0 animated:NO];
-    [self pickerView:irPicker didSelectRow:0 inComponent:0];
     [irPicker setHidden:YES];
     [myView addSubview:irPicker];
 
@@ -139,7 +137,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [myView addSubview:irPickerLabel];
 
     testIrButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [testIrButton setFrame:CGRectMake(250, 500, 100, 44)];
+    [testIrButton setFrame:CGRectMake(250, 500, 300, 44)];
     [testIrButton setTitle:@"Test Command" forState:UIControlStateNormal];
     [testIrButton addTarget:self action:@selector(testIRCommand:) forControlEvents:UIControlEventTouchUpInside];
     [testIrButton setHidden:YES];
@@ -149,9 +147,11 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     // Determine initial action
     if([[self actions] count] == 1) { // Only support a single action for now
         action = [[self actions] objectAtIndex:0];
+        //NSLog(@"action: %@", [action XMLString]);
         NSArray *actionSequences = [action nodesForXPath:@".//actionsequence" error:&xmlError];
         if([actionSequences count] == 1) { // Only support a single action for now
             DDXMLNode *actionSequence = [actionSequences objectAtIndex:0];
+            //NSLog(@"actionSequence: %@", [actionSequence XMLString]);
             int numUnsupportedThings = [[actionSequence nodesForXPath:@".//actionname" error:&xmlError] count];
             numUnsupportedThings += [[actionSequence nodesForXPath:@".//loop" error:&xmlError] count];
             numUnsupportedThings += [[actionSequence nodesForXPath:@".//delay" error:&xmlError] count];
@@ -162,30 +162,76 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             } else {
                 NSArray *turnSwitchesOnCommands = [actionSequence nodesForXPath:@".//turnSwitchesOn" error:&xmlError];
                 NSArray *turnSwitchesOffCommands = [actionSequence nodesForXPath:@".//turnSwitchesOff" error:&xmlError];
-                if([turnSwitchesOnCommands count] + [turnSwitchesOffCommands count] != 1) {
+                NSArray *irCommands = [actionSequence nodesForXPath:@".//docommand/@command" error:&xmlError];
+                if([turnSwitchesOnCommands count] + [turnSwitchesOffCommands count] + [irCommands count] != 1) {
+                    NSLog(@"XML string = %@", [actionSequence XMLString]);
                     NSLog(@"Don't have exactly one action in sequence. Initializing configured action to 'No Action'");
                 } else {
-                    DDXMLNode *switchCommandNode;
-                    if([turnSwitchesOnCommands count]) {
-                        switchCommandNode = [turnSwitchesOnCommands objectAtIndex:0];
-                        [actionPicker selectRow:INDEX_FOR_TURNSWITCHESON inComponent:1 animated:NO];
-                    } else {
-                        switchCommandNode = [turnSwitchesOffCommands objectAtIndex:0];
-                        [actionPicker selectRow:INDEX_FOR_TURNSWITCHESOFF inComponent:1 animated:NO];
-                    }
-                    // Set up the buttons to match the command
-                    NSScanner *switchScan = [[NSScanner alloc] initWithString:[switchCommandNode stringValue]];
-                    int switchNumber;
-                    while([switchScan scanInt:&switchNumber]) {
-                        if((switchNumber > 0) && (switchNumber <= NUM_SJIG_SWITCHES)) {
-                            [switchButtons[switchNumber-1] setBackgroundColor:[UIColor redColor]];
+                    if([turnSwitchesOnCommands count] || [turnSwitchesOffCommands count]) {
+                        DDXMLNode *switchCommandNode;
+                        if([turnSwitchesOnCommands count]) {
+                            switchCommandNode = [turnSwitchesOnCommands objectAtIndex:0];
+                            [actionPicker selectRow:INDEX_FOR_TURNSWITCHESON inComponent:1 animated:NO];
+                        } else {
+                            switchCommandNode = [turnSwitchesOffCommands objectAtIndex:0];
+                            [actionPicker selectRow:INDEX_FOR_TURNSWITCHESOFF inComponent:1 animated:NO];
                         }
-                    }
-                    // Make buttons visible
-                    for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
-                    {
-                        [switchButtons[i] setHidden:NO];
-                    }
+                        // Set up the buttons to match the command
+                        NSScanner *switchScan = [[NSScanner alloc] initWithString:[switchCommandNode stringValue]];
+                        int switchNumber;
+                        while([switchScan scanInt:&switchNumber]) {
+                            if((switchNumber > 0) && (switchNumber <= NUM_SJIG_SWITCHES)) {
+                                [switchButtons[switchNumber-1] setBackgroundColor:[UIColor redColor]];
+                            }
+                        }
+                        // Make buttons visible
+                        for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
+                        {
+                            [switchButtons[i] setHidden:NO];
+                        }
+                       
+                    } // Switchamajig Controller Commands
+                    if([irCommands count]) {
+                        //DDXMLElement *irElement = (DDXMLElement *)[irCommands objectAtIndex:0];
+                        DDXMLNode *irCommandAttribute = [irCommands objectAtIndex:0];
+                        NSString *IRCommand = [irCommandAttribute stringValue];
+                        NSArray *irCommandParts = [IRCommand componentsSeparatedByString:@":"];
+                        if([irCommandParts count] == 4) {
+                            // Database command
+                            [actionPicker selectRow:INDEX_FOR_IRCOMMAND inComponent:1 animated:NO];
+                            int brandIndex = [brands indexOfObject:[irCommandParts objectAtIndex:0]];
+                            if((brandIndex == NSNotFound) && ([[filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"])) {
+                                // Un-filter the brands
+                                [filterBrandButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+                                brandIndex = [brands indexOfObject:[irCommandParts objectAtIndex:0]];
+                            }
+                            if(brandIndex != NSNotFound) {
+                                [irPicker selectRow:brandIndex inComponent:0 animated:NO];
+                                [self pickerView:irPicker didSelectRow:brandIndex inComponent:0];
+                                int deviceIndex = [devices indexOfObject:[irCommandParts objectAtIndex:1]];
+                                if(deviceIndex != NSNotFound) {
+                                    [irPicker selectRow:deviceIndex inComponent:1 animated:NO];
+                                    [self pickerView:irPicker didSelectRow:deviceIndex inComponent:1];
+                                    int codeSetIndex = [codeSets indexOfObject:[irCommandParts objectAtIndex:2]];
+                                    if(codeSetIndex != NSNotFound) {
+                                        [irPicker selectRow:codeSetIndex inComponent:2 animated:NO];
+                                        [self pickerView:irPicker didSelectRow:codeSetIndex inComponent:1];
+                                        int functionIndex = [functions indexOfObject:[irCommandParts objectAtIndex:3]];
+                                        if((functionIndex == NSNotFound) && ([[filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"])) {
+                                            // Un-filter the brands
+                                            [filterFunctionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+                                            functionIndex = [functions indexOfObject:[irCommandParts objectAtIndex:3]];
+                                        }
+                                        if(functionIndex != NSNotFound) {
+                                            [irPicker selectRow:functionIndex inComponent:3 animated:NO];
+                                            [self pickerView:irPicker didSelectRow:functionIndex inComponent:3];
+                                        }
+                                    }
+                                }
+                            }
+                            [self pickerView:actionPicker didSelectRow:INDEX_FOR_IRCOMMAND inComponent:1];
+                        }
+                    } // IR command
                 } // Only one command
             } // Nothing unsupported
         } // Only one action in sequence
@@ -229,11 +275,15 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         brands = filterBrands([SwitchamajigIRDeviceDriver getIRDatabaseBrands]);
     }
     int brandIndex = [brands indexOfObject:currentBrand];
-    if(brandIndex == NSNotFound)
-        brandIndex = 0;
     [irPicker reloadComponent:0];
-    [irPicker selectRow:brandIndex inComponent:0 animated:NO];
-    [self pickerView:irPicker didSelectRow:brandIndex inComponent:0];
+    if(brandIndex == NSNotFound) {
+        brandIndex = 0;
+        [irPicker selectRow:brandIndex inComponent:0 animated:NO];
+        [self pickerView:irPicker didSelectRow:brandIndex inComponent:0];
+    } else {
+        // No need to reload other components
+        [irPicker selectRow:brandIndex inComponent:0 animated:NO];
+    }
 }
 
 - (void) filterFunctionToggle:(id)sender {
