@@ -484,6 +484,9 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                         }
                     }
                     [[[self appDelegate] statusInfoLock] unlock];
+                    // Select a default IR command
+                    [irPicker selectRow:0 inComponent:0 animated:NO];
+                    [self pickerView:irPicker didSelectRow:0 inComponent:0];
            }
         }
         [self updateActions];

@@ -1070,9 +1070,7 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New audio path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
-#endif
 
-#if 1
 - (void)test_003_defineActionViewController_001_Initialization {
     // Create and initialize with no friendly names or actions
     NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
@@ -1198,6 +1196,22 @@
     STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitchesoff with switches 2, 5, and 6. Expected %@ but got %@", expectedAction, actionString);
 }
 #endif
+
+- (void)test_003_defineActionViewController_003_IR {
+    // Make sure the IR controls aren't visible by default
+    NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
+    SwitchControlAppDelegate *dummy_app_delegate = [SwitchControlAppDelegate alloc];
+    [dummy_app_delegate setFriendlyNameSwitchamajigDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy1" forKey:@"hoopy"];
+    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    STAssertTrue([defineVC->irPicker isHidden] && [defineVC->irPickerLabel isHidden] && [defineVC->filterBrandButton isHidden] && [defineVC->filterFunctionButton isHidden] && [defineVC->testIrButton isHidden], @"IR UI is visible when no action is passed in");
+    // Select IR command from action picker
+    [defineVC->actionPicker selectRow:3 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:3 inComponent:1];
+    STAssertFalse([defineVC->irPicker isHidden] || [defineVC->irPickerLabel isHidden] || [defineVC->filterBrandButton isHidden] || [defineVC->filterFunctionButton isHidden], @"IR UI not visible after selecting IR action.");
+    STAssertTrue([defineVC->testIrButton isHidden], @"Test IR button visible with no IR devices connected");
+}
 
 #if 0
 // Implement this once configuration working
