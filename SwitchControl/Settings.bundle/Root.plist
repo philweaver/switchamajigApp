@@ -8,6 +8,32 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
+			<string>Choose Products To Support</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Support Switchamajig Controller</string>
+			<key>Key</key>
+			<string>supportSwitchamajigControllerPreference</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
+			<string>Support Switchamajig IR</string>
+			<key>Key</key>
+			<string>supportSwitchamajigIRPreference</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
 			<string>Accessing The Panels</string>
 		</dict>
 		<dict>

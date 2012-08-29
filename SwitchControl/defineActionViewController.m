@@ -20,11 +20,12 @@ NSArray *filterBrands(NSArray *bigListOfBrands);
 NSArray *filterFunctions(NSArray *bigListOfFunctions);
 
 // There's probably a cleaner way, but here we are
-#define NUM_ACTIONS 4
+#define NUM_ACTIONS 5
 #define INDEX_FOR_TURNSWITCHESON 1
 #define INDEX_FOR_TURNSWITCHESOFF 2
 #define INDEX_FOR_IRCOMMAND 3
-NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn Switches Off", @"IR Command"};
+#define INDEX_FOR_LEARNED_IRCOMMAND 4
+NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn Switches Off", @"Standard IR Command", @"Learned IR Command"};
 
 - (id) initWithActions:(NSMutableArray *)actionsInit appDelegate:(SwitchControlAppDelegate *)appDelegate {
     self = [super init];

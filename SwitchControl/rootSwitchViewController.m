@@ -263,18 +263,6 @@
 - (bool)addPanelButtonToScrollViewFromUrl:(NSURL*)url atOrigin:(CGPoint)origin withButtonSize:(CGSize)buttonSize andTextSize:(CGSize)textSize {
     if(url == nil)
         return false;
-    // Skip test panels
-    BOOL isTest = [[NSPredicate predicateWithFormat:@"SELF contains \"__TEST\""] evaluateWithObject:[url absoluteString]];
-    if(isTest)
-        return false;
-    // Skip IR panel
-    BOOL isIR = [[NSPredicate predicateWithFormat:@"SELF contains \"ir_5_basic\""] evaluateWithObject:[url absoluteString]];
-    if(isIR)
-        return false;
-    // Only do xml files
-    BOOL isXml = [[NSPredicate predicateWithFormat:@"SELF contains \".xml\""] evaluateWithObject:[url absoluteString]];
-    if(!isXml)
-        return false;
     int fontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     numberOfPanelsInScrollView++;
     // Render view controller into image
@@ -319,13 +307,26 @@
     NSArray *xmlUrls = [[NSBundle mainBundle] URLsForResourcesWithExtension:@"xml" subdirectory:nil];
     NSURL *url;
     for(url in xmlUrls) {
-        bool success = [self addPanelButtonToScrollViewFromUrl:url atOrigin:CGPointMake(current_button_x, current_button_y) withButtonSize:CGSizeMake(selectButtonWidth, panelButtonHeight) andTextSize:textSize];
-        if(!success)
-            continue;
-        current_button_y += panelButtonHeight + textSize.height + button_spacing;
-        if(current_button_y + panelButtonHeight + textSize.height >= [panelSelectionScrollView bounds].size.height) {
-            current_button_y = 0;
-            current_button_x += selectButtonWidth + button_spacing;
+        // Only process built-in panels that we are supporting
+        BOOL displayThisPanel = NO;
+        BOOL isIR = [[NSPredicate predicateWithFormat:@"SELF CONTAINS \"ir_\""] evaluateWithObject:[url absoluteString]];
+        BOOL isCtrl = [[NSPredicate predicateWithFormat:@"SELF CONTAINS \"ctrl_\""] evaluateWithObject:[url absoluteString]];
+        BOOL isBlank = [[NSPredicate predicateWithFormat:@"SELF CONTAINS \"blank\""] evaluateWithObject:[url absoluteString]];
+        if(isIR && [[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigIRPreference"])
+            displayThisPanel = YES;
+        if(isCtrl && [[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigControllerPreference"])
+            displayThisPanel = YES;
+        if(isBlank && [[NSUserDefaults standardUserDefaults] boolForKey:@"allowEditingOfSwitchPanelsPreference"])
+            displayThisPanel = YES;
+        if(displayThisPanel) {
+            bool success = [self addPanelButtonToScrollViewFromUrl:url atOrigin:CGPointMake(current_button_x, current_button_y) withButtonSize:CGSizeMake(selectButtonWidth, panelButtonHeight) andTextSize:textSize];
+            if(!success)
+                continue;
+            current_button_y += panelButtonHeight + textSize.height + button_spacing;
+            if(current_button_y + panelButtonHeight + textSize.height >= [panelSelectionScrollView bounds].size.height) {
+                current_button_y = 0;
+                current_button_x += selectButtonWidth + button_spacing;
+            }
         }
     }
     // Find all user switch panel files
@@ -335,6 +336,10 @@
     NSString *filename;
     for(filename in DocumentDirectoryContents) {
         NSString *fullpath = [documentsDirectory stringByAppendingPathComponent:filename];
+        // Only do xml files
+        BOOL isXml = [[NSPredicate predicateWithFormat:@"SELF contains \".xml\""] evaluateWithObject:fullpath];
+        if(!isXml)
+            continue;
         url = [NSURL fileURLWithPath:fullpath];
         bool success = [self addPanelButtonToScrollViewFromUrl:url atOrigin:CGPointMake(current_button_x, current_button_y) withButtonSize:CGSizeMake(selectButtonWidth, panelButtonHeight) andTextSize:textSize];
         if(!success)

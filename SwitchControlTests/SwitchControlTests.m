@@ -457,7 +457,10 @@
         UIView *viewToRemove;
         for(viewToRemove in [[rootViewController view] subviews])
             [viewToRemove removeFromSuperview];
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];       
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
         [rootViewController loadView];
         // Confirm text sizes
         STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
@@ -525,6 +528,27 @@
     [[[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:1] sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue(naviControl->didReceivePushViewController, @"Selecting switch panel did not push view controller");
     STAssertTrue([naviControl->lastViewController isKindOfClass:[switchPanelViewController class]], @"Switch panel did not display");
+}
+
+// Check settings for various support
+- (void)test_001_RootViewController_006_LaunchSwitchPanel {
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"allowEditingOfSwitchPanelsPreference"];
+    [rootViewController ResetScrollPanel];
+    // Shouldn't see much
+    STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"], @"Yellow panel shown with controller support disabled.");
+    STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"IR Basic"], @"IR Basic panel shown with IR support disabled.");
+    STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel shown with editing support disabled.");
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
+    [rootViewController ResetScrollPanel];
+    // Should see them now much
+    STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"], @"Yellow panel not shown with controller support enabled.");
+    STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"IR Basic"], @"IR Basic panel not shown with IR support enabled.");
+    STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel not shown with editing support enabled.");
+
 }
 
 - (void)test_002_SwitchPanelViewController_001_PanelLayout {
@@ -670,6 +694,10 @@
 
 - (void)test_002_SwitchPanelViewController_005_ConfigureLifeCycle {
     // Work with "yellow" panel
+    // Make sure it's displayed
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    [rootViewController ResetScrollPanel];
+
     // Create a panel from a test XML file and enable configuration mode
     switchPanelViewController *viewController = [switchPanelViewController alloc];
     // Open the test xml file
