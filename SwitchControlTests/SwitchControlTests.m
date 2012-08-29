@@ -1100,14 +1100,26 @@
 }
 
 - (void)test_003_defineActionViewController_001_Initialization {
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
     // Create and initialize with no friendly names or actions
     NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
     SwitchControlAppDelegate *dummy_app_delegate = [SwitchControlAppDelegate alloc];
     [dummy_app_delegate setFriendlyNameSwitchamajigDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
     defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
-    // Confirm that currently have only "Default", and that "No Action" is selected
     [defineVC loadView];
+    // Confirm that currently have only "Default", and "No Action"
     STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:0] == 1, @"With no friendly names, defineActionPicker should show only one value: 'Default'");
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:1] == 1, @"With no drivers supported, defineActionPicker should show only one action: 'No Action'");
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:1] == 3, @"With only controller supported, defineActionPicker should show three actions.");
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:1] == 5, @"With both controller and IR supported, defineActionPicker should show five actions.");
+   
     STAssertTrue([defineVC->actionPicker selectedRowInComponent:0] == 0, @"Default value not selected when no friendly names");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:0 forComponent:0] isEqualToString:@"Default"], @"With no friendly names, defineActionPicker should show only one value: 'Default'");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"No Action"], @"Must show 'No Action' when none defined in XML");
@@ -1180,6 +1192,8 @@
 }
 
 - (void)test_003_defineActionViewController_002_UpdateNoActionAndSwitches {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
     // Create and initialize with no friendly names or actions
     NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
     SwitchControlAppDelegate *dummy_app_delegate = [SwitchControlAppDelegate alloc];
@@ -1226,6 +1240,8 @@
 #endif
 
 - (void)test_003_defineActionViewController_003_IR {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
     // Make sure the IR controls aren't visible by default
     NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
     SwitchControlAppDelegate *dummy_app_delegate = [SwitchControlAppDelegate alloc];

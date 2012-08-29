@@ -24,6 +24,7 @@
     UIButton *filterFunctionButton;
     UIButton *testIrButton;
     NSMutableArray *friendlyNamesArray;
+    NSMutableArray *availableActions;
 }
 - (id) initWithActions:(NSMutableArray *)actionsInit appDelegate:(SwitchControlAppDelegate *)appDelegate;
 @property (nonatomic, strong) NSMutableArray *actions;

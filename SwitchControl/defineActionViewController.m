@@ -20,13 +20,17 @@ NSArray *filterBrands(NSArray *bigListOfBrands);
 NSArray *filterFunctions(NSArray *bigListOfFunctions);
 
 // There's probably a cleaner way, but here we are
-#define NUM_ACTIONS 5
-#define INDEX_FOR_TURNSWITCHESON 1
-#define INDEX_FOR_TURNSWITCHESOFF 2
-#define INDEX_FOR_IRCOMMAND 3
-#define INDEX_FOR_LEARNED_IRCOMMAND 4
-NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn Switches Off", @"Standard IR Command", @"Learned IR Command"};
-
+//#define NUM_ACTIONS 5
+//#define INDEX_FOR_TURNSWITCHESON 1
+//#define INDEX_FOR_TURNSWITCHESOFF 2
+//#define INDEX_FOR_IRCOMMAND 3
+//#define INDEX_FOR_LEARNED_IRCOMMAND 4
+//NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn Switches Off", @"Standard IR Command", @"Learned IR Command"};
+NSString *noActionString = @"No Action";
+NSString *turnSwitchesOnString = @"Turn Switches On";
+NSString *turnSwitchesOffString = @"Turn Switches Off";
+NSString *standardIRCmdString = @"Standard IR Command";
+NSString *learnedIRCmdString = @"Learned IR Command";
 - (id) initWithActions:(NSMutableArray *)actionsInit appDelegate:(SwitchControlAppDelegate *)appDelegate {
     self = [super init];
     if(self != nil) {
@@ -36,6 +40,16 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         [[appDelegate statusInfoLock] lock];
         friendlyNamesArray = [[NSMutableArray alloc] initWithArray:[[appDelegate friendlyNameSwitchamajigDictionary] allKeys]];
         [[appDelegate statusInfoLock] unlock];
+        availableActions = [[NSMutableArray alloc] initWithCapacity:5];
+        [availableActions addObject:@"No Action"];
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigControllerPreference"]) {
+            [availableActions addObject:turnSwitchesOnString];
+            [availableActions addObject:turnSwitchesOffString];
+        }
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigIRPreference"]) {
+            [availableActions addObject:standardIRCmdString];
+            [availableActions addObject:learnedIRCmdString];
+        }
     }
     return self;
 }
@@ -172,10 +186,20 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                         DDXMLNode *switchCommandNode;
                         if([turnSwitchesOnCommands count]) {
                             switchCommandNode = [turnSwitchesOnCommands objectAtIndex:0];
-                            [actionPicker selectRow:INDEX_FOR_TURNSWITCHESON inComponent:1 animated:NO];
+                            // Show this command regardless of settings
+                            if([availableActions indexOfObject:turnSwitchesOnString] == NSNotFound) {
+                                [availableActions addObject:turnSwitchesOnString];
+                                [actionPicker reloadComponent:1];
+                            }
+                            [actionPicker selectRow:[availableActions indexOfObject:turnSwitchesOnString] inComponent:1 animated:NO];
                         } else {
                             switchCommandNode = [turnSwitchesOffCommands objectAtIndex:0];
-                            [actionPicker selectRow:INDEX_FOR_TURNSWITCHESOFF inComponent:1 animated:NO];
+                            // Show this command regardless of settings
+                            if([availableActions indexOfObject:turnSwitchesOffString] == NSNotFound) {
+                                [availableActions addObject:turnSwitchesOffString];
+                                [actionPicker reloadComponent:1];
+                            }
+                            [actionPicker selectRow:[availableActions indexOfObject:turnSwitchesOffString] inComponent:1 animated:NO];
                         }
                         // Set up the buttons to match the command
                         NSScanner *switchScan = [[NSScanner alloc] initWithString:[switchCommandNode stringValue]];
@@ -194,13 +218,18 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                     } // Switchamajig Controller Commands
                     if([irCommands count]) {
                         //DDXMLElement *irElement = (DDXMLElement *)[irCommands objectAtIndex:0];
-                        [self pickerView:actionPicker didSelectRow:INDEX_FOR_IRCOMMAND inComponent:1];
+                        // Show this command regardless of settings
+                        if([availableActions indexOfObject:standardIRCmdString] == NSNotFound) {
+                            [availableActions addObject:standardIRCmdString];
+                            [actionPicker reloadComponent:1];
+                        }
+                        [actionPicker selectRow:[availableActions indexOfObject:standardIRCmdString] inComponent:1 animated:NO];
+                        [self pickerView:actionPicker didSelectRow:[availableActions indexOfObject:standardIRCmdString] inComponent:1];
                         DDXMLNode *irCommandAttribute = [irCommands objectAtIndex:0];
                         NSString *IRCommand = [irCommandAttribute stringValue];
                         NSArray *irCommandParts = [IRCommand componentsSeparatedByString:@":"];
                         if([irCommandParts count] == 4) {
                             // Database command
-                            [actionPicker selectRow:INDEX_FOR_IRCOMMAND inComponent:1 animated:NO];
                             int brandIndex = [brands indexOfObject:[irCommandParts objectAtIndex:0]];
                             if((brandIndex == NSNotFound) && ([[filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"])) {
                                 // Un-filter the brands
@@ -374,7 +403,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     [xmlString appendString:@"</friendlyname>"];
     [xmlString appendString:@"<actionsequence>"];
     int actionIndex = [actionPicker selectedRowInComponent:1];
-    if(actionIndex == INDEX_FOR_TURNSWITCHESON) {
+    if([[availableActions objectAtIndex:actionIndex] isEqualToString:turnSwitchesOnString]) {
         [xmlString appendString:@"<turnSwitchesOn>"];
         for(int i=0; i < NUM_SJIG_SWITCHES; ++i) {
             if([[switchButtons[i] backgroundColor] isEqual:[UIColor redColor]])
@@ -382,7 +411,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         }
         [xmlString appendString:@"</turnSwitchesOn>"];
     }
-    if(actionIndex == INDEX_FOR_TURNSWITCHESOFF) {
+    if([[availableActions objectAtIndex:actionIndex] isEqualToString:turnSwitchesOffString]) {
         [xmlString appendString:@"<turnSwitchesOff>"];
         for(int i=0; i < NUM_SJIG_SWITCHES; ++i) {
             if([[switchButtons[i] backgroundColor] isEqual:[UIColor redColor]])
@@ -390,7 +419,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
         }
         [xmlString appendString:@"</turnSwitchesOff>"];
     }
-    if(actionIndex == INDEX_FOR_IRCOMMAND) {
+    if([[availableActions objectAtIndex:actionIndex] isEqualToString:standardIRCmdString]) {
         NSString *irXmlCommand = [self generateIrXmlCommand];
         [xmlString appendString:irXmlCommand];
     }
@@ -423,7 +452,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
     if(pickerView == actionPicker) {
         if(component == 0)
             return [friendlyNamesArray count];
-        return NUM_ACTIONS;
+        return [availableActions count];
     }
     if(pickerView == irPicker) {
         if(component == 0)
@@ -451,7 +480,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             SwitchamajigDriver *driver = [[[self appDelegate] friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
             if(driver) {
                 if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
-                    if([[self pickerView:actionPicker titleForRow:[actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:actionArray[INDEX_FOR_IRCOMMAND]])
+                    if([[self pickerView:actionPicker titleForRow:[actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:standardIRCmdString])
                         [testIrButton setHidden:NO];
                 }
             }
@@ -465,30 +494,29 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             [irPickerLabel setHidden:YES];
             [filterBrandButton setHidden:YES];
             [filterFunctionButton setHidden:YES];
-            switch (row) {
-                case INDEX_FOR_TURNSWITCHESON:
-                case INDEX_FOR_TURNSWITCHESOFF:
-                    for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
-                        [switchButtons[i] setHidden:NO];
-                    break;
-                case INDEX_FOR_IRCOMMAND:
-                    [irPicker setHidden:NO];
-                    [irPickerLabel setHidden:NO];
-                    [filterBrandButton setHidden:NO];
-                    [filterFunctionButton setHidden:NO];
-                    NSString *friendlyName = [self pickerView:pickerView titleForRow:[actionPicker selectedRowInComponent:0] forComponent:0];
-                    [[[self appDelegate] statusInfoLock] lock];
-                    SwitchamajigDriver *driver = [[[self appDelegate] friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
-                    if(driver) {
-                        if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
-                            [testIrButton setHidden:NO];
-                        }
+            NSString *currentAction = [self pickerView:actionPicker titleForRow:row forComponent:1];
+            if([currentAction isEqualToString:turnSwitchesOnString] || [currentAction isEqualToString:turnSwitchesOffString]) {
+                for(int i=0; i < NUM_SJIG_SWITCHES; ++i)
+                    [switchButtons[i] setHidden:NO];
+            }
+            if([currentAction isEqualToString:standardIRCmdString]){
+                [irPicker setHidden:NO];
+                [irPickerLabel setHidden:NO];
+                [filterBrandButton setHidden:NO];
+                [filterFunctionButton setHidden:NO];
+                NSString *friendlyName = [self pickerView:pickerView titleForRow:[actionPicker selectedRowInComponent:0] forComponent:0];
+                [[[self appDelegate] statusInfoLock] lock];
+                SwitchamajigDriver *driver = [[[self appDelegate] friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
+                if(driver) {
+                    if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
+                        [testIrButton setHidden:NO];
                     }
-                    [[[self appDelegate] statusInfoLock] unlock];
-                    // Select a default IR command
-                    [irPicker selectRow:0 inComponent:0 animated:NO];
-                    [self pickerView:irPicker didSelectRow:0 inComponent:0];
-           }
+                }
+                [[[self appDelegate] statusInfoLock] unlock];
+                // Select a default IR command
+                [irPicker selectRow:0 inComponent:0 animated:NO];
+                [self pickerView:irPicker didSelectRow:0 inComponent:0];
+            }
         }
         [self updateActions];
         return;
@@ -529,7 +557,13 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
             // Friendly names
             return [friendlyNamesArray objectAtIndex:row];
         }
-        return actionArray[row];
+        if(component == 1) {
+            if(row >= [availableActions count]) {
+                NSLog(@"Crashing bug: defineActionViewController: titleForRow: avaialbleActions out of bounds with row = %d, count = %d", row, [availableActions count]);
+                return nil;
+            }
+        }
+        return [availableActions objectAtIndex:row];
     }
     if(pickerView == irPicker) {
         if(component == 0) {
