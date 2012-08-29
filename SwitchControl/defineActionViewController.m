@@ -193,6 +193,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                     } // Switchamajig Controller Commands
                     if([irCommands count]) {
                         //DDXMLElement *irElement = (DDXMLElement *)[irCommands objectAtIndex:0];
+                        [self pickerView:actionPicker didSelectRow:INDEX_FOR_IRCOMMAND inComponent:1];
                         DDXMLNode *irCommandAttribute = [irCommands objectAtIndex:0];
                         NSString *IRCommand = [irCommandAttribute stringValue];
                         NSArray *irCommandParts = [IRCommand componentsSeparatedByString:@":"];
@@ -215,7 +216,7 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                                     int codeSetIndex = [codeSets indexOfObject:[irCommandParts objectAtIndex:2]];
                                     if(codeSetIndex != NSNotFound) {
                                         [irPicker selectRow:codeSetIndex inComponent:2 animated:NO];
-                                        [self pickerView:irPicker didSelectRow:codeSetIndex inComponent:1];
+                                        [self pickerView:irPicker didSelectRow:codeSetIndex inComponent:2];
                                         int functionIndex = [functions indexOfObject:[irCommandParts objectAtIndex:3]];
                                         if((functionIndex == NSNotFound) && ([[filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"])) {
                                             // Un-filter the brands
@@ -229,7 +230,6 @@ NSString *actionArray[NUM_ACTIONS] = {@"No Action", @"Turn Switches On", @"Turn 
                                     }
                                 }
                             }
-                            [self pickerView:actionPicker didSelectRow:INDEX_FOR_IRCOMMAND inComponent:1];
                         }
                     } // IR command
                 } // Only one command
