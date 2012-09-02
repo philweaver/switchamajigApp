@@ -10,7 +10,6 @@
 #import "stdio.h"
 #import "../../KissXML/KissXML/DDXMLDocument.h"
 #import "SJUIStatusMessageLabel.h"
-#import "defineActionViewController.h"
 
 @implementation SJUIButtonWithActions
 
@@ -694,7 +693,9 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         actions = [currentButton deactivateActions];
     }
     defineActionViewController *newViewController = [[defineActionViewController alloc] initWithActions:actions appDelegate:appDelegate];
+    [newViewController setDelegate:self];
     actionPopover = [[UIPopoverController alloc] initWithContentViewController:newViewController];
+    [actionPopover setDelegate:self];
     [actionPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
@@ -776,19 +777,33 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [self popoverControllerDidDismissPopover:audioPopover];
 }
 
+- (void) SJUIDefineActionViewControllerReadyForDismissal:(id)viewController {
+    [actionPopover dismissPopoverAnimated:YES];
+    [self popoverControllerDidDismissPopover:actionPopover];
+}
+
+
+-(BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController {
+    if(popoverController == actionPopover) {
+        return NO; // Only dismissed by cancel button
+    }
+    return YES;
+}
+
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
     //NSLog(@"switchPanelViewController: popoverControllerDidDismissPopover");
-    // The only popover that we get this for is the audio select
-    // Check if we have valid audio for the switch
-    if(!currentButton)
-        return;
-    if(![currentButton audioFilePath])
-        return;
-    if([[NSFileManager defaultManager] fileExistsAtPath:[currentButton audioFilePath]]) {
-        [recordAudioButton setTitle:@"Delete Sound" forState:UIControlStateNormal];
-    } else {
-        [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
-        [currentButton setAudioFilePath:nil];
+    if(popoverController == audioPopover) {
+        // Check if we have valid audio for the switch
+        if(!currentButton)
+            return;
+        if(![currentButton audioFilePath])
+            return;
+        if([[NSFileManager defaultManager] fileExistsAtPath:[currentButton audioFilePath]]) {
+            [recordAudioButton setTitle:@"Delete Sound" forState:UIControlStateNormal];
+        } else {
+            [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
+            [currentButton setAudioFilePath:nil];
+        }
     }
 }
 @end

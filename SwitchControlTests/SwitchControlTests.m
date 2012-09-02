@@ -1098,6 +1098,7 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New audio path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
+#endif
 
 - (void)test_003_defineActionViewController_001_Initialization {
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
@@ -1123,8 +1124,13 @@
     STAssertTrue([defineVC->actionPicker selectedRowInComponent:0] == 0, @"Default value not selected when no friendly names");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:0 forComponent:0] isEqualToString:@"Default"], @"With no friendly names, defineActionPicker should show only one value: 'Default'");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"No Action"], @"Must show 'No Action' when none defined in XML");
+    SJActionUITurnSwitchesOn *turnSwitchesOnUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches On"];
+    SJActionUITurnSwitchesOff *turnSwitchesOffUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches Off"];
+    STAssertNotNil(turnSwitchesOnUI, @"Must have a turn switches on UI");
+    STAssertNotNil(turnSwitchesOffUI, @"Must have a turn switches off UI");
     for(int i=0; i < 6; ++i) {
-        STAssertTrue([defineVC->switchButtons[i] isHidden], @"Switch buttons not hidden for no action");
+        STAssertTrue([turnSwitchesOnUI->switchButtons[i] isHidden], @"Switch on buttons not hidden for no action");
+        STAssertTrue([turnSwitchesOffUI->switchButtons[i] isHidden], @"Switch off buttons not hidden for no action");
     }
 
     // Add a couple of names to the friendly list, and create a "switch on" action
@@ -1154,9 +1160,13 @@
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:0] forComponent:0] isEqualToString:@"Default"], @"Friendly name 'Default' not selected as specified in xml");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"Turn Switches On"], @"'Turn Switches On' action not selected when in action sequence");
     int switchMask = 0;
+    // Check mask and verify the buttons are visible
+    turnSwitchesOnUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches On"];
+    turnSwitchesOffUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches Off"];
     for(int i=0; i < 6; ++i) {
-        STAssertFalse([defineVC->switchButtons[i] isHidden], @"Switch buttons hidden for switches on");
-        if([[defineVC->switchButtons[i] backgroundColor] isEqual:[UIColor redColor]]) 
+        STAssertFalse([turnSwitchesOnUI->switchButtons[i] isHidden], @"Switch on buttons hidden for switches on");
+        STAssertTrue([turnSwitchesOffUI->switchButtons[i] isHidden], @"Switch off buttons not hidden for switches on");
+        if([[turnSwitchesOnUI->switchButtons[i] backgroundColor] isEqual:[UIColor redColor]])
             switchMask |= (1 << i);
     }
     STAssertTrue(switchMask == 5, @"Switch mask wrong for turn switches on. Should be 5 instead is %d", switchMask);
@@ -1173,9 +1183,12 @@
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:0] forComponent:0] isEqualToString:@"frood"], @"Friendly name 'frood' not selected as specified in xml");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:[defineVC->actionPicker selectedRowInComponent:1] forComponent:1] isEqualToString:@"Turn Switches Off"], @"'Turn Switches Off' action not selected when in action sequence");
     switchMask = 0;
+    turnSwitchesOnUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches On"];
+    turnSwitchesOffUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches Off"];
     for(int i=0; i < 6; ++i) {
-        STAssertFalse([defineVC->switchButtons[i] isHidden], @"Switch buttons hidden for switches on");
-        if([[defineVC->switchButtons[i] backgroundColor] isEqual:[UIColor redColor]]) 
+        STAssertFalse([turnSwitchesOffUI->switchButtons[i] isHidden], @"Switch off buttons hidden for switches off");
+        STAssertTrue([turnSwitchesOnUI->switchButtons[i] isHidden], @"Switch on buttons not hidden for switches off");
+        if([[turnSwitchesOffUI->switchButtons[i] backgroundColor] isEqual:[UIColor redColor]])
             switchMask |= (1 << i);
     }
     STAssertTrue(switchMask == 58, @"Switch mask wrong for turn switches on. Should be 58 instead is %d", switchMask);
@@ -1206,6 +1219,7 @@
     [defineVC->actionPicker selectRow:0 inComponent:1 animated:NO];
     [defineVC pickerView:defineVC->actionPicker didSelectRow:0 inComponent:1];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     // There should now be an action
     STAssertTrue([actions count], @"Actions count isn't 1 with default sjig and no action");
     NSString *expectedAction = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence></actionsequence></actionsequenceondevice>";
@@ -1215,29 +1229,36 @@
     [defineVC->actionPicker selectRow:1 inComponent:0 animated:NO];
     [defineVC->actionPicker selectRow:1 inComponent:1 animated:NO];
     [defineVC pickerView:defineVC->actionPicker didSelectRow:1 inComponent:1];
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     actionString = [[actions objectAtIndex:0] XMLString];
     expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOn></turnSwitchesOn></actionsequence></actionsequenceondevice>";
     STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitcheson with no switches. Expected %@ but got %@", expectedAction, actionString);
     // Set a couple of switches
-    [defineVC->switchButtons[0] sendActionsForControlEvents:UIControlEventTouchUpInside];
-    [defineVC->switchButtons[4] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    SJActionUITurnSwitchesOn *turnSwitchesOnUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches On"];
+    SJActionUITurnSwitchesOff *turnSwitchesOffUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Turn Switches Off"];
+    [turnSwitchesOnUI->switchButtons[0] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [turnSwitchesOnUI->switchButtons[4] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     actionString = [[actions objectAtIndex:0] XMLString];
     expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOn>1 5 </turnSwitchesOn></actionsequence></actionsequenceondevice>";
     STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitcheson with switches 1 and 4. Expected %@ but got %@", expectedAction, actionString);
     [defineVC->actionPicker selectRow:2 inComponent:1 animated:NO];
     [defineVC pickerView:defineVC->actionPicker didSelectRow:2 inComponent:1];
+    [turnSwitchesOffUI->switchButtons[0] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [turnSwitchesOffUI->switchButtons[4] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     actionString = [[actions objectAtIndex:0] XMLString];
     expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOff>1 5 </turnSwitchesOff></actionsequence></actionsequenceondevice>";
     STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitchesoff with switches 1 and 4. Expected %@ but got %@", expectedAction, actionString);
     // Change switch selection
-    [defineVC->switchButtons[0] sendActionsForControlEvents:UIControlEventTouchUpInside];
-    [defineVC->switchButtons[1] sendActionsForControlEvents:UIControlEventTouchUpInside];
-    [defineVC->switchButtons[5] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [turnSwitchesOffUI->switchButtons[0] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [turnSwitchesOffUI->switchButtons[1] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [turnSwitchesOffUI->switchButtons[5] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     actionString = [[actions objectAtIndex:0] XMLString];
     expectedAction = @"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOff>2 5 6 </turnSwitchesOff></actionsequence></actionsequenceondevice>";
     STAssertTrue([actionString isEqualToString:expectedAction], @"Actions string incorrect for turnswitchesoff with switches 2, 5, and 6. Expected %@ but got %@", expectedAction, actionString);
 }
-#endif
 
 - (void)test_003_defineActionViewController_003_IR {
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
@@ -1249,63 +1270,69 @@
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy1" forKey:@"hoopy"];
     defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [defineVC loadView];
-    STAssertTrue([defineVC->irPicker isHidden] && [defineVC->irPickerLabel isHidden] && [defineVC->filterBrandButton isHidden] && [defineVC->filterFunctionButton isHidden] && [defineVC->testIrButton isHidden], @"IR UI is visible when no action is passed in");
+    SJActionUIIRDatabaseCommand *actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Standard IR Command"];
+    STAssertTrue([actionUI->irPicker isHidden] && [actionUI->irPickerLabel isHidden] && [actionUI->filterBrandButton isHidden] && [actionUI->filterFunctionButton isHidden] && [actionUI->testIrButton isHidden], @"IR UI is visible when no action is passed in");
     // Select IR command from action picker
     [defineVC->actionPicker selectRow:3 inComponent:1 animated:NO];
     [defineVC pickerView:defineVC->actionPicker didSelectRow:3 inComponent:1];
-    STAssertFalse([defineVC->irPicker isHidden] || [defineVC->irPickerLabel isHidden] || [defineVC->filterBrandButton isHidden] || [defineVC->filterFunctionButton isHidden], @"IR UI not visible after selecting IR action.");
-    STAssertTrue([defineVC->testIrButton isHidden], @"Test IR button visible with no IR devices connected");
+    STAssertFalse([actionUI->irPicker isHidden] || [actionUI->irPickerLabel isHidden] || [actionUI->filterBrandButton isHidden] || [actionUI->filterFunctionButton isHidden], @"IR UI not visible after selecting IR action.");
+    STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible with no IR devices connected");
     // Verify that we got the expected command
     NSString *expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     DDXMLNode *action = [actions objectAtIndex:0];
     NSString *actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Actual command mismatches. Got %@", actualCommand);
     // Verify that more/fewer brands works
-    int numBrands = [defineVC pickerView:defineVC->irPicker numberOfRowsInComponent:0];
+    int numBrands = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:0];
     STAssertTrue(numBrands == 20, @"Num brands wrong when reduced list shown. Has %d brands.", numBrands);
-    STAssertTrue([[defineVC->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"], @"Text wrong on show more brands");
-    [defineVC->filterBrandButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    STAssertTrue([[defineVC->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show Fewer Brands"], @"Text wrong on show fewer brands");
-    numBrands = [defineVC pickerView:defineVC->irPicker numberOfRowsInComponent:0];
+    STAssertTrue([[actionUI->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"], @"Text wrong on show more brands");
+    [actionUI->filterBrandButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue([[actionUI->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show Fewer Brands"], @"Text wrong on show fewer brands");
+    numBrands = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:0];
     STAssertTrue(numBrands == 638, @"Num brands wrong when expanded list shown. Has %d brands.", numBrands);
-    [defineVC->filterBrandButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    STAssertTrue([[defineVC->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"], @"Text wrong on show more brands after activating toggle twice");
-    numBrands = [defineVC pickerView:defineVC->irPicker numberOfRowsInComponent:0];
+    [actionUI->filterBrandButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue([[actionUI->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"], @"Text wrong on show more brands after activating toggle twice");
+    numBrands = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:0];
     STAssertTrue(numBrands == 20, @"Num brands wrong when reduced list reshown. Has %d brands.", numBrands);
     // Verify that more/fewer functions works
-    int numFunctions = [defineVC pickerView:defineVC->irPicker numberOfRowsInComponent:3];
+    int numFunctions = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:3];
     STAssertTrue(numFunctions == 4, @"Num functions wrong when reduced list shown. Has %d functions.", numFunctions);
-    STAssertTrue([[defineVC->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"], @"Text wrong on show more functions");
-    [defineVC->filterFunctionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    STAssertTrue([[defineVC->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show Fewer Functions"], @"Text wrong on show fewer functions");
-    numFunctions = [defineVC pickerView:defineVC->irPicker numberOfRowsInComponent:3];
+    STAssertTrue([[actionUI->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"], @"Text wrong on show more functions");
+    [actionUI->filterFunctionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue([[actionUI->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show Fewer Functions"], @"Text wrong on show fewer functions");
+    numFunctions = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:3];
     STAssertTrue(numFunctions == 15, @"Num functions wrong when expanded list shown. Has %d functions.", numFunctions);
-    [defineVC->filterFunctionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    STAssertTrue([[defineVC->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"], @"Text wrong on show more functions after activating toggle twice");
-    numFunctions = [defineVC pickerView:defineVC->irPicker numberOfRowsInComponent:3];
+    [actionUI->filterFunctionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue([[actionUI->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"], @"Text wrong on show more functions after activating toggle twice");
+    numFunctions = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:3];
     STAssertTrue(numFunctions == 4, @"Num functions wrong when reduced list reshown. Has %d functions.", numFunctions);
     // Touch every wheel on the UI
-    [defineVC->irPicker selectRow:1 inComponent:0 animated:NO];
-    [defineVC pickerView:defineVC->irPicker didSelectRow:1 inComponent:0];
+    [actionUI->irPicker selectRow:1 inComponent:0 animated:NO];
+    [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:0];
     expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DTA Converter:UEI Setup Code 2667:CHANNEL DOWN\" ir_data=\"UT26675\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
-    [defineVC->irPicker selectRow:2 inComponent:1 animated:NO];
-    [defineVC pickerView:defineVC->irPicker didSelectRow:2 inComponent:1];
+    [actionUI->irPicker selectRow:2 inComponent:1 animated:NO];
+    [actionUI pickerView:actionUI->irPicker didSelectRow:2 inComponent:1];
     expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 1:NEXT\" ir_data=\"P141f 1f26 7e1d 2595 018b 56a8 3032 b9a4 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa e2fd 670d 1b21 4432 ec1b b994 12df fcaa 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee 5ef0 d152 e750 eb37 9785 838d 5f3b db42 6cb1 e039 98fa 9321 4a15 5627 fe87 486a 3c7c 84e2 390c 7b16 b638 3b12 6903 a545  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
-    [defineVC->irPicker selectRow:1 inComponent:2 animated:NO];
-    [defineVC pickerView:defineVC->irPicker didSelectRow:1 inComponent:2];
+    [actionUI->irPicker selectRow:1 inComponent:2 animated:NO];
+    [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:2];
     expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 2:FORWARD\" ir_data=\"P9464 7681 617b 5328 b4a2 abdd e391 6116 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa e2fd 670d 1b21 4432 ec1b b994 12df fcaa d95c 04e7 037b 83eb 5146 4643 5211 c619 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee e2fd 670d 1b21 4432 ec1b b994 12df fcaa 1c3b de22 9f02 46e7 a341 90a8 212c 9071 395d da19 85c7 ad30 ca0b e6c2 27e3 8562  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
-    [defineVC->irPicker selectRow:1 inComponent:3 animated:NO];
-    [defineVC pickerView:defineVC->irPicker didSelectRow:1 inComponent:3];
+    [actionUI->irPicker selectRow:1 inComponent:3 animated:NO];
+    [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:3];
     expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 2:NEXT\" ir_data=\"Pa99a 533c fbc7 4574 b7cd 5bfe 1469 5e76 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa 4a1e 30e8 3e1c 8ea7 f51a fa30 6840 2414 9a09 e9c6 3593 4e7d d90b 9fd7 b774 9c96 9945 1207 d1e0 701d 533d bac8 e2ae d8bc 4a58 3f03 6eb4 4c41 8b69 06de 27bc 5281 65cb 7fa2 bc40 7e47 c758 d9a6 75be 1e10 310b 3e9d 126d d57c f98b d8d3 7504 1c7f  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
@@ -1315,11 +1342,12 @@
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [defineVC loadView];
-    STAssertTrue([defineVC->testIrButton isHidden], @"Test IR button visible before IR driver selected");
+    actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Standard IR Command"];
+    //STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible before IR driver selected");
     [defineVC->actionPicker selectRow:1 inComponent:0 animated:NO];
     [defineVC pickerView:defineVC->actionPicker didSelectRow:1 inComponent:0];
-    STAssertFalse([defineVC->testIrButton isHidden], @"Test IR button not visible after IR driver selected");
-    [defineVC->testIrButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertFalse([actionUI->testIrButton isHidden], @"Test IR button not visible after IR driver selected");
+    [actionUI->testIrButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver->commandsReceived count]==1, @"No command received for test IR command");
     expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 2:NEXT\" ir_data=\"Pa99a 533c fbc7 4574 b7cd 5bfe 1469 5e76 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa 4a1e 30e8 3e1c 8ea7 f51a fa30 6840 2414 9a09 e9c6 3593 4e7d d90b 9fd7 b774 9c96 9945 1207 d1e0 701d 533d bac8 e2ae d8bc 4a58 3f03 6eb4 4c41 8b69 06de 27bc 5281 65cb 7fa2 bc40 7e47 c758 d9a6 75be 1e10 310b 3e9d 126d d57c f98b d8d3 7504 1c7f  \" ch=\"0\"></docommand>";

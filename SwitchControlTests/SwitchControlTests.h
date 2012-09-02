@@ -13,6 +13,8 @@
 #import "configViewController.h"
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigControllerDeviceDriver.h"
+#import "SJActionUITurnSwitchesOnOff.h"
+#import "SJActionUIIRDatabaseCommand.h"
 @interface SwitchControlTests : SenTestCase {
     SwitchControlAppDelegate *app_delegate;
     UINavigationController *nav_controller;

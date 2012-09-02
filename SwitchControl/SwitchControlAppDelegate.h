@@ -21,7 +21,7 @@
 #define PROTOCOL_SQ (IPPROTO_TCP + IPPROTO_UDP + 1)
 #define ROVING_PORTNUM 2000
 #define SQ_PORTNUM 80
-@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate, SwitchamajigDeviceListenerDelegate, SwitchamajigDeviceDriverDelegate> {
+@interface SwitchControlAppDelegate : NSObject <UIApplicationDelegate, NSNetServiceBrowserDelegate, NSNetServiceDelegate, SwitchamajigDeviceListenerDelegate, SwitchamajigIRDeviceDriverDelegate> {
     int switch_state;
     NSNetServiceBrowser *netServiceBrowser;
     SwitchamajigControllerDeviceListener *sjigControllerListener;
@@ -29,6 +29,9 @@
     int friendlyNameDictionaryIndex;
     NSTimer *statusMessageTimer;
     int listenerDevicesToIgnore;
+    NSLock *switchamajigIRLock;
+    NSString *lastLearnedIRCommand;
+    NSError *lastLearnedIRError;
 }
 - (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice;
 - (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError;
@@ -39,7 +42,9 @@
 - (void) executeActionSequence:(NSArray *)threadInfoArray;
 - (SwitchamajigControllerDeviceDriver *) firstSwitchamajigControllerDriver;
 - (void)removeDriver:(SwitchamajigDriver *)driver;
-
+- (NSString *) getLastLearnedIRCommand;
+- (NSError *) getLastLearnedIRError;
+- (void) clearLastLearnedIRInfo;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (retain) NSLock *switchStateLock;

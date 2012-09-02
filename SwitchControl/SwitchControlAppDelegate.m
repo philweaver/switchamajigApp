@@ -84,6 +84,7 @@
     if(error) {
         NSLog(@"Error loading IR database: %@", error);
     }
+    switchamajigIRLock = [[NSLock alloc] init];
     return YES;
 }
 
@@ -505,6 +506,39 @@ char *commands[] = {
     [[self friendlyNameSwitchamajigDictionary] removeObjectsForKeys:friendlyNames];
     [statusInfoLock unlock];
 }
+
+// IR Delegate
+-(void) SwitchamajigIRDeviceDriverDelegateDidReceiveLearnedIRCommand:(id)deviceDriver irCommand:(NSString *)irCommand {
+    [switchamajigIRLock lock];
+    lastLearnedIRCommand = irCommand;
+    [switchamajigIRLock unlock];
+}
+-(void) SwitchamajigIRDeviceDriverDelegateErrorOnLearnIR:(id)deviceDriver error:(NSError *)error {
+    [switchamajigIRLock lock];
+    lastLearnedIRError = error;
+    [switchamajigIRLock unlock];    
+}
+
+// Access to IR learning stuff
+- (NSString *) getLastLearnedIRCommand {
+    [switchamajigIRLock lock];
+    NSString * retVal = lastLearnedIRCommand;
+    [switchamajigIRLock unlock];
+    return retVal;
+}
+- (NSError *) getLastLearnedIRError {
+    [switchamajigIRLock lock];
+    NSError * retVal = lastLearnedIRError;
+    [switchamajigIRLock unlock];
+    return retVal;
+}
+- (void) clearLastLearnedIRInfo {
+    [switchamajigIRLock lock];
+    lastLearnedIRError = nil;
+    lastLearnedIRCommand = nil;
+    [switchamajigIRLock unlock];
+}
+
 
 - (SwitchamajigControllerDeviceDriver *) firstSwitchamajigControllerDriver {
     SwitchamajigControllerDeviceDriver *firstDriver = nil;

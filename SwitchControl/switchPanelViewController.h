@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "SwitchControlAppDelegate.h"
 #import "SJUIRecordAudioViewController.h"
+#import "defineActionViewController.h"
 @interface SJUIButtonWithActions : UIButton 
 @property (nonatomic) NSMutableArray *activateActions;
 @property (nonatomic) NSMutableArray *deactivateActions;
@@ -16,7 +17,7 @@
 @property NSString *audioFilePath;
 @end
 
-@interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, SJUIRecordAudioViewControllerDelegate, UIPopoverControllerDelegate>{
+@interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, SJUIRecordAudioViewControllerDelegate, SJUIDefineActionViewController, UIPopoverControllerDelegate>{
 @public
     SwitchControlAppDelegate *appDelegate;
     id backButton;

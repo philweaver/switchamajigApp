@@ -58,6 +58,14 @@
 		ADD3AEC3158D22CA0067602A /* SJUIStatusMessageLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = ADD3AEC2158D22CA0067602A /* SJUIStatusMessageLabel.m */; };
 		ADDF2813144CED7D000EB423 /* ctrl_4_fish_with_toggle.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF2812144CED7D000EB423 /* ctrl_4_fish_with_toggle.xml */; };
 		ADDF3F1315EEB05400EA05C1 /* blank.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF3F1215EEB05400EA05C1 /* blank.xml */; };
+		ADDF3F1515EFDBE600EA05C1 /* learning_IR.png in Resources */ = {isa = PBXBuildFile; fileRef = ADDF3F1415EFDBE600EA05C1 /* learning_IR.png */; };
+		ADDF3F1915F01DC200EA05C1 /* learning_IR_1.png in Resources */ = {isa = PBXBuildFile; fileRef = ADDF3F1615F01DC200EA05C1 /* learning_IR_1.png */; };
+		ADDF3F1A15F01DC200EA05C1 /* learning_IR_2.png in Resources */ = {isa = PBXBuildFile; fileRef = ADDF3F1715F01DC200EA05C1 /* learning_IR_2.png */; };
+		ADDF3F1B15F01DC200EA05C1 /* learning_IR_3.png in Resources */ = {isa = PBXBuildFile; fileRef = ADDF3F1815F01DC200EA05C1 /* learning_IR_3.png */; };
+		ADDF3F1F15F176B400EA05C1 /* SJActionUI.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDF3F1E15F176B400EA05C1 /* SJActionUI.m */; };
+		ADDF3F2215F1793800EA05C1 /* SJActionUITurnSwitchesOnOff.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDF3F2115F1793700EA05C1 /* SJActionUITurnSwitchesOnOff.m */; };
+		ADDF3F2515F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDF3F2415F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.m */; };
+		ADDF3F2815F1966500EA05C1 /* SJActionUIlearnedIRCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = ADDF3F2715F1966500EA05C1 /* SJActionUIlearnedIRCommand.m */; };
 		ADE97CE1143FBFC800521DE0 /* ctrl_4_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE0143FBFC800521DE0 /* ctrl_4_steering.xml */; };
 		ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */; };
 		ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */; };
@@ -135,6 +143,18 @@
 		ADD3AEC2158D22CA0067602A /* SJUIStatusMessageLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJUIStatusMessageLabel.m; sourceTree = "<group>"; };
 		ADDF2812144CED7D000EB423 /* ctrl_4_fish_with_toggle.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ctrl_4_fish_with_toggle.xml; sourceTree = "<group>"; };
 		ADDF3F1215EEB05400EA05C1 /* blank.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = blank.xml; sourceTree = "<group>"; };
+		ADDF3F1415EFDBE600EA05C1 /* learning_IR.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = learning_IR.png; sourceTree = "<group>"; };
+		ADDF3F1615F01DC200EA05C1 /* learning_IR_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = learning_IR_1.png; sourceTree = "<group>"; };
+		ADDF3F1715F01DC200EA05C1 /* learning_IR_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = learning_IR_2.png; sourceTree = "<group>"; };
+		ADDF3F1815F01DC200EA05C1 /* learning_IR_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = learning_IR_3.png; sourceTree = "<group>"; };
+		ADDF3F1D15F176B400EA05C1 /* SJActionUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUI.h; sourceTree = "<group>"; };
+		ADDF3F1E15F176B400EA05C1 /* SJActionUI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUI.m; sourceTree = "<group>"; };
+		ADDF3F2015F1793700EA05C1 /* SJActionUITurnSwitchesOnOff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUITurnSwitchesOnOff.h; sourceTree = "<group>"; };
+		ADDF3F2115F1793700EA05C1 /* SJActionUITurnSwitchesOnOff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUITurnSwitchesOnOff.m; sourceTree = "<group>"; };
+		ADDF3F2315F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUIIRDatabaseCommand.h; sourceTree = "<group>"; };
+		ADDF3F2415F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUIIRDatabaseCommand.m; sourceTree = "<group>"; };
+		ADDF3F2615F1966500EA05C1 /* SJActionUIlearnedIRCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUIlearnedIRCommand.h; sourceTree = "<group>"; };
+		ADDF3F2715F1966500EA05C1 /* SJActionUIlearnedIRCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUIlearnedIRCommand.m; sourceTree = "<group>"; };
 		ADE97CE0143FBFC800521DE0 /* ctrl_4_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ctrl_4_steering.xml; sourceTree = "<group>"; };
 		ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = helpDisplayViewController.h; path = ../helpDisplayViewController.h; sourceTree = "<group>"; };
 		ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = helpDisplayViewController.m; path = ../helpDisplayViewController.m; sourceTree = "<group>"; };
@@ -176,12 +196,16 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				ADDF3F1615F01DC200EA05C1 /* learning_IR_1.png */,
+				ADDF3F1715F01DC200EA05C1 /* learning_IR_2.png */,
+				ADDF3F1815F01DC200EA05C1 /* learning_IR_3.png */,
+				ADDF3F1415EFDBE600EA05C1 /* learning_IR.png */,
+				AD84EAD315BCAE5D00C27938 /* iphone_delete_button.png */,
 				AD59BDDB15E6D6E3001D5BFF /* IRDB.sqlite */,
 				AD59BDD915E6CE4A001D5BFF /* libKissXML.a */,
 				AD59BDD715E6CE36001D5BFF /* libSwitchamajigDriver.a */,
 				AD59BDD415E6B9C1001D5BFF /* libsqlite3.dylib */,
 				AD09605315CA0AE6003F4212 /* AVFoundation.framework */,
-				AD84EAD315BCAE5D00C27938 /* iphone_delete_button.png */,
 				AD921B05157D6CAC00940981 /* Security.framework */,
 				AD921B03157D6CA000940981 /* CFNetwork.framework */,
 				AD762F3D14F3650D00812CF8 /* ctrl_6_steering.xml */,
@@ -232,8 +256,7 @@
 		ADB75BF513DB539C00448025 /* SwitchControl */ = {
 			isa = PBXGroup;
 			children = (
-				ADB1EE2015C0D34E003BABDC /* defineActionViewController.h */,
-				ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */,
+				ADDF3F1C15F1596500EA05C1 /* DefineActions */,
 				ADE97CE71443DA5500521DE0 /* helpDisplayViewController.h */,
 				ADE97CE81443DA5500521DE0 /* helpDisplayViewController.m */,
 				ADE97CE91443DA5500521DE0 /* helpDisplayViewController.xib */,
@@ -290,6 +313,23 @@
 				ADB75C1413DB539C00448025 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		ADDF3F1C15F1596500EA05C1 /* DefineActions */ = {
+			isa = PBXGroup;
+			children = (
+				ADB1EE2015C0D34E003BABDC /* defineActionViewController.h */,
+				ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */,
+				ADDF3F1D15F176B400EA05C1 /* SJActionUI.h */,
+				ADDF3F1E15F176B400EA05C1 /* SJActionUI.m */,
+				ADDF3F2015F1793700EA05C1 /* SJActionUITurnSwitchesOnOff.h */,
+				ADDF3F2115F1793700EA05C1 /* SJActionUITurnSwitchesOnOff.m */,
+				ADDF3F2315F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.h */,
+				ADDF3F2415F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.m */,
+				ADDF3F2615F1966500EA05C1 /* SJActionUIlearnedIRCommand.h */,
+				ADDF3F2715F1966500EA05C1 /* SJActionUIlearnedIRCommand.m */,
+			);
+			name = DefineActions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -388,6 +428,10 @@
 				AD09604E15C728A4003F4212 /* unused_scanning_settings.plist in Resources */,
 				AD59BDDC15E6D6E3001D5BFF /* IRDB.sqlite in Resources */,
 				ADDF3F1315EEB05400EA05C1 /* blank.xml in Resources */,
+				ADDF3F1515EFDBE600EA05C1 /* learning_IR.png in Resources */,
+				ADDF3F1915F01DC200EA05C1 /* learning_IR_1.png in Resources */,
+				ADDF3F1A15F01DC200EA05C1 /* learning_IR_2.png in Resources */,
+				ADDF3F1B15F01DC200EA05C1 /* learning_IR_3.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +478,10 @@
 				ADD3AEC3158D22CA0067602A /* SJUIStatusMessageLabel.m in Sources */,
 				ADB1EE2215C0D34E003BABDC /* defineActionViewController.m in Sources */,
 				AD09605215C9FBED003F4212 /* SJUIRecordAudioViewController.m in Sources */,
+				ADDF3F1F15F176B400EA05C1 /* SJActionUI.m in Sources */,
+				ADDF3F2215F1793800EA05C1 /* SJActionUITurnSwitchesOnOff.m in Sources */,
+				ADDF3F2515F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.m in Sources */,
+				ADDF3F2815F1966500EA05C1 /* SJActionUIlearnedIRCommand.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

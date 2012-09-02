@@ -7,26 +7,26 @@
 //
 
 #import <UIKit/UIKit.h>
+@protocol SJUIDefineActionViewController <NSObject>
+- (void) SJUIDefineActionViewControllerReadyForDismissal:(id)viewController;
+@end
 #import "switchPanelViewController.h"
 #import "SwitchControlAppDelegate.h"
-#define NUM_SJIG_SWITCHES 6
+
+
+
 @interface defineActionViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate> {
 @public
-    UIPickerView *actionPicker;
-    UIPickerView *irPicker;
-    UILabel *irPickerLabel;
-    UIButton *switchButtons[NUM_SJIG_SWITCHES];
-    NSArray *brands;
-    NSArray *devices;
-    NSArray *codeSets;
-    NSArray *functions;
-    UIButton *filterBrandButton;
-    UIButton *filterFunctionButton;
-    UIButton *testIrButton;
     NSMutableArray *friendlyNamesArray;
+    UIPickerView *actionPicker;
+    NSDictionary *actionNamesToSJActionUIDict;
     NSMutableArray *availableActions;
+    UIButton *cancelButton;
+    UIButton *doneButton;
 }
 - (id) initWithActions:(NSMutableArray *)actionsInit appDelegate:(SwitchControlAppDelegate *)appDelegate;
+-(SwitchamajigDriver*) getCurrentlySelectedDriver;
 @property (nonatomic, strong) NSMutableArray *actions;
 @property (nonatomic, strong) SwitchControlAppDelegate *appDelegate;
+@property id<SJUIDefineActionViewController>delegate;
 @end
