@@ -9,6 +9,7 @@
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
 #import "defineActionViewController.h"
+#import "chooseIconViewController.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -1099,7 +1100,65 @@
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New audio path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
 #endif
-
+- (void)test_002_SwitchPanelViewController_010_IconForSwitch {
+    // Bring up the yellow panel to edit
+    SJUIButtonWithActions *yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    switchPanelViewController *viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController editPanel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    // Tap the button
+    yellowButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"1"];
+    [yellowButton sendActionsForControlEvents:UIControlEventTouchDown];
+    
+    UIButton *chooseIconButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Choose Icon"];
+    STAssertNotNil(chooseIconButton, @"No Choose Icon Button");
+    [chooseIconButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    
+    chooseIconViewController *iconVC = (chooseIconViewController *) [viewController->iconPopover contentViewController];
+    STAssertNotNil(iconVC, @"No icon view controller");
+    
+    // Check that the picker view has the right number of items, and that only the first one is nil
+    int numIcons = [iconVC->iconPicker numberOfRowsInComponent:0];
+    STAssertTrue(numIcons == 15, @"Iconpicker has %d elements.", numIcons);
+    // With no picker selected, row 0 should be selected
+    STAssertTrue([iconVC->iconPicker selectedRowInComponent:0] == 0, @"With no content, iconPicker should start at row 0");
+    // The first element should be nil, but the rest should have elements
+    STAssertNil([iconVC->iconPicker viewForRow:0 forComponent:0], @"First element of icon picker should be nil");
+    for(int i=1; i < numIcons; ++i) {
+        [iconVC->iconPicker selectRow:i inComponent:0 animated:NO];
+        STAssertNotNil([iconVC->iconPicker viewForRow:i forComponent:0], @"Element %d of icon picker is nil", i);
+    }
+    // Spot check a couple of choices
+    [iconVC->iconPicker selectRow:0 inComponent:0 animated:NO];
+    [[iconVC->iconPicker delegate] pickerView:iconVC->iconPicker didSelectRow:0 inComponent:0];
+    STAssertNil([iconVC iconName], @"Name not nil for icon 0. Instead is %@", [iconVC iconName]);
+    [iconVC->iconPicker selectRow:5 inComponent:0 animated:NO];
+    [[iconVC->iconPicker delegate] pickerView:iconVC->iconPicker didSelectRow:5 inComponent:0];
+    STAssertTrue([[iconVC iconName] isEqualToString:@"VOL_DownArrow.png"], @"Name wrong for icon 5. Got %@", [iconVC iconName]);
+    [viewController->iconPopover dismissPopoverAnimated:NO];
+    [[viewController->iconPopover delegate] popoverControllerDidDismissPopover:viewController->iconPopover];
+    
+    // Re-start the panel and make sure the same icon is selected
+    [chooseIconButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    
+    iconVC = (chooseIconViewController *) [viewController->iconPopover contentViewController];
+    STAssertNotNil(iconVC, @"No icon view controller second time around");
+    int selectedRow = [iconVC->iconPicker selectedRowInComponent:0];
+    STAssertTrue(selectedRow == 5, @"Did not preserve selected row after configuring it. Curent row = %d", selectedRow);
+    // Delete the panel
+    [viewController->iconPopover dismissPopoverAnimated:NO];
+    [viewController goBack:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    viewController = (switchPanelViewController *) [nav_controller visibleViewController];
+    [viewController deletePanel:viewController->confirmDeleteButton];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+}
+#if RUN_ALL_TESTS
 - (void)test_003_defineActionViewController_001_Initialization {
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
@@ -1354,6 +1413,8 @@
     actualCommand = [driver->commandsReceived objectAtIndex:0];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
 }
+#endif
+
 
 #if 0
 // Implement this once configuration working

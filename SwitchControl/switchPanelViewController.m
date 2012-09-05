@@ -80,6 +80,7 @@
         NSArray *textNodes = [element nodesForXPath:@".//switchtext" error:&xmlError];
         NSArray *actionArray = [element nodesForXPath:@".//onswitchactivate/actionsequenceondevice" error:&xmlError];
         NSArray *imageNodes = [element nodesForXPath:@".//image" error:&xmlError];
+        NSArray *iconNodes = [element nodesForXPath:@".//icon" error:&xmlError];
         NSArray *audioNodes = [element nodesForXPath:@".//audioforswitchactivate" error:&xmlError];
         [myButton setActivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
         [[myButton activateActions] setArray:actionArray];
@@ -112,7 +113,13 @@
             UIImage *image = [UIImage imageWithContentsOfFile:imageNodePath];
             [myButton setBackgroundImage:image forState:UIControlStateNormal];
         }
-        
+     
+        // Icon
+        if([iconNodes count]) {
+            [myButton setIconName:[[iconNodes objectAtIndex:0] stringValue]];
+            [myButton setImage:[[UIImage imageNamed:[myButton iconName]] stretchableImageWithLeftCapWidth:8.0f topCapHeight:0.0f] forState:UIControlStateNormal];
+        }
+
         // Audio
         if([audioNodes count]) {
             NSString *audioNodePath = [[audioNodes objectAtIndex:0] stringValue];
@@ -256,63 +263,73 @@
         
         // Color buttons
         UIButton *colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(980, 704, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 604, 44, 44)];
         [colorButton setBackgroundColor:[UIColor redColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(980, 654, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 554, 44, 44)];
         [colorButton setBackgroundColor:[UIColor blueColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(980, 604, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 504, 44, 44)];
         [colorButton setBackgroundColor:[UIColor greenColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(980, 554, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 454, 44, 44)];
         [colorButton setBackgroundColor:[UIColor yellowColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        [colorButton setFrame:CGRectMake(980, 504, 44, 44)];
+        [colorButton setFrame:CGRectMake(980, 404, 44, 44)];
         [colorButton setBackgroundColor:[UIColor orangeColor]];
+        [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
+        [myView addSubview:colorButton];
+        [colorButton setFrame:CGRectMake(980, 654, 44, 44)];
+        [colorButton setBackgroundColor:[UIColor colorWithRed:0.7 green:0.7 blue:0.7 alpha:1.0]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
 
         UIButton *newSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [newSwitchButton setFrame:CGRectMake(175, 704, 100, 44)];
+        [newSwitchButton setFrame:CGRectMake(150, 704, 100, 44)];
         [newSwitchButton addTarget:self action:@selector(newSwitch:) forControlEvents:UIControlEventTouchUpInside];
         [newSwitchButton setTitle:@"New Switch" forState:UIControlStateNormal];
         [myView addSubview:newSwitchButton];
 
         UIButton *deleteSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [deleteSwitchButton setFrame:CGRectMake(50, 704, 100, 44)];
+        [deleteSwitchButton setFrame:CGRectMake(0, 704, 125, 44)];
         [deleteSwitchButton addTarget:self action:@selector(deleteSwitch:) forControlEvents:UIControlEventTouchUpInside];
         [deleteSwitchButton setTitle:@"Delete Switch" forState:UIControlStateNormal];
         [myView addSubview:deleteSwitchButton];
         
         UIButton *pressActionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [pressActionButton setFrame:CGRectMake(300, 704, 150, 44)];
+        [pressActionButton setFrame:CGRectMake(275, 704, 150, 44)];
         [pressActionButton addTarget:self action:@selector(defineAction:) forControlEvents:UIControlEventTouchUpInside];
         [pressActionButton setTitle:@"Action For Touch" forState:UIControlStateNormal];
         [myView addSubview:pressActionButton];
         
         UIButton *releaseActionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [releaseActionButton setFrame:CGRectMake(475, 704, 150, 44)];
+        [releaseActionButton setFrame:CGRectMake(450, 704, 150, 44)];
         [releaseActionButton addTarget:self action:@selector(defineAction:) forControlEvents:UIControlEventTouchUpInside];
         [releaseActionButton setTitle:@"Action For Release" forState:UIControlStateNormal];
         [myView addSubview:releaseActionButton];
         
+        chooseIconButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [chooseIconButton setFrame:CGRectMake(625, 704, 100, 44)];
+        [chooseIconButton addTarget:self action:@selector(chooseIcon:) forControlEvents:UIControlEventTouchUpInside];
+        [chooseIconButton setTitle:@"Choose Icon" forState:UIControlStateNormal];
+        [myView addSubview:chooseIconButton];
+        
         chooseImageButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [chooseImageButton setFrame:CGRectMake(650, 704, 150, 44)];
+        [chooseImageButton setFrame:CGRectMake(750, 704, 125, 44)];
         [chooseImageButton addTarget:self action:@selector(chooseImage:) forControlEvents:UIControlEventTouchUpInside];
         [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
         [myView addSubview:chooseImageButton];
         
         recordAudioButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-        [recordAudioButton setFrame:CGRectMake(825, 704, 150, 44)];
+        [recordAudioButton setFrame:CGRectMake(900, 704, 124, 44)];
         [recordAudioButton addTarget:self action:@selector(recordAudio:) forControlEvents:UIControlEventTouchUpInside];
         [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
         [myView addSubview:recordAudioButton];
@@ -432,22 +449,22 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
 
 // Replace the current panel with one that enables editing
 - (void)editPanel:(id)sender {
+    switchPanelViewController *newViewController = [switchPanelViewController alloc];
     // If this is a built-in panel, save it to a new file that we'll edit
     if(isBuiltInPanel) {
         urlToLoad = GetURLWithNoConflictWithName(@"Panel", @"xml");
         // Create a new name for the panel
         [self setSwitchPanelName:[[urlToLoad lastPathComponent] stringByDeletingPathExtension]];
         [self savePanelToPath:urlToLoad];
+        NSString *panelNameWithExtension = [urlToLoad lastPathComponent];
+        [newViewController setSwitchPanelName:[panelNameWithExtension stringByDeletingPathExtension]];
     }
     UINavigationController *navController = self.navigationController;
     [navController popViewControllerAnimated:NO];
-    switchPanelViewController *newViewController = [switchPanelViewController alloc];
     [newViewController setUrlToLoad:[self urlToLoad]];
     [newViewController setEditingActive:YES];
     UIView *view = [newViewController view]; // Force initialization
     view = view; // Suppress warning
-    NSString *panelNameWithExtension = [urlToLoad lastPathComponent];
-    [newViewController setSwitchPanelName:[panelNameWithExtension stringByDeletingPathExtension]];
     [navController pushViewController:newViewController animated:YES];
 }
 
@@ -494,6 +511,9 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<switchtext>%@</switchtext>\n", [button titleForState:UIControlStateNormal]]];
         if([button imageFilePath]) {
             [stringToSave appendString:[NSString stringWithFormat:@"\t\t<image>%@</image>\n", [button imageFilePath]]];
+        }
+        if([button iconName]) {
+            [stringToSave appendString:[NSString stringWithFormat:@"\t\t<icon>%@</icon>\n", [button iconName]]];
         }
         if([button audioFilePath]) {
             [stringToSave appendString:[NSString stringWithFormat:@"\t\t<audioforswitchactivate>%@</audioforswitchactivate>\n", [button audioFilePath]]];
@@ -744,6 +764,19 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [audioPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 }
 
+- (void)chooseIcon:(id)sender {
+    [confirmDeleteButton setHidden:YES];
+    if(currentButton == nil)
+        return;
+
+    chooseIconViewController *iconViewController = [[chooseIconViewController alloc] init];
+    [iconViewController setIconName:[currentButton iconName]];
+    
+    iconPopover = [[UIPopoverController alloc] initWithContentViewController:iconViewController];
+    [iconPopover setDelegate:self];
+    [iconPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+}
+
 
 - (void) imagePickerController: (UIImagePickerController *) picker didFinishPickingMediaWithInfo: (NSDictionary *) info {
     UIImage *imageToUse;
@@ -804,6 +837,16 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
             [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
             [currentButton setAudioFilePath:nil];
         }
+    }
+    if(popoverController == iconPopover) {
+        if(!currentButton)
+            return;
+        chooseIconViewController *iconVC = (chooseIconViewController *)[iconPopover contentViewController];
+        [currentButton setIconName:[iconVC iconName]];
+        if(![currentButton iconName])
+            [currentButton setImage:nil forState:UIControlStateNormal];
+        else
+            [currentButton setImage:[[UIImage imageNamed:[currentButton iconName]] stretchableImageWithLeftCapWidth:8.0f topCapHeight:0.0f] forState:UIControlStateNormal];
     }
 }
 @end

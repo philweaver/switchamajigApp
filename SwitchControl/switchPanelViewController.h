@@ -10,11 +10,14 @@
 #import "SwitchControlAppDelegate.h"
 #import "SJUIRecordAudioViewController.h"
 #import "defineActionViewController.h"
+#import "chooseIconViewController.h"
+
 @interface SJUIButtonWithActions : UIButton 
 @property (nonatomic) NSMutableArray *activateActions;
 @property (nonatomic) NSMutableArray *deactivateActions;
 @property NSString *imageFilePath;
 @property NSString *audioFilePath;
+@property NSString *iconName;
 @end
 
 @interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, SJUIRecordAudioViewControllerDelegate, SJUIDefineActionViewController, UIPopoverControllerDelegate>{
@@ -34,8 +37,10 @@
     UIPopoverController *actionPopover;
     UIPopoverController *imagePopover;
     UIPopoverController *audioPopover;
+    UIPopoverController *iconPopover;
     UIButton *chooseImageButton;
     UIButton *recordAudioButton;
+    UIButton *chooseIconButton;
     AVAudioPlayer *player;
 }
 - (IBAction)allowNavigation:(id)sender;
