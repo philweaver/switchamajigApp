@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+    <panelname>Simple TV</panelname>
+    <panelelement>
+        <frame>50 50 924 189</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <icon>onoff.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>50 289 437 189</frame>
+        <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
+        <icon>VOL_UpArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>50 528 437 189</frame>
+        <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
+        <icon>VOL_DownArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>537 289 437 189</frame>
+        <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
+        <icon>CH_UpArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>537 528 437 189</frame>
+        <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
+        <icon>CH_DownArrow.png</icon>
+    </panelelement>
+</panel>

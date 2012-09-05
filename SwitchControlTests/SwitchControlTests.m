@@ -1123,7 +1123,7 @@
     
     // Check that the picker view has the right number of items, and that only the first one is nil
     int numIcons = [iconVC->iconPicker numberOfRowsInComponent:0];
-    STAssertTrue(numIcons == 15, @"Iconpicker has %d elements.", numIcons);
+    STAssertTrue(numIcons == 18, @"Iconpicker has %d elements.", numIcons);
     // With no picker selected, row 0 should be selected
     STAssertTrue([iconVC->iconPicker selectedRowInComponent:0] == 0, @"With no content, iconPicker should start at row 0");
     // The first element should be nil, but the rest should have elements

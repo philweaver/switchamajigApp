@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+    <panelname>Universal</panelname>
+    <panelelement>
+        <frame>50 50 250 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>TV</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>50 125 50 50</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <icon>onoff.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>75 200 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>VOL_UpArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>75 325 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>VOL_DownArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>200 200 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>CH_UpArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>200 325 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>CH_DownArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>50 450 100 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>TV/Video</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>200 450 100 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Menu</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>150 525 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>uparrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>150 585 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>OK</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>150 645 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>downarrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>210 585 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>play.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>90 585 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>reverse.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>225 525 75 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Exit</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>225 645 75 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Return</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>35 645 90 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Submenu</switchtext>
+    </panelelement>
+    
+    <panelelement>
+        <frame>350 50 325 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>Cable/Satellite/DVR</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>350 125 50 50</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <icon>onoff.png</icon>
+    </panelelement>
+    
+    <panelelement>
+        <frame>487 105 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>uparrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>487 160 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>OK</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>487 215 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>downarrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>547 160 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>play.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>427 160 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>reverse.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>350 220 75 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>Live TV</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>600 220 75 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>Guide</switchtext>
+    </panelelement>
+
+    <panelelement>
+        <frame>427 285 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>1</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>487 285 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>2</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>547 285 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>3</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>427 345 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>4</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>487 345 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>5</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>547 345 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>6</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>427 405 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>7</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>487 405 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>8</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>547 405 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>9</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>427 465 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>Clear</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>487 465 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>0</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>547 465 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <switchtext>Enter</switchtext>
+    </panelelement>
+
+    <panelelement>
+        <frame>487 525 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>play.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>487 580 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>pause.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>547 580 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>fastforward.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>427 580 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>fastbackward.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>487 635 50 50</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>slowplay.png</icon>
+    </panelelement>
+
+    
+
+    <panelelement>
+        <frame>725 50 250 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>DVD/Blu-ray</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>725 125 50 50</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <icon>onoff.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>885 125 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>eject.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>825 200 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>play.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>885 200 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>fastforward.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>765 200 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>fastbackward.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>825 275 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>pause.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>885 275 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>skipforward.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>765 275 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>skipbackward.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>825 350 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>stop.png</icon>
+    </panelelement>
+
+    <panelelement>
+        <frame>875 450 100 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Menu</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>725 450 100 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Home</switchtext>
+    </panelelement>
+
+    
+    
+    <panelelement>
+        <frame>825 525 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>uparrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>825 585 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>OK</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>825 645 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>downarrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>885 585 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>play.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>765 585 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>reverse.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>900 525 75 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Exit</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>900 645 75 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Return</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>710 645 90 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Submenu</switchtext>
+    </panelelement>
+
+</panel>

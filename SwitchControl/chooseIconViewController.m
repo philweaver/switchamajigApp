@@ -19,7 +19,7 @@
     self = [super init];
     if (self) {
         [self setContentSizeForViewInPopover:CGSizeMake(320, 250)];
-        iconImageNames = [NSArray arrayWithObjects:@"onoff.png", @"CH_UpArrow.png", @"CH_DownArrow.png", @"VOL_UpArrow.png", @"VOL_DownArrow.png", @"play.png", @"stop.png", @"pause.png", @"fastforward.png", @"fastbackward.png", @"skipforward.png", @"skipbackward.png", @"eject.png", @"slowplay.png", nil];
+        iconImageNames = [NSArray arrayWithObjects:@"onoff.png", @"CH_UpArrow.png", @"CH_DownArrow.png", @"VOL_UpArrow.png", @"VOL_DownArrow.png", @"play.png", @"stop.png", @"pause.png", @"fastforward.png", @"fastbackward.png", @"skipforward.png", @"skipbackward.png", @"eject.png", @"slowplay.png", @"reverse", @"uparrow", @"downarrow", nil];
     }
     return self;
 }
