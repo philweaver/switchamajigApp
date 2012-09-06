@@ -9,21 +9,20 @@
 #import "SJActionUI.h"
 
 @interface SJActionUIlearnedIRCommand : SJActionUI <UIPickerViewDataSource, UIPickerViewDelegate> {
+@public
     UIPickerView *learnedIrPicker;
     UILabel *learnedIRPickerLabel;
     UILabel *learningIRInstructionsLabel;
     UIButton *learningIRCancelButton;
     UIButton *learnIRButton;
-    UIActivityIndicatorView *learnIRActivityView;
     UIImageView *learnIRImage;
-    UIButton *renameLearnedIRCommandButton;
-    UIButton *deleteLearnedIRCommandButton;
-    UIButton *confirmDeleteLearnedIRCommandButton;
+    //UIButton *renameLearnedIRCommandButton;
+    //UIButton *deleteLearnedIRCommandButton;
+    //UIButton *confirmDeleteLearnedIRCommandButton;
     UIButton *testLearnedIRButton;
     NSMutableDictionary *learnedIRCommands;
     NSTimer *learnIRPollTimer;
     int learnIRAnimationCounter;
-    UIButton *testIrButton;
 }
 
 @end

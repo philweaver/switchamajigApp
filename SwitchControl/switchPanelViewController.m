@@ -508,7 +508,8 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         a = components[3];
 #endif
         [stringToSave appendString:[NSString stringWithFormat:@"\t\t<rgbacolor>%3.1f %3.1f %3.1f %3.1f</rgbacolor>\n", r, g, b, a]];
-        [stringToSave appendString:[NSString stringWithFormat:@"\t\t<switchtext>%@</switchtext>\n", [button titleForState:UIControlStateNormal]]];
+        if(buttonTitle)
+            [stringToSave appendString:[NSString stringWithFormat:@"\t\t<switchtext>%@</switchtext>\n", buttonTitle]];
         if([button imageFilePath]) {
             [stringToSave appendString:[NSString stringWithFormat:@"\t\t<image>%@</image>\n", [button imageFilePath]]];
         }

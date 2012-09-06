@@ -37,6 +37,8 @@
     [learnIRButton addTarget:self action:@selector(learnNewIRCommand:) forControlEvents:UIControlEventTouchUpInside];
     [[[self defineActionVC] view] addSubview:learnIRButton];
     
+#if 0
+    // Don't support renaming and deleting commands until we also remember them
     renameLearnedIRCommandButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [renameLearnedIRCommandButton setFrame:CGRectMake(600, 250, 200, 44)];
     [renameLearnedIRCommandButton setTitle:@"Rename IR Command" forState:UIControlStateNormal];
@@ -49,13 +51,6 @@
     [deleteLearnedIRCommandButton addTarget:self action:@selector(deleteIRCommand:) forControlEvents:UIControlEventTouchUpInside];
     [[[self defineActionVC] view] addSubview:deleteLearnedIRCommandButton];
     
-    
-    testLearnedIRButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [testLearnedIRButton setFrame:CGRectMake(600, 350, 200, 44)];
-    [testLearnedIRButton setTitle:@"Test IR Command" forState:UIControlStateNormal];
-    [testLearnedIRButton addTarget:self action:@selector(testLearnedIRCommand:) forControlEvents:UIControlEventTouchUpInside];
-    [[[self defineActionVC] view] addSubview:testLearnedIRButton];
-    
     confirmDeleteLearnedIRCommandButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [confirmDeleteLearnedIRCommandButton setFrame:CGRectMake(325, 550, 150, 44)];
     [confirmDeleteLearnedIRCommandButton setBackgroundImage:[[UIImage imageNamed:@"iphone_delete_button.png"] stretchableImageWithLeftCapWidth:8.0f topCapHeight:0.0f] forState:UIControlStateNormal];
@@ -63,6 +58,13 @@
     [confirmDeleteLearnedIRCommandButton setTitle:@"Confirm Delete" forState:UIControlStateNormal];
     [confirmDeleteLearnedIRCommandButton addTarget:self action:@selector(deleteIRCommand:) forControlEvents:UIControlEventTouchUpInside];
     [[[self defineActionVC] view] addSubview:confirmDeleteLearnedIRCommandButton];
+#endif
+    
+    testLearnedIRButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    [testLearnedIRButton setFrame:CGRectMake(600, 350, 200, 44)];
+    [testLearnedIRButton setTitle:@"Test IR Command" forState:UIControlStateNormal];
+    [testLearnedIRButton addTarget:self action:@selector(testLearnedIRCommand:) forControlEvents:UIControlEventTouchUpInside];
+    [[[self defineActionVC] view] addSubview:testLearnedIRButton];
     
     // UI when learning is in progress
     // Instructions
@@ -84,9 +86,6 @@
     [learningIRCancelButton setTitle:@"Cancel IR Learning" forState:UIControlStateNormal];
     [learningIRCancelButton addTarget:self action:@selector(cancelIRLearning:) forControlEvents:UIControlEventTouchUpInside];
     [[[self defineActionVC] view] addSubview:learningIRCancelButton];
-    learnIRActivityView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(375, 500, 50, 50)];
-    [[[self defineActionVC] view] addSubview:learnIRActivityView];
-
 };
 - (void) driverSelectionDidChange {
     [testLearnedIRButton setHidden:[learnedIrPicker isHidden]];
@@ -103,23 +102,54 @@
 - (void) setHidden:(BOOL)hidden{
     [learnedIrPicker setHidden:hidden];
     [learnedIRPickerLabel setHidden:hidden];
-    [renameLearnedIRCommandButton setHidden:hidden];
-    [deleteLearnedIRCommandButton setHidden:hidden];
+    //[renameLearnedIRCommandButton setHidden:hidden];
+    //[deleteLearnedIRCommandButton setHidden:hidden];
     // Parts of the UI should only become visible when they are explicitly shown, but they should be hidden with the rest
     if(hidden) {
-        [confirmDeleteLearnedIRCommandButton setHidden:hidden];
+        //[confirmDeleteLearnedIRCommandButton setHidden:hidden];
         [learnIRImage setHidden:hidden];
         [learningIRInstructionsLabel setHidden:hidden];
         [learningIRCancelButton setHidden:hidden];
-        [learnIRActivityView setHidden:hidden];
     }
     // Other parts of the UI are shown only if the current driver supports IR
    [self driverSelectionDidChange];
 };
 
-- (NSString*) XMLStringForAction{ return nil; };
-- (BOOL) setAction:(DDXMLNode*)action{
-    return NO; // Didn't process anything
+
+- (NSString*) XMLStringForAction {
+    int currentRow = [learnedIrPicker selectedRowInComponent:0];
+    NSString *learnedCommandName = [self pickerView:learnedIrPicker titleForRow:currentRow forComponent:0];
+    if(!learnedCommandName)
+        return nil;
+    NSString *learnedCommand = [learnedIRCommands objectForKey:learnedCommandName];
+    if(!learnedCommand)
+        return nil;
+    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Learned:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", learnedCommandName, learnedCommand];
+    NSLog(@"Learned IR XML Command = %@", irXmlCommand);
+    return irXmlCommand;
+};
+
+
+- (BOOL) setAction:(DDXMLNode*)action {
+    if(![[action name] isEqualToString:@"docommand"])
+        return NO;
+    DDXMLElement *actionElement = (DDXMLElement *)action;
+    DDXMLNode *IRDataNode = [actionElement attributeForName:@"ir_data"];
+    if(!IRDataNode)
+        return NO;
+    NSString *IRDataString = [IRDataNode stringValue];
+    if(!IRDataString)
+        return NO;
+    // Add command to dictionary
+    NSString *commandName;
+    unsigned int i=0;
+    do {
+        ++i;
+        commandName = [NSString stringWithFormat:@"Learned IR Command %d", i];
+    } while ([learnedIRCommands objectForKey:commandName]);
+    [learnedIRCommands setObject:IRDataString forKey:commandName];
+    [learnedIrPicker reloadAllComponents];
+    return YES;
 };
 
 - (void) learnNewIRCommand:(id)sender {
@@ -139,13 +169,13 @@
     [learnIRImage setHidden:NO];
     [learningIRInstructionsLabel setHidden:NO];
     [learningIRCancelButton setHidden:NO];
-    [learnIRActivityView setHidden:NO];
-    [learnIRActivityView startAnimating];
     // Disable the rest of the UI
     [[self defineActionVC]->actionPicker setUserInteractionEnabled:NO];
-    [confirmDeleteLearnedIRCommandButton setHidden:YES];
-    [renameLearnedIRCommandButton setUserInteractionEnabled:NO];
-    [deleteLearnedIRCommandButton setUserInteractionEnabled:NO];
+    [[self defineActionVC]->doneButton setUserInteractionEnabled:NO];
+    [[self defineActionVC]->cancelButton setUserInteractionEnabled:NO];
+    //[confirmDeleteLearnedIRCommandButton setHidden:YES];
+    //[renameLearnedIRCommandButton setUserInteractionEnabled:NO];
+    //[deleteLearnedIRCommandButton setUserInteractionEnabled:NO];
     [testLearnedIRButton setUserInteractionEnabled:NO];
     SwitchamajigIRDeviceDriver *irDriver = (SwitchamajigIRDeviceDriver *)driver;
     [[[self defineActionVC] appDelegate] clearLastLearnedIRInfo];
@@ -188,13 +218,34 @@
     [learnIRImage setHidden:YES];
     [learningIRInstructionsLabel setHidden:YES];
     [learningIRCancelButton setHidden:YES];
-    [learnIRActivityView stopAnimating];
     NSLog(@"learnIRImage ishidden: %d", (int)[learnIRImage isHidden]);
     // Enable the rest of the UI
     [[self defineActionVC]->actionPicker setUserInteractionEnabled:YES];
-    [renameLearnedIRCommandButton setUserInteractionEnabled:YES];
-    [deleteLearnedIRCommandButton setUserInteractionEnabled:YES];
+    [[self defineActionVC]->doneButton setUserInteractionEnabled:YES];
+    [[self defineActionVC]->cancelButton setUserInteractionEnabled:YES];
+    //[renameLearnedIRCommandButton setUserInteractionEnabled:YES];
+    //[deleteLearnedIRCommandButton setUserInteractionEnabled:YES];
     [testLearnedIRButton setUserInteractionEnabled:YES];
+}
+
+-(void) testLearnedIRCommand:(id)sender {
+    NSString *irXmlCommand = [self XMLStringForAction];
+    NSError *xmlError;
+    DDXMLDocument *action = [[DDXMLDocument alloc] initWithXMLString:irXmlCommand options:0 error:&xmlError];
+    if(action == nil) {
+        NSLog(@"testIRCommand: Failed to create action XML. Error = %@. String = %@.\n", xmlError, irXmlCommand);
+        return;
+    }
+    DDXMLNode *actionNode = [[action children] objectAtIndex:0];
+    [[[[self defineActionVC] appDelegate] statusInfoLock] lock];
+    SwitchamajigDriver *driver = [[self defineActionVC] getCurrentlySelectedDriver];
+    if(driver) {
+        if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
+            NSError *error;
+            [driver issueCommandFromXMLNode:actionNode error:&error];
+        }
+    }
+    [[[[self defineActionVC] appDelegate] statusInfoLock] unlock];
 }
 
 // UIPickerViewDataSource

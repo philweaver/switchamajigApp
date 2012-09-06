@@ -10,6 +10,7 @@
 #import "SJUIStatusMessageLabel.h"
 #import "defineActionViewController.h"
 #import "chooseIconViewController.h"
+#import "SJActionUIlearnedIRCommand.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -1099,7 +1100,6 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New audio path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
-#endif
 - (void)test_002_SwitchPanelViewController_010_IconForSwitch {
     // Bring up the yellow panel to edit
     SJUIButtonWithActions *yellowButton = [SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
@@ -1158,7 +1158,6 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
-#if RUN_ALL_TESTS
 - (void)test_003_defineActionViewController_001_Initialization {
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
@@ -1415,6 +1414,69 @@
 }
 #endif
 
+- (void)test_003_defineActionViewController_004_IRLearning {
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
+    // Make sure the IR controls aren't visible by default
+    NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
+    SwitchControlAppDelegate *dummy_app_delegate = [SwitchControlAppDelegate alloc];
+    [dummy_app_delegate setFriendlyNameSwitchamajigDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy1" forKey:@"hoopy"];
+    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    SJActionUIlearnedIRCommand *actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Learned IR Command"];
+    STAssertTrue([actionUI->learnedIrPicker isHidden] && [actionUI->learnedIRPickerLabel isHidden] && [actionUI->learningIRInstructionsLabel isHidden] && [actionUI->learnIRButton isHidden] && [actionUI->testLearnedIRButton isHidden], @"Learned IR UI is visible when no action is passed in");
+    // Select IR command from action picker
+    [defineVC->actionPicker selectRow:4 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:4 inComponent:1];
+    STAssertFalse([actionUI->learnedIrPicker isHidden] || [actionUI->learnedIRPickerLabel isHidden], @"Learned IR UI not visible after selecting IR action.");
+    STAssertTrue([actionUI->testLearnedIRButton isHidden], @"Test IR button visible with no IR devices connected");
+    STAssertTrue([actionUI->learnIRButton isHidden], @"Learn IR button visible with no IR devices connected");
+    STAssertTrue([actionUI->learningIRInstructionsLabel isHidden] && [actionUI->learningIRCancelButton isHidden] && [actionUI->learnIRImage isHidden], @"IR learning UI visible without activating IR learning");
+    NSString *xmlCommandString = [actionUI XMLStringForAction];
+    // With no commands, action should be nil
+    STAssertNil(xmlCommandString, @"Should not have valid action when nothing has been learned");
+    // Re-open the UI when a driver is present
+    MockSwitchamajigDriver *driver = [[MockSwitchamajigDriver alloc] initWithHostname:@"localhost"];
+    driver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    [defineVC->actionPicker selectRow:4 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:4 inComponent:1];
+    actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Learned IR Command"];
+    STAssertFalse([actionUI->testLearnedIRButton isHidden], @"Test Learned IR button not visible after IR driver selected");
+    STAssertFalse([actionUI->learnIRButton isHidden], @"Learn IR button not visible after IR driver selected");
+    STAssertTrue([actionUI->learnedIrPicker numberOfRowsInComponent:0] == 0, @"Command present before IR learning");
+    [actionUI->learnIRButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    // Verify that the learn IR UI is now visible
+    STAssertFalse([actionUI->learningIRInstructionsLabel isHidden] || [actionUI->learningIRCancelButton isHidden] || [actionUI->learnIRImage isHidden], @"IR learning UI not visible after pressing IR learning button");
+    // Verify that other buttons are disabled
+    STAssertFalse([defineVC->doneButton isUserInteractionEnabled] || [defineVC->cancelButton isUserInteractionEnabled] || [defineVC->cancelButton isUserInteractionEnabled] || [defineVC->actionPicker isUserInteractionEnabled] || [actionUI->testLearnedIRButton isUserInteractionEnabled], @"Rest of UI not disabled during IR learning");
+    // Learn an IR command
+    [dummy_app_delegate SwitchamajigIRDeviceDriverDelegateDidReceiveLearnedIRCommand:driver irCommand:@"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320"];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    // Verify that the learn IR UI disappeared
+    STAssertTrue([actionUI->learningIRInstructionsLabel isHidden] && [actionUI->learningIRCancelButton isHidden] && [actionUI->learnIRImage isHidden], @"Learned IR UI is visible after learned IR command arrived.");
+    // Verify that rest of UI now enabled
+    STAssertTrue([defineVC->doneButton isUserInteractionEnabled] && [defineVC->cancelButton isUserInteractionEnabled] && [defineVC->cancelButton isUserInteractionEnabled] && [defineVC->actionPicker isUserInteractionEnabled] && [actionUI->testLearnedIRButton isUserInteractionEnabled], @"UI not re-enabled after IR learning command arrived");
+    // Verify that the IR picker now has a command
+    STAssertTrue([actionUI->learnedIrPicker numberOfRowsInComponent:0] != 0, @"No command present after learned IR command arrived");
+    STAssertTrue([actionUI->learnedIrPicker numberOfRowsInComponent:0] < 2, @"More than one command present after IR learning");
+    // Confirm that command is correct
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    xmlCommandString = [actionUI XMLStringForAction];
+    NSString *expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Learned:Learned IR Command 1\" ir_data=\"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320\" ch=\"0\"></docommand>";
+    STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Actual command mismatches. Got %@", xmlCommandString);
+    
+    // Re-initialize the UI with with the command
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Learned IR Command"];
+    xmlCommandString = [actionUI XMLStringForAction];
+    STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
+}
 
 #if 0
 // Implement this once configuration working
