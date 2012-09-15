@@ -26,6 +26,7 @@
 - (void) selectPressed:(id)sender;
 - (void) highlightCurrentScanSelection:(BOOL)highlight;
 @property (nonatomic, strong) UIButton *helpButton;
+@property (nonatomic, strong) UIButton *showQuickstartWizardButton;
 @property (nonatomic, strong) UIScrollView *panelSelectionScrollView;
 @property (nonatomic, strong) SJUIStatusMessageLabel *statusText;
 @property (strong, nonatomic) UIButton *configButton;

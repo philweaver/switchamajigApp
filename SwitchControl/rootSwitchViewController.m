@@ -9,12 +9,14 @@
 #import "rootSwitchViewController.h"
 #import "switchPanelViewController.h"
 #import "helpDisplayViewController.h"
+#import "quickStartSettingsViewController.h"
 #import "configViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation rootSwitchViewController
 @synthesize configButton;
 @synthesize helpButton;
+@synthesize showQuickstartWizardButton;
 @synthesize panelSelectionScrollView;
 @synthesize statusText;
 @synthesize scanButton;
@@ -143,16 +145,26 @@
         if(displayHelpButton) {
             NSString *helpText = @"Help";
             [self setHelpButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+            /* No resizable
             CGSize helpTextSize = [helpText sizeWithFont:[UIFont systemFontOfSize:textFontSize]];
             if(helpTextSize.width > helpConfigButtonWidth)
                 helpConfigButtonWidth = helpTextSize.width;
             if(helpConfigButtonWidth > FRAME_WIDTH/2)
                 helpConfigButtonWidth = FRAME_WIDTH/2;
+             */
             [[self helpButton] setFrame:CGRectMake(FRAME_WIDTH-helpConfigButtonWidth, [self view].bounds.size.height-spaceOnBottomForExtraButtons, helpConfigButtonWidth, spaceOnBottomForExtraButtons)];
-            [[self helpButton] setTitle:@"Help" forState:UIControlStateNormal];
+            [[self helpButton] setTitle:helpText forState:UIControlStateNormal];
             [[[self helpButton] titleLabel] setFont:[UIFont systemFontOfSize:20/*textFontSize*/]];
             [[self helpButton] addTarget:self action:@selector(display_help:) forControlEvents:UIControlEventTouchUpInside]; 
             [[self view] addSubview:[self helpButton]];
+        }
+        if(1) {
+            [self setShowQuickstartWizardButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
+            [[self showQuickstartWizardButton] setFrame:CGRectMake((FRAME_WIDTH-helpConfigButtonWidth)/2, [self view].bounds.size.height-spaceOnBottomForExtraButtons, helpConfigButtonWidth, spaceOnBottomForExtraButtons)];
+            [[self showQuickstartWizardButton] setTitle:@"Quick-Start Wizard" forState:UIControlStateNormal];
+            [[[self showQuickstartWizardButton] titleLabel] setFont:[UIFont systemFontOfSize:20/*textFontSize*/]];
+            [[self showQuickstartWizardButton] addTarget:self action:@selector(display_qswizard:) forControlEvents:UIControlEventTouchUpInside];
+            [[self view] addSubview:[self showQuickstartWizardButton]];
         }
     }
     
@@ -268,6 +280,7 @@
     // Render view controller into image
     switchPanelViewController *viewController = [switchPanelViewController alloc];
     [viewController setUrlToLoad:url];
+    [[viewController view] setFrame:CGRectMake(0, 20, 1024, 748)]; // Init as if we were full-size
     // Create the specified button
     id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [myButton setFrame:CGRectMake(origin.x, origin.y, buttonSize.width, buttonSize.height)];
@@ -421,6 +434,13 @@
     helpDisplayViewController *helpViewCtrl = [helpDisplayViewController alloc];
     [self.navigationController pushViewController:helpViewCtrl animated:YES];
 }
+
+- (void)display_qswizard:(id)sender {
+    [[self navigationController] setNavigationBarHidden:NO];
+    quickStartSettingsViewController *qsViewCtrl = [quickStartSettingsViewController alloc];
+    [self.navigationController pushViewController:qsViewCtrl animated:YES];
+}
+
 - (void)config_pressed:(id)sender {
     SwitchamajigControllerDeviceDriver *driver = [appDelegate firstSwitchamajigControllerDriver];
     if(driver) {

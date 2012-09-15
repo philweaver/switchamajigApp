@@ -24,12 +24,16 @@
 @public
     SwitchControlAppDelegate *appDelegate;
     id backButton;
+    UIButton *allowNavButton;
+    UIButton *editButton;
+    UIButton *deleteButton;
     id textToShowSwitchName;
     BOOL oneButtonNavigation;
     BOOL isBuiltInPanel;
     UIButton *confirmDeleteButton;
     SJUIButtonWithActions *currentButton;
     float lastPinchScale;
+    BOOL userButtonsHidden;
     
     // Configuration UI
     UITextField *panelNameTextField;
@@ -62,6 +66,7 @@
 - (void)defineAction:(id)sender;
 - (void)chooseImage:(id)sender;
 - (void)recordAudio:(id)sender;
+- (void)hideUserButtons;
 
 @property (nonatomic, strong) NSURL *urlToLoad;
 @property (nonatomic, strong) NSString *switchPanelName;

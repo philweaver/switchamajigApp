@@ -24,16 +24,7 @@
 @synthesize urlToLoad;
 @synthesize switchPanelName;
 @synthesize editingActive;
-/*
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
+
 - (void)didReceiveMemoryWarning
 {
     // Releases the view if it doesn't have a superview.
@@ -48,11 +39,19 @@
 - (void)loadView
 {
     appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
+    UIView *myView = [[UIView alloc] init];
+	self.view = myView;
+}
+
+
+// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
     UIColor *bgColor = [appDelegate backgroundColor];
-    
-	CGRect cgRct = CGRectMake(0, 20, 1024, 748);
-    UIView *myView = [[UIView alloc] initWithFrame:cgRct];
+    UIView *myView = [self view];
     [myView setBackgroundColor:bgColor];
+    [[self view] setClipsToBounds:YES];
 	myView.autoresizesSubviews = YES;
     
     NSError *xmlError=nil, *fileError=nil;
@@ -87,13 +86,13 @@
         actionArray = [element nodesForXPath:@".//onswitchdeactivate/actionsequenceondevice" error:&xmlError];
         [myButton setDeactivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
         [[myButton deactivateActions] setArray:actionArray];
-
+        
         // Read frame
         if([frameNodes count] <= 0) {
             NSLog(@"No frame found.\n");
             continue;
         }
-
+        
         DDXMLNode *frameNode = [frameNodes objectAtIndex:0];
         NSString *frameString = [frameNode stringValue];
         NSScanner *frameScan = [[NSScanner alloc] initWithString:frameString];
@@ -105,7 +104,7 @@
         if(!x_ok || !y_ok || !w_ok || !h_ok)
             continue;
         CGRect buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
-
+        
         // Image
         if([imageNodes count]) {
             NSString *imageNodePath = [[imageNodes objectAtIndex:0] stringValue];
@@ -113,13 +112,13 @@
             UIImage *image = [UIImage imageWithContentsOfFile:imageNodePath];
             [myButton setBackgroundImage:image forState:UIControlStateNormal];
         }
-     
+        
         // Icon
         if([iconNodes count]) {
             [myButton setIconName:[[iconNodes objectAtIndex:0] stringValue]];
             [myButton setImage:[[UIImage imageNamed:[myButton iconName]] stretchableImageWithLeftCapWidth:8.0f topCapHeight:0.0f] forState:UIControlStateNormal];
         }
-
+        
         // Audio
         if([audioNodes count]) {
             NSString *audioNodePath = [[audioNodes objectAtIndex:0] stringValue];
@@ -147,19 +146,19 @@
         
         // Associate different actions for the buttons depending on whether or not we're editing
         if(editingActive) {
-            [myButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)]; 
-            [myButton addTarget:self action:@selector(onButtonSelect:) forControlEvents:(UIControlEventTouchDown)]; 
+            [myButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)];
+            [myButton addTarget:self action:@selector(onButtonSelect:) forControlEvents:(UIControlEventTouchDown)];
         } else {
-            [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)]; 
+            [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)];
             [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)];
         }
         // Read text for switch
         if([textNodes count]) {
             [myButton setTitle:[[textNodes objectAtIndex:0] stringValue] forState:UIControlStateNormal];
-        } 
+        }
         [myButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [[myButton titleLabel] setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
-
+        
         [myView addSubview:myButton];
     }
     
@@ -171,11 +170,11 @@
         // If we're allowing editing, don't bother with "Enable Back Button"
         if(!allowEditing) {
             // Create two-button combo to allow navigation
-            id allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            allowNavButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
             CGRect buttonRect = CGRectMake(412, 704, 200, 44);
             [allowNavButton setFrame:buttonRect];
             [allowNavButton setTitle:[NSString stringWithCString:"Enable Back Button" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-            [allowNavButton addTarget:self action:@selector(allowNavigation:) forControlEvents:UIControlEventTouchUpInside]; 
+            [allowNavButton addTarget:self action:@selector(allowNavigation:) forControlEvents:UIControlEventTouchUpInside];
             [myView addSubview:allowNavButton];
             [backButton setEnabled:NO];
         }
@@ -207,20 +206,20 @@
         oneButtonNavigation = YES;
         // Show button to start editing if we aren't already editing
         if(!editingActive) {
-            id editButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            editButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
             CGRect buttonRect = CGRectMake(150, 0, 100, 44);
             [editButton setFrame:buttonRect];
             [editButton setTitle:[NSString stringWithCString:"Edit Panel" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-            [editButton addTarget:self action:@selector(editPanel:) forControlEvents:UIControlEventTouchUpInside]; 
+            [editButton addTarget:self action:@selector(editPanel:) forControlEvents:UIControlEventTouchUpInside];
             [myView addSubview:editButton];
         }
         // If this panel is built-in or we're editting it, don't allow deleting it
         if(!isBuiltInPanel && !editingActive) {
-            id deleteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+            deleteButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
             CGRect buttonRect = CGRectMake(300, 0, 100, 44);
             [deleteButton setFrame:buttonRect];
             [deleteButton setTitle:[NSString stringWithCString:"Delete Panel" encoding:NSASCIIStringEncoding]forState:UIControlStateNormal];
-            [deleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside]; 
+            [deleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside];
             [myView addSubview:deleteButton];
         }
     }
@@ -229,7 +228,7 @@
     textToShowSwitchName = [[SJUIStatusMessageLabel alloc] initWithFrame:textRect];
     [textToShowSwitchName setBackgroundColor:bgColor];
     [myView addSubview:textToShowSwitchName];
-
+    
     // OK always to create hidden button
     confirmDeleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [confirmDeleteButton setFrame:CGRectMake(412, 650, 200, 44)];
@@ -238,7 +237,7 @@
     [confirmDeleteButton setTitle:@"Confirm Delete" forState:UIControlStateNormal];
     if(editingActive)
         [confirmDeleteButton addTarget:self action:@selector(deleteSwitch:) forControlEvents:UIControlEventTouchUpInside];
-    else 
+    else
         [confirmDeleteButton addTarget:self action:@selector(deletePanel:) forControlEvents:UIControlEventTouchUpInside];
     [confirmDeleteButton setHidden:YES];
     [myView addSubview:confirmDeleteButton];
@@ -291,13 +290,13 @@
         [colorButton setBackgroundColor:[UIColor colorWithRed:0.7 green:0.7 blue:0.7 alpha:1.0]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
-
+        
         UIButton *newSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [newSwitchButton setFrame:CGRectMake(150, 704, 100, 44)];
         [newSwitchButton addTarget:self action:@selector(newSwitch:) forControlEvents:UIControlEventTouchUpInside];
         [newSwitchButton setTitle:@"New Switch" forState:UIControlStateNormal];
         [myView addSubview:newSwitchButton];
-
+        
         UIButton *deleteSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [deleteSwitchButton setFrame:CGRectMake(0, 704, 125, 44)];
         [deleteSwitchButton addTarget:self action:@selector(deleteSwitch:) forControlEvents:UIControlEventTouchUpInside];
@@ -344,19 +343,11 @@
         [switchNameTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
         [switchNameTextField setReturnKeyType:UIReturnKeyDone];
         [myView addSubview:switchNameTextField];
-        
     }
-    
-	self.view = myView;
+    if(userButtonsHidden)
+        [self hideUserButtons];
 }
 
-/*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-}
-*/
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -849,5 +840,17 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         else
             [currentButton setImage:[[UIImage imageNamed:[currentButton iconName]] stretchableImageWithLeftCapWidth:8.0f topCapHeight:0.0f] forState:UIControlStateNormal];
     }
+}
+
+- (void) hideUserButtons {
+    if(backButton)
+        [backButton setHidden:YES];
+    if(editButton)
+        [editButton setHidden:YES];
+    if(deleteButton)
+        [deleteButton setHidden:YES];
+    if(allowNavButton)
+        [allowNavButton setHidden:YES];
+    userButtonsHidden = YES;
 }
 @end

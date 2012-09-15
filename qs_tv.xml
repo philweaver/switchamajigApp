@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+    <panelname>Quick-Start TV</panelname>
+    <panelelement>
+        <frame>50 0 50 50</frame>
+        <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+        <icon>onoff.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>75 75 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>VOL_UpArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>75 200 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>VOL_DownArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>200 75 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>CH_UpArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>200 200 75 100</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>CH_DownArrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>50 325 100 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>TV/Video</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>200 325 100 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Menu</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>150 400 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>uparrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>150 460 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>OK</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>150 520 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>downarrow.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>210 460 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>play.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>90 460 50 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <icon>reverse.png</icon>
+    </panelelement>
+    <panelelement>
+        <frame>225 400 75 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Exit</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>225 520 75 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Return</switchtext>
+    </panelelement>
+    <panelelement>
+        <frame>35 520 90 50</frame>
+        <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
+        <switchtext>Submenu</switchtext>
+    </panelelement>
+</panel>
