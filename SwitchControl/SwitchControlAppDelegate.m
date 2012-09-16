@@ -8,8 +8,6 @@
 
 #import "SwitchControlAppDelegate.h"
 #import "rootSwitchViewController.h"
-#import "Reachability.h"
-#import "signal.h"
 
 // Silly widgit that probably means I should be signaling the action thread to stop in some better way
 @interface SwitchamajigMutableBool : NSObject {
@@ -29,9 +27,6 @@
 @synthesize actionnameActionthreadDictionary;
 @synthesize statusMessages;
 @synthesize statusInfoLock;
-@synthesize switchStateLock = _switchStateLock;
-@synthesize active_switch_index = _active_switch_index;
-@synthesize switch_socket = _switch_socket;
 @synthesize backgroundColor = _backgroundColor;
 @synthesize foregroundColor = _foregroundColor;
 
@@ -42,7 +37,6 @@
     // Override point for customization after application launch.
     // Initialize default settings values if needed
     [[NSUserDefaults standardUserDefaults] registerDefaults:[self defaultsFromPlistNamed:@"Root"]];
-    [self setActive_switch_index:-1];
     // Disable SIGPIPE
     struct sigaction sigpipeaction;
     memset(&sigpipeaction, 0, sizeof(sigpipeaction));
@@ -63,17 +57,8 @@
     // Listen for Switchamajigs
     sjigControllerListener = [[SwitchamajigControllerDeviceListener alloc] initWithDelegate:self];
     sjigIRListener = [[SwitchamajigIRDeviceListener alloc] initWithDelegate:self];
-    //  Initialize switch state
-    [self setSwitch_socket:-1];
-    switch_state = 0;
-    [self setSwitchStateLock:[[NSLock alloc] init]];
-    // Create browser to listen for Bonjour services
-    //netServiceBrowser = [[NSNetServiceBrowser alloc] init];
-    //[netServiceBrowser setDelegate:self];
-    //[netServiceBrowser searchForServicesOfType:@"_sqp._tcp." inDomain:@""];
     // Prepare to run status timer
     statusMessageTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
-    //[netServiceBrowser searchForServicesOfType:@"_http._tcp." inDomain:@""];
     friendlyNameDictionaryIndex = 0;
     [self setStatusMessages:[[NSMutableArray alloc] initWithCapacity:5]];
     listenerDevicesToIgnore = 0;
@@ -157,127 +142,7 @@
 
 - (void)dealloc
 {
-    if([self switch_socket] >= 0)
-        close([self switch_socket]);
 }
-
-#define ITACH_MAX_PACKET_SIZE 1024
-
-
-#define MAX_STRING 1024
-
-// Utility function for verifying that we get the expected response from a socket
-bool verify_socket_reply(int socket, const char *expected_string);
-bool verify_socket_reply(int socket, const char *expected_string) {
-    int expected_len = strlen(expected_string);
-    char *buffer = malloc(expected_len);
-    if(!buffer)
-        return false;
-    int total_bytes_read = 0;
-    while(total_bytes_read < expected_len) {
-        struct timeval tv;
-        int bytes_read;
-        fd_set readfds;
-        tv.tv_sec = 0;
-        tv.tv_usec = 500000; // 0.5s
-        FD_ZERO(&readfds);
-        FD_SET(socket, &readfds);
-        select(socket+1, &readfds, NULL, NULL, &tv);
-        if(!FD_ISSET(socket, &readfds)) {
-            free(buffer);
-            return false;
-        }
-        bytes_read = recv(socket, buffer+total_bytes_read, expected_len - total_bytes_read, 0);
-        if(bytes_read <= 0) {
-            NSLog(@"%s\n", strerror(errno));
-            free(buffer);
-            return false;
-        }
-        for(int i=total_bytes_read; i < total_bytes_read + bytes_read; ++i) {
-            if(expected_string[i] != buffer[i]) {
-                free(buffer);
-                return false;
-            }
-        }
-        total_bytes_read += bytes_read;
-    }
-    free(buffer);
-    return true;
-}
-- (void)SequenceThroughSwitches:(id)switchSequence {
-#if 0
-// Redesign needed
-    NSAutoreleasePool *mempool = [[NSAutoreleasePool alloc] init];
-    [switchSequence retain];
-    NSArray *sequence = (NSArray *)switchSequence;
-    int index = 1;
-    while(1) {
-        NSNumber *dontQuit = [sequence objectAtIndex:0];
-        if(![dontQuit integerValue])
-            break;
-        if([sequence count] < index+1) {
-            index = 1;
-            continue;
-        }
-        NSNumber *mask = [sequence objectAtIndex:index++];
-        NSNumber *time = [sequence objectAtIndex:index++];
-        [self activate:mask];
-        [NSThread sleepForTimeInterval:[time floatValue]];
-        [self deactivate:mask];
-    }
-    [switchSequence release];
-    [mempool release];
-#endif
-}
-#define SWITCHAMAJIG_PACKET_LENGTH 8
-#define SWITCHAMAJIG_PACKET_BYTE_0 255
-#define SWITCHAMAJIG_CMD_SET_RELAY 0
-- (void)sendSwitchState {
-#if 0
-    // REDESIGN
-    int switchIndex = [self active_switch_index];
-    unsigned char packet[SWITCHAMAJIG_PACKET_LENGTH];
-    memset(packet, 0, sizeof(packet));
-    packet[0] = SWITCHAMAJIG_PACKET_BYTE_0;
-    packet[1] = SWITCHAMAJIG_CMD_SET_RELAY;
-    packet[2] = switch_state & 0x0f;
-    packet[3] = (switch_state >> 4) & 0x0f;
-    int retries = 1;
-    int retval;
-    if([self current_switch_connection_protocol] == IPPROTO_TCP) {
-        do {
-            retval = send([self switch_socket], packet, sizeof(packet), 0);
-            if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex protocol:[self current_switch_connection_protocol] retries:5 showMessagesOnError:NO];
-                NSLog(@"Retrying write for sendSwitchState (tcp)");
-            }
-            verify_socket_reply([self switch_socket], "lots of stuff to make sure we clear the buffer");
-        } while((retval <= 0) && (retries--));
-    }
-    if([self current_switch_connection_protocol] == IPPROTO_UDP) {
-        do {
-            retval = sendto([self switch_socket], packet, sizeof(packet), 0, (struct sockaddr*) &udp_socket_address, sizeof(udp_socket_address));
-            if((retval < 0) && retries) {
-                [self connect_to_switch:switchIndex protocol:[self current_switch_connection_protocol] retries:5 showMessagesOnError:NO];
-                NSLog(@"Retrying write for sendSwitchState (udp)");
-            }
-        } while((retval <= 0) && (retries--));
-    }
-#endif
-}
-
-#define COMMAND_OFFSET 65536
-char *commands[] = {
-    "POST /docmnd.xml HTTP/1.1\r\nContent-Type: text/xml\r\nContent-Length: 179\r\n\r\n<docommand key=\"dev\" repeat=\"n\" seq=\"n\" command=\"onoff\" irdata=\"L30 12d00 d40400d4 8f3906e2 37d00d4 29800d4 e2b213 23333333 33332333 33333323 33333332 32222332 32222320\" ch=\"0\" />", // Power
-    
-    "POST /docmnd.xml HTTP/1.1\r\nContent-Type: text/xml\r\nContent-Length: 179\r\n\r\n<docommand key=\"dev\" repeat=\"n\" seq=\"n\" command=\"voldn\" irdata=\"L30 12d00 d40400d4 8f3c06e2 37d00d4 29800d4 e2b213 23333333 33332333 33333323 33333332 33332332 33332320\" ch=\"0\" />", // Vol down
-    
-    "POST /docmnd.xml HTTP/1.1\r\nContent-Type: text/xml\r\nContent-Length: 179\r\n\r\n<docommand key=\"dev\" repeat=\"n\" seq=\"n\" command=\"volup\" irdata=\"L30 12d00 d40400d4 8f3d06e2 37d00d4 29800d4 e2b213 23333333 33332333 33333323 33333333 33332333 33332320\" ch=\"0\" />", // Vol up
-    
-    "POST /docmnd.xml HTTP/1.1\r\nContent-Type: text/xml\r\nContent-Length: 138\r\n\r\n<docommand key=\"dev\" repeat=\"n\" seq=\"n\" command=\"chndn\" irdata=\"L1b 11800 d4842424 54555545 55544554 44445555 55554441 30823021\" ch=\"0\" />", // Chan down
-    
-    "POST /docmnd.xml HTTP/1.1\r\nContent-Type: text/xml\r\nContent-Length: 138\r\n\r\n<docommand key=\"dev\" repeat=\"n\" seq=\"n\" command=\"chnup\" irdata=\"L1b 11800 d4842424 54555545 55544555 44445555 55554441 30823000\" ch=\"0\" />" // Chan up
-};
 
 - (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice {
     // Get the friendly name for this sequence
@@ -398,91 +263,6 @@ char *commands[] = {
     [[self statusInfoLock] unlock];
     if([statusMessageTimer isValid])
         [statusMessageTimer fire];
-}
-
-// Initialize connection with remote switch
-- (void)connect_to_switch:(int)switchIndex protocol:(int)protocol retries:(int)retries showMessagesOnError:(BOOL)showMessagesOnError
-{
-}
-
-// NSNetServiceBrowserDelegate
-- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindDomain:(NSString *)domainName moreComing:(BOOL)moreDomainsComing {
-    NSLog(@"didFindDomain: %@\n", domainName);
-}
-- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didFindService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing {
-    NSLog(@"didFindService %@\n", [netService hostName]);
-    [netService setDelegate:self];
-    [netService resolveWithTimeout:0];
-}
-- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didNotSearch:(NSDictionary *)errorInfo {
-    NSLog(@"didNotSearch: %@ %@\n", [errorInfo objectForKey:NSNetServicesErrorCode], [errorInfo objectForKey:NSNetServicesErrorDomain]);
-    
-}
-- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didRemoveDomain:(NSString *)domainName moreComing:(BOOL)moreDomainsComing {
-    printf("didRemoveDomain\n");
-    
-}
-- (void)netServiceBrowser:(NSNetServiceBrowser *)netServiceBrowser didRemoveService:(NSNetService *)netService moreComing:(BOOL)moreServicesComing {
-    printf("didRemoveService\n");
-    
-}
-- (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)netServiceBrowser {
-    printf("netServiceBrowserDidStopSearch\n");
-    
-}
-- (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)netServiceBrowser {
-    printf("netServiceBrowserWillSearch\n");
-    
-}
-// NSNetServiceDelegate
-- (void)netService:(NSNetService *)sender didNotPublish:(NSDictionary *)errorDict {
-    NSLog(@"didNotPublish\n");
-}
-- (void)netService:(NSNetService *)sender didNotResolve:(NSDictionary *)errorDict{
-    NSLog(@"didNotResolve\n");
-}
-
-- (void)netService:(NSNetService *)sender didUpdateTXTRecordData:(NSData *)data{
-    NSLog(@"didUpdateTXTRecordData\n");
-}
-
-- (void)netServiceDidPublish:(NSNetService *)sender{
-    NSLog(@"netServiceDidPublish\n");
-}
-
-- (void)netServiceDidResolveAddress:(NSNetService *)sender{
-    int numaddresses = [[sender addresses] count];
-    NSData *address = [[sender addresses] objectAtIndex:0];
-    struct sockaddr_in *socketAddress = (struct sockaddr_in *) [address bytes];
-    NSString *ipString = [NSString stringWithFormat: @"%s", inet_ntoa(socketAddress->sin_addr)];
-    NSLog(@"netServiceDidResolveAddress. %d addresses. Hostname %@. IP %@\n", numaddresses, [sender hostName], ipString);
-    // Add this to list of switches
-    // Lock the switch info and then update it
-#if 0
-// Redesign
-    [[self switchDataLock] lock];
-    NSString *switchName = @"sq";
-    if(CFDictionaryContainsKey((CFDictionaryRef) [self switchNameDictionary], switchName)) {
-        CFDictionaryRemoveValue([self switchNameDictionary], switchName);
-    } else {
-        CFArrayAppendValue([self switchNameArray], switchName);
-    }
-    CFDictionaryAddValue([self switchNameDictionary], switchName, ipString);
-    [[self switchDataLock] unlock];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"switch_list_was_updated" object:nil];
-#endif
-}
-
-- (void)netServiceDidStop:(NSNetService *)sender{
-    NSLog(@"netServiceDidStop\n");
-}
-
-- (void)netServiceWillPublish:(NSNetService *)sender{
-    NSLog(@"netServiceWillPublish\n");
-}
-
-- (void)netServiceWillResolve:(NSNetService *)sender{
-    NSLog(@"netServiceWillResolve\n");
 }
 
 // SwitchamajigDeviceDriverDelegate
