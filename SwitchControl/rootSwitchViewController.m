@@ -108,7 +108,8 @@
         int spaceOnBottomForExtraButtons = 0;
         BOOL displayHelpButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showHelpButtonPreference"];
         BOOL displayNetworkConfigButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showNetworkConfigButtonPreference"];
-        if(displayHelpButton || displayNetworkConfigButton) {
+        BOOL displayQuickStartWizardButton = [[NSUserDefaults standardUserDefaults] boolForKey:@"showQuickStartWizardButtonPreference"];
+        if(displayHelpButton || displayNetworkConfigButton || displayQuickStartWizardButton) {
             /* Don't make config and text buttons resizable
             spaceOnButtomForExtraButtons = panelButtonHeight;
              */
@@ -158,7 +159,7 @@
             [[self helpButton] addTarget:self action:@selector(display_help:) forControlEvents:UIControlEventTouchUpInside]; 
             [[self view] addSubview:[self helpButton]];
         }
-        if(1) {
+        if(displayQuickStartWizardButton) {
             [self setShowQuickstartWizardButton:[UIButton buttonWithType:UIButtonTypeRoundedRect]];
             [[self showQuickstartWizardButton] setFrame:CGRectMake((FRAME_WIDTH-helpConfigButtonWidth)/2, [self view].bounds.size.height-spaceOnBottomForExtraButtons, helpConfigButtonWidth, spaceOnBottomForExtraButtons)];
             [[self showQuickstartWizardButton] setTitle:@"Quick-Start Wizard" forState:UIControlStateNormal];

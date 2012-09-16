@@ -357,6 +357,7 @@
     STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
 }
 #endif
+
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
     NSArray *theSubviews = [view subviews];
     int numOverlaps = 0;
@@ -389,7 +390,13 @@
         rect1.origin.x = rect1.origin.y = 0; // Make origin relative to child views
         CGRect rect2 = [subView frame];
         if(!CGRectContainsRect(rect1, rect2)) {
-            //NSLog(@"Out-of-bounds: (%4.1f, %4.1f, %4.1f, %4.1f) doesn't contain (%4.1f, %4.1f, %4.1f, %4.1f)", rect1.origin.x, rect1.origin.y, rect1.size.width, rect1.size.height, rect2.origin.x, rect2.origin.y, rect2.size.width, rect2.size.height);
+            /*NSLog(@"Out-of-bounds: (%4.1f, %4.1f, %4.1f, %4.1f) doesn't contain (%4.1f, %4.1f, %4.1f, %4.1f)", rect1.origin.x, rect1.origin.y, rect1.size.width, rect1.size.height, rect2.origin.x, rect2.origin.y, rect2.size.width, rect2.size.height);
+            if([view isKindOfClass:[UIButton class]]) {
+                NSLog(@"Superview is button. Title is %@", [(UIButton*)view titleForState:UIControlStateNormal]);
+            }
+            if([subView isKindOfClass:[UIButton class]]) {
+                NSLog(@"Subview is button. Title is %@", [(UIButton*)subView titleForState:UIControlStateNormal]);
+            }*/
             numOutOfBounds++;
         }
         numOutOfBounds += [SwitchControlTests numberOfSubviewsOutsideParents:subView];
@@ -540,23 +547,24 @@
     [rootViewController ResetScrollPanel];
     // Shouldn't see much
     STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"], @"Yellow panel shown with controller support disabled.");
-    STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"IR Basic"], @"IR Basic panel shown with IR support disabled.");
+    STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Simple TV"], @"IR Basic panel shown with IR support disabled.");
     STAssertNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel shown with editing support disabled.");
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
     [rootViewController ResetScrollPanel];
-    // Should see them now much
+    // Should see them now
     STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"], @"Yellow panel not shown with controller support enabled.");
-    STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"IR Basic"], @"IR Basic panel not shown with IR support enabled.");
+    STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Simple TV"], @"IR Basic panel not shown with IR support enabled.");
     STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel not shown with editing support enabled.");
 
 }
+#endif // RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_001_PanelLayout {
     // Make sure panel displays properly
     switchPanelViewController *viewController = [switchPanelViewController alloc];
-    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"6_tworows" ofType:@"xml"]]];
+    [viewController setUrlToLoad:[NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"ctrl_6_tworows" ofType:@"xml"]]];
     UIView *thisView;
     BOOL didFindFirstButton = NO;
     BOOL didFindLastButton = NO;
@@ -576,9 +584,10 @@
                 didFindLastButton = YES;
         }
     }
-    STAssertTrue(didFindFirstButton, @"First button in 6_tworows.xml does not exist.");
-    STAssertTrue(didFindLastButton, @"Last button in 6_tworows.xml does not exist.");
+    STAssertTrue(didFindFirstButton, @"First button in ctrl_6_tworows.xml does not exist.");
+    STAssertTrue(didFindLastButton, @"Last button in ctrl_6_tworows.xml does not exist.");
 }
+#if RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_002_BackButton {
     // Confirm that the back button works properly
@@ -703,7 +712,7 @@
     // Create a panel from a test XML file and enable configuration mode
     switchPanelViewController *viewController = [switchPanelViewController alloc];
     // Open the test xml file
-    NSURL *originalURL = [NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"1_yellow" ofType:@"xml"]];
+    NSURL *originalURL = [NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"ctrl_1_yellow" ofType:@"xml"]];
     [viewController setUrlToLoad:originalURL];
     // Disable display of config button in settings
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"allowEditingOfSwitchPanelsPreference"];
@@ -1412,7 +1421,6 @@
     actualCommand = [driver->commandsReceived objectAtIndex:0];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
 }
-#endif
 
 - (void)test_003_defineActionViewController_004_IRLearning {
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
@@ -1477,6 +1485,7 @@
     xmlCommandString = [actionUI XMLStringForAction];
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
 }
+#endif
 
 #if 0
 // Implement this once configuration working
