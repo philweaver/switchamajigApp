@@ -11,6 +11,7 @@
 #import "defineActionViewController.h"
 #import "chooseIconViewController.h"
 #import "SJActionUIlearnedIRCommand.h"
+#import "quickStartSettingsViewController.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -469,8 +470,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showQuickStartWizardButtonPreference"];
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
         [rootViewController loadView];
+        [rootViewController viewDidLoad];
         // Confirm text sizes
         STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
         // Make sure we don't have inappropriate overlaps
@@ -559,7 +562,6 @@
     STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel not shown with editing support enabled.");
 
 }
-#endif // RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_001_PanelLayout {
     // Make sure panel displays properly
@@ -587,7 +589,6 @@
     STAssertTrue(didFindFirstButton, @"First button in ctrl_6_tworows.xml does not exist.");
     STAssertTrue(didFindLastButton, @"Last button in ctrl_6_tworows.xml does not exist.");
 }
-#if RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_002_BackButton {
     // Confirm that the back button works properly
@@ -1485,7 +1486,54 @@
     xmlCommandString = [actionUI XMLStringForAction];
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
 }
-#endif
+#endif // RUN_ALL_TESTS
+
+- (void)test_004_QuickStartViewController_000_AppearanceAndInitialization {
+    // Check that the root controller will display the settings if the program hasn't been run before
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"firstRun"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showQuickStartWizardButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"allowEditingOfSwitchPanelsPreference"];
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    MockNavigationController *naviControl = [[MockNavigationController alloc] initWithRootViewController:rootViewController];
+    naviControl->didReceivePushViewController = NO;
+    [rootViewController view];
+    [rootViewController viewDidLoad];
+    STAssertNil([rootViewController showQuickstartWizardButton], @"Quick start wizard button should not exist when preferences say not to show it");
+    STAssertTrue(naviControl->didReceivePushViewController, @"quickStart not shown on first run");
+    STAssertTrue([naviControl->lastViewController isKindOfClass:[quickStartSettingsViewController class]], @"Wrong kind of view controller shown for quickstart");
+    quickStartSettingsViewController *qsViewController = (quickStartSettingsViewController *)naviControl->lastViewController;
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    [qsViewController view];
+    [qsViewController viewDidLoad];
+    // Check that the toggle switches are initialized properly
+    STAssertFalse([[qsViewController supportSwitchamajigControllerSwitch] isOn], @"Support Controller Switch not initialized correctly");
+    STAssertTrue([[qsViewController supportSwitchamajigIRSwitch] isOn], @"Support Controller Switch not initialized correctly");
+    STAssertFalse([[qsViewController allowEditingSwitch] isOn], @"Support Controller Switch not initialized correctly");
+    // Confirm that the navigation controller shows the back button
+    // Confirm that future restarts don't show quickstart
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showQuickStartWizardButtonPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    naviControl = [[MockNavigationController alloc] initWithRootViewController:rootViewController];
+    naviControl->didReceivePushViewController = NO;
+    [rootViewController view];
+    [rootViewController viewDidLoad];
+    STAssertNotNil([rootViewController showQuickstartWizardButton], @"Quick start wizard button should not exist when preferences say to show it");
+    STAssertFalse(naviControl->didReceivePushViewController, @"quickStart shown on second run");
+    [[rootViewController showQuickstartWizardButton] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue(naviControl->didReceivePushViewController, @"quickStart not shown on button press");
+    // Check that the toggle switches are initialized properly
+    qsViewController = (quickStartSettingsViewController *)naviControl->lastViewController;
+    [qsViewController view];
+    [qsViewController viewDidLoad];
+    STAssertTrue([[qsViewController supportSwitchamajigControllerSwitch] isOn], @"Support Controller Switch not initialized correctly");
+    STAssertFalse([[qsViewController supportSwitchamajigIRSwitch] isOn], @"Support Controller Switch not initialized correctly");
+    STAssertTrue([[qsViewController allowEditingSwitch] isOn], @"Support Controller Switch not initialized correctly");
+}
 
 #if 0
 // Implement this once configuration working

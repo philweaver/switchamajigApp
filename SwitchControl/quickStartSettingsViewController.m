@@ -30,6 +30,11 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    [[self supportSwitchamajigControllerSwitch] setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigControllerPreference"] animated:NO];
+    BOOL supportSwitchamajigIRPreference = [[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigIRPreference"];
+    //NSLog(@"supportSwitchamajigIRPreference = %d", supportSwitchamajigIRPreference);
+    [[self supportSwitchamajigIRSwitch] setOn:supportSwitchamajigIRPreference animated:NO];
+    [[self allowEditingSwitch] setOn:[[NSUserDefaults standardUserDefaults] boolForKey:@"allowEditingOfSwitchPanelsPreference"] animated:NO];
 }
 
 - (void)viewDidUnload

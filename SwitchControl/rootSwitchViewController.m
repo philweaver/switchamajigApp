@@ -240,6 +240,11 @@
     // Make nav bar disappear
     [[self navigationController] setNavigationBarHidden:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switch_names_updated:) name:@"switch_list_was_updated" object:nil];
+    // When we're first run, display the quick-start wizard
+    if(![[NSUserDefaults standardUserDefaults] objectForKey:@"firstRun"]) {
+        [[NSUserDefaults standardUserDefaults] setObject:[NSDate date] forKey:@"firstRun"];
+        [self display_qswizard:nil];
+    }
 }
 
 - (UIImage *) imageFromViewController:(UIViewController*)viewController scaledTo:(CGSize)scaledSize {
