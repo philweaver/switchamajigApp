@@ -65,6 +65,9 @@
 
 - (IBAction)didSelectQuickConfigIR:(id)sender {
     quickIRConfigViewController *qirViewCtrl = [quickIRConfigViewController alloc];
+    [qirViewCtrl setAppDelegate:[self appDelegate]];
+    [qirViewCtrl setUrlForControlPanel:[[NSBundle mainBundle] URLForResource:@"qs_tv" withExtension:@"xml"]];
+    [qirViewCtrl setDeviceType:@"TV"];
     UINavigationController *navController = [self navigationController];
     [navController popViewControllerAnimated:NO];
     [navController pushViewController:qirViewCtrl animated:YES];

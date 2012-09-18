@@ -444,6 +444,7 @@
 - (void)display_qswizard:(id)sender {
     [[self navigationController] setNavigationBarHidden:NO];
     quickStartSettingsViewController *qsViewCtrl = [quickStartSettingsViewController alloc];
+    [qsViewCtrl setAppDelegate:appDelegate];
     [self.navigationController pushViewController:qsViewCtrl animated:YES];
 }
 

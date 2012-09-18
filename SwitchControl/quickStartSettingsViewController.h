@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SwitchControlAppDelegate.h"
 
 @interface quickStartSettingsViewController : UIViewController
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *supportSwitchamajigControllerSwitch;
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *supportSwitchamajigIRSwitch;
 @property (unsafe_unretained, nonatomic) IBOutlet UISwitch *allowEditingSwitch;
+@property SwitchControlAppDelegate *appDelegate;
 - (IBAction)didChangeSupportSwitchamajigController:(id)sender;
 - (IBAction)didChangeSupportSwitchamajigIR:(id)sender;
 - (IBAction)didChangeAllowEditing:(id)sender;

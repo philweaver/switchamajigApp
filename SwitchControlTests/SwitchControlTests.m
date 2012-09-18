@@ -12,6 +12,7 @@
 #import "chooseIconViewController.h"
 #import "SJActionUIlearnedIRCommand.h"
 #import "quickStartSettingsViewController.h"
+#import "quickIRConfigViewController.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
 #define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
 #define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
@@ -36,6 +37,20 @@
 @implementation MockSwitchControlDelegate
 - (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice {
     [commandsReceived addObject:actionSequenceOnDevice];
+}
+NSString *lastIRBrand;
+NSString *lastIRCodeSet;
+NSString *lastIRDevice;
+- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet forDevice:(NSString *)device {
+    lastIRBrand = brand;
+    lastIRCodeSet = codeSet;
+    lastIRDevice = device;
+}
+- (NSString *) getIRBrandForDevice:(NSString *)device {
+    return @"Panasonic";
+}
+- (NSString *) getIRCodeSetForDevice:(NSString *)device{
+    return nil;
 }
 
 @end
@@ -1486,7 +1501,6 @@
     xmlCommandString = [actionUI XMLStringForAction];
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
 }
-#endif // RUN_ALL_TESTS
 
 - (void)test_004_QuickStartViewController_000_AppearanceAndInitialization {
     // Check that the root controller will display the settings if the program hasn't been run before
@@ -1533,6 +1547,36 @@
     STAssertTrue([[qsViewController supportSwitchamajigControllerSwitch] isOn], @"Support Controller Switch not initialized correctly");
     STAssertFalse([[qsViewController supportSwitchamajigIRSwitch] isOn], @"Support Controller Switch not initialized correctly");
     STAssertTrue([[qsViewController allowEditingSwitch] isOn], @"Support Controller Switch not initialized correctly");
+}
+
+#endif // RUN_ALL_TESTS
+
+- (void)test_005_QuickIRConfigViewController_000_InitializationAndBasicFunctions {
+    MockSwitchControlDelegate *mySwitchDelegate = [MockSwitchControlDelegate alloc];
+    quickIRConfigViewController *qirVC = [[quickIRConfigViewController alloc] initWithNibName:@"quickIRConfigViewController" bundle:[NSBundle mainBundle]];
+    [qirVC setAppDelegate:mySwitchDelegate];
+    [qirVC setDeviceType:@"TV"];
+    NSURL *tvControlURL = [NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"qs_tv" ofType:@"xml"]];
+    [qirVC setUrlForControlPanel:tvControlURL];
+    [qirVC view];
+    [qirVC viewDidLoad];
+    // Check that the code set is configured correctly
+    NSString *currentBrand = [qirVC pickerView:[qirVC brandPickerView] titleForRow:[[qirVC brandPickerView] selectedRowInComponent:0] forComponent:0];
+    STAssertTrue([currentBrand isEqualToString:@"Panasonic"], @"Brand failed to initialize from delegate");
+    // Check that the delegate was set to the proper value
+    STAssertTrue([lastIRDevice isEqualToString:@"TV"], @"Did not update delegate with proper device. Instead is %@", lastIRDevice);
+    STAssertTrue([lastIRBrand isEqualToString:@"Panasonic"], @"Did not update delegate with proper brand. Instead is %@", lastIRBrand);
+    STAssertTrue([lastIRCodeSet isEqualToString:@"All Models"], @"Did not update delegate with proper code set. Instead is %@", lastIRCodeSet);
+    // Fiddle with the UI a bit
+    [[qirVC filterBrandButton] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[qirVC brandPickerView] selectRow:5 inComponent:0 animated:NO];
+    [qirVC pickerView:[qirVC brandPickerView] didSelectRow:5 inComponent:0];
+    STAssertTrue([lastIRBrand isEqualToString:@"Akai"], @"Did not update delegate with proper brand. Instead is %@", lastIRBrand);
+    STAssertTrue([lastIRCodeSet isEqualToString:@"Code Group 2 (RPTV)"], @"Did not update delegate with proper code set. Instead is %@", lastIRCodeSet);
+    [[qirVC codeSetPickerView] selectRow:1 inComponent:0 animated:NO];
+    [qirVC pickerView:[qirVC codeSetPickerView] didSelectRow:1 inComponent:0];
+    STAssertTrue([lastIRBrand isEqualToString:@"Akai"], @"Did not update delegate with proper brand. Instead is %@", lastIRBrand);
+    STAssertTrue([lastIRCodeSet isEqualToString:@"Code Group 1 (Plasma Displays)"], @"Did not update delegate with proper code set. Instead is %@", lastIRCodeSet);
 }
 
 #if 0

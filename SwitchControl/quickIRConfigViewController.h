@@ -7,11 +7,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SwitchControlAppDelegate.h"
 
 @interface quickIRConfigViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate> {
-    
+@public
+    NSArray *brands;
+    NSArray *codeSets;
 }
 @property (unsafe_unretained, nonatomic) IBOutlet UIPickerView *codeSetPickerView;
 @property (unsafe_unretained, nonatomic) IBOutlet UIPickerView *brandPickerView;
-
+@property NSString *deviceType;
+@property NSURL *urlForControlPanel;
+@property (unsafe_unretained, nonatomic) IBOutlet UIButton *filterBrandButton;
+@property SwitchControlAppDelegate *appDelegate;
+- (IBAction)filterBrandToggle:(id)sender;
 @end

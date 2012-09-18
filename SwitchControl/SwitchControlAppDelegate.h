@@ -32,6 +32,9 @@
 - (NSString *) getLastLearnedIRCommand;
 - (NSError *) getLastLearnedIRError;
 - (void) clearLastLearnedIRInfo;
+- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet forDevice:(NSString *)device;
+- (NSString *) getIRBrandForDevice:(NSString *)device;
+- (NSString *) getIRCodeSetForDevice:(NSString *)device;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (strong, nonatomic) NSMutableDictionary *friendlyNameSwitchamajigDictionary;
@@ -40,8 +43,4 @@
 @property (strong, nonatomic) NSMutableArray *statusMessages;
 @property (nonatomic, retain) UIColor *backgroundColor;
 @property (nonatomic, retain) UIColor *foregroundColor;
-
-// Settings default handling
-- (NSDictionary *)defaultsFromPlistNamed:(NSString *)plistName;
-
 @end

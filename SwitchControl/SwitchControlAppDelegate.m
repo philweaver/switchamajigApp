@@ -388,6 +388,20 @@
     [self addStatusAlertMessage:[NSString stringWithFormat:@"%@ needs its batteries replaced",friendlyname]  withColor:[UIColor redColor] displayForSeconds:5.0];
 }
 
+- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet forDevice:(NSString *)device {
+    // Stub
+}
+- (NSString *) getIRBrandForDevice:(NSString *)device {
+    // Stub
+    return nil;
+}
+- (NSString *) getIRCodeSetForDevice:(NSString *)device{
+    // Stub
+    return nil;
+}
+
+
+
 // Handle settings initialization
 - (NSDictionary *)defaultsFromPlistNamed:(NSString *)plistName {
     NSString *settingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
