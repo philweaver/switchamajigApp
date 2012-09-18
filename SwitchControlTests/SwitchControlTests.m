@@ -294,6 +294,23 @@ NSString *lastIRDevice;
     [simulatedController stopListening];
 }
 
+#endif // RUN_ALL_TESTS
+
+- (void)test_000_AppDelegate_003_IRDefaults {
+    [app_delegate setIRBrand:@"Sony" andCodeSet:@"hoopy" forDevice:@"TV"];
+    NSString *brand = [app_delegate getIRBrandForDevice:@"TV"];
+    NSString *codeSet = [app_delegate getIRCodeSetForDevice:@"TV"];
+    STAssertTrue([brand isEqualToString:@"Sony"], @"Brand not set for ir defaults. Instead got %@", brand);
+    STAssertTrue([codeSet isEqualToString:@"hoopy"], @"Code set not set for ir defaults. Instead got %@", codeSet);
+    [app_delegate setIRBrand:@"Panasonic" andCodeSet:@"frood" forDevice:@"TV"];
+    brand = [app_delegate getIRBrandForDevice:@"TV"];
+    codeSet = [app_delegate getIRCodeSetForDevice:@"TV"];
+    STAssertTrue([brand isEqualToString:@"Panasonic"], @"Brand not set for ir defaults. Instead got %@", brand);
+    STAssertTrue([codeSet isEqualToString:@"frood"], @"Code set not set for ir defaults. Instead got %@", codeSet);
+}
+
+#if RUN_ALL_TESTS
+
 - (void)test_001_RootViewController_001_Help
 {
     // Disable scanning, enable help button
@@ -1549,8 +1566,6 @@ NSString *lastIRDevice;
     STAssertTrue([[qsViewController allowEditingSwitch] isOn], @"Support Controller Switch not initialized correctly");
 }
 
-#endif // RUN_ALL_TESTS
-
 - (void)test_005_QuickIRConfigViewController_000_InitializationAndBasicFunctions {
     MockSwitchControlDelegate *mySwitchDelegate = [MockSwitchControlDelegate alloc];
     quickIRConfigViewController *qirVC = [[quickIRConfigViewController alloc] initWithNibName:@"quickIRConfigViewController" bundle:[NSBundle mainBundle]];
@@ -1578,6 +1593,8 @@ NSString *lastIRDevice;
     STAssertTrue([lastIRBrand isEqualToString:@"Akai"], @"Did not update delegate with proper brand. Instead is %@", lastIRBrand);
     STAssertTrue([lastIRCodeSet isEqualToString:@"Code Group 1 (Plasma Displays)"], @"Did not update delegate with proper code set. Instead is %@", lastIRCodeSet);
 }
+
+#endif // RUN_ALL_TESTS
 
 #if 0
 // Implement this once configuration working

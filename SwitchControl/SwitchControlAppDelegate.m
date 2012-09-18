@@ -389,15 +389,33 @@
 }
 
 - (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet forDevice:(NSString *)device {
-    // Stub
+    NSDictionary *irBrandDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToBrandDictionary"];
+    if(!irBrandDictionary)
+        irBrandDictionary = [NSDictionary dictionary];
+    NSMutableDictionary *newIRBrandDictionary = [NSMutableDictionary dictionaryWithCapacity:5];
+    [newIRBrandDictionary addEntriesFromDictionary:irBrandDictionary];
+    [newIRBrandDictionary setObject:brand forKey:device];
+    NSDictionary *irCodeSetDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToCodeSetDictionary"];
+    if(!irCodeSetDictionary)
+        irCodeSetDictionary = [NSDictionary dictionary];
+    NSMutableDictionary *newCodeSetBrandDictionary = [NSMutableDictionary dictionaryWithCapacity:5];
+    [newCodeSetBrandDictionary addEntriesFromDictionary:irCodeSetDictionary];
+    [newCodeSetBrandDictionary setObject:codeSet forKey:device];
+    [[NSUserDefaults standardUserDefaults] setObject:newIRBrandDictionary forKey:@"irDeviceTypeToBrandDictionary"];
+    [[NSUserDefaults standardUserDefaults] setObject:newCodeSetBrandDictionary forKey:@"irDeviceTypeToCodeSetDictionary"];
 }
 - (NSString *) getIRBrandForDevice:(NSString *)device {
-    // Stub
-    return nil;
+    NSDictionary *irBrandDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToBrandDictionary"];
+    if(!irBrandDictionary)
+        return nil;
+    return [irBrandDictionary objectForKey:device];
 }
+
 - (NSString *) getIRCodeSetForDevice:(NSString *)device{
-    // Stub
-    return nil;
+    NSDictionary *irCodeSetDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToCodeSetDictionary"];
+    if(!irCodeSetDictionary)
+        return nil;
+    return [irCodeSetDictionary objectForKey:device];
 }
 
 
