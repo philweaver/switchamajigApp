@@ -294,8 +294,6 @@ NSString *lastIRDevice;
     [simulatedController stopListening];
 }
 
-#endif // RUN_ALL_TESTS
-
 - (void)test_000_AppDelegate_003_IRDefaults {
     [app_delegate setIRBrand:@"Sony" andCodeSet:@"hoopy" forDevice:@"TV"];
     NSString *brand = [app_delegate getIRBrandForDevice:@"TV"];
@@ -307,6 +305,29 @@ NSString *lastIRDevice;
     codeSet = [app_delegate getIRCodeSetForDevice:@"TV"];
     STAssertTrue([brand isEqualToString:@"Panasonic"], @"Brand not set for ir defaults. Instead got %@", brand);
     STAssertTrue([codeSet isEqualToString:@"frood"], @"Code set not set for ir defaults. Instead got %@", codeSet);
+}
+
+#endif // RUN_ALL_TESTS
+
+- (void)test_000_AppDelegate_004_QuickIRCommand {
+    SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
+    [[app_delegate friendlyNameSwitchamajigDictionary] removeAllObjects];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"frood"];
+    // Verify that the new device is in the dictionary
+    STAssertNotNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"frood"], @"Device not in dictionary after being detected");
+    // Mock up a Sjig controller and to verify that commands come through
+    MockSwitchamajigDriver *driver1 = [MockSwitchamajigDriver alloc];
+    driver1->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
+    // Verify that the command is passed to the controller
+    NSError *error;
+    DDXMLDocument *node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate setIRBrand:@"Sony" andCodeSet:@"All Models All Types" forDevice:@"TV"];
+    [app_delegate performActionSequence:node1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    STAssertTrue([driver1->commandsReceived count] == 1, @"Driver did not receive ir command.");
+    NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
+    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"Did not receive simple command. Instead got %@", commandString);
 }
 
 #if RUN_ALL_TESTS

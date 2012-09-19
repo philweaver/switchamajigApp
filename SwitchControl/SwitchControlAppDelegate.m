@@ -247,7 +247,43 @@
                 }
                 continue;
             }
-            
+            if([[action name] isEqualToString:@"quickIrCommand"]) {
+                // Get device types and possible commands
+                NSError *xmlError;
+                NSArray *deviceTypeNodes = [action nodesForXPath:@".//deviceType" error:&xmlError];
+                NSArray *functionNodes = [action nodesForXPath:@".//function" error:&xmlError];
+                DDXMLNode *deviceTypeNode;
+                // Try to find a device in the defaults where we can execute the command
+                for(deviceTypeNode in deviceTypeNodes) {
+                    NSString *deviceType = [deviceTypeNode stringValue];
+                    NSString *brand, *codeSet;
+                    brand = [self getIRBrandForDevice:deviceType];
+                    codeSet = [self getIRCodeSetForDevice:deviceType];
+                    if(brand && codeSet) {
+                        DDXMLNode *functionNode;
+                        for(functionNode in functionNodes) {
+                            NSString *function = [functionNode stringValue];
+                            NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeSet onDevice:deviceType forBrand:brand];
+                            NSLog(@"%@:%@:%@:%@  --  irCommand = %@", brand, deviceType, codeSet, function, irCommand);
+                            if(irCommand) {
+                                // Wrap the command up as xml
+                                NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"%@\" ch=\"0\"></docommand>", irCommand];
+                                DDXMLDocument *actionDoc = [[DDXMLDocument alloc] initWithXMLString:irXmlCommand options:0 error:&xmlError];
+                                if(action == nil) {
+                                    NSLog(@"Failed to create action XML. Error = %@. String = %@.\n", xmlError, irXmlCommand);
+                                    return;
+                                }
+                                action = [[actionDoc children] objectAtIndex:0];
+                                goto foundAction;
+                            }
+                        }
+                    }
+                }
+                // Didn't find an action
+                NSLog(@"executeActionSequence: Failed to find action set for command %@", [action XMLString]);
+                return;
+            }
+        foundAction:
             // Send command to driver
             NSLog(@"Issuing command %@", [action XMLString]);
             NSError *error;
