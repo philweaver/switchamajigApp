@@ -5,25 +5,32 @@
         <frame>50 50 924 189</frame>
         <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
         <icon>onoff.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>50 289 437 189</frame>
         <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
         <icon>VOL_UpArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>VOLUME UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>50 528 437 189</frame>
         <rgbacolor>1.0 1.0 0.0 1.0</rgbacolor>
         <icon>VOL_DownArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>VOLUME DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>537 289 437 189</frame>
         <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
         <icon>CH_UpArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CHANNEL UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>537 528 437 189</frame>
         <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
         <icon>CH_DownArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CHANNEL DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
 </panel>

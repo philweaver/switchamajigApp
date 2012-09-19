@@ -5,75 +5,92 @@
         <frame>50 0 50 50</frame>
         <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
         <icon>onoff.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>75 75 75 100</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>VOL_UpArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>VOLUME UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>75 200 75 100</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>VOL_DownArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>VOLUME DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>200 75 75 100</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>CH_UpArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CHANNEL UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>200 200 75 100</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>CH_DownArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CHANNEL DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>50 325 100 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>TV/Video</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>TV VIDEO</function><function>INPUT SCROLL</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>200 325 100 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Menu</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>MENU MAIN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>150 400 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>uparrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CURSOR UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>150 460 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>OK</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CURSOR ENTER</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>150 520 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>downarrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CURSOR DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>210 460 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>play.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CURSOR RIGHT</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>90 460 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>reverse.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>CURSOR LEFT</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>225 400 75 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Exit</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>EXIT</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>225 520 75 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Return</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>RETURN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>35 520 90 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Submenu</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>MENU SUB</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
 </panel>
