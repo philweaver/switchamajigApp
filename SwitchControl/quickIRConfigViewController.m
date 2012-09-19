@@ -16,7 +16,7 @@
 @implementation quickIRConfigViewController
 @synthesize codeSetPickerView;
 @synthesize brandPickerView;
-@synthesize deviceType;
+@synthesize deviceGroup;
 @synthesize urlForControlPanel;
 @synthesize filterBrandButton;
 
@@ -32,6 +32,22 @@ static NSArray *filterBrands(NSArray *bigListOfBrands);
     return self;
 }
 
+- (void) setupBrandsForFiltering:(BOOL)filter {
+    brands = [NSMutableArray arrayWithCapacity:50];
+    NSArray *devices = [[self deviceGroup] componentsSeparatedByString:@"/"];
+    NSString *device;
+    for (device in devices) {
+        NSArray *brandsFromDatabase = [SwitchamajigIRDeviceDriver getIRDatabaseBrandsForDevice:device];
+        if(filter)
+            brandsFromDatabase = filterBrands(brandsFromDatabase);
+        NSString *brand;
+        for(brand in brandsFromDatabase) {
+            NSString *brandWithDeviceName = [NSString stringWithFormat:@"%@:%@", brand, device];
+            [brands addObject:brandWithDeviceName];
+        }
+    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -41,28 +57,32 @@ static NSArray *filterBrands(NSArray *bigListOfBrands);
     [self addChildViewController:switchPanelVC];
     [switchPanelVC setUrlToLoad:[self urlForControlPanel]];
     [switchPanelVC hideUserButtons];
-    [[switchPanelVC view] setFrame:CGRectMake(650, 75, 300, 650)];
+    [[switchPanelVC view] setFrame:CGRectMake(625, 75, 375, 650)];
     [[self view] addSubview:[switchPanelVC view]];
     [switchPanelVC didMoveToParentViewController:self];
-    brands = filterBrands([SwitchamajigIRDeviceDriver getIRDatabaseBrandsForDevice:[self deviceType]]);
+    [self setupBrandsForFiltering:YES];
     // Initialize the picker wheels
-    NSString *currentBrand = [[self appDelegate] getIRBrandForDevice:[self deviceType]];
-    int brandIndex = [brands indexOfObject:currentBrand];
+    NSString *currentBrand = [[self appDelegate] getIRBrandForDeviceGroup:[self deviceGroup]];
+    NSString *currentDevice = [[self appDelegate] getIRDeviceForDeviceGroup:[self deviceGroup]];
+    NSString *currentBrandWithDevice = [NSString stringWithFormat:@"%@:%@", currentBrand, currentDevice];
+    int brandIndex = [brands indexOfObject:currentBrandWithDevice];
     if((brandIndex == NSNotFound) && ([[[self filterBrandButton] titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"])) {
         // Un-filter the brands
         [[self filterBrandButton] sendActionsForControlEvents:UIControlEventTouchUpInside];
-        brandIndex = [brands indexOfObject:currentBrand];
-    }
-    if(brandIndex != NSNotFound) {
-        [[self brandPickerView] selectRow:brandIndex inComponent:0 animated:NO];
-        [self pickerView:[self brandPickerView] didSelectRow:brandIndex inComponent:0];
-        NSString *codeSet = [[self appDelegate] getIRCodeSetForDevice:[self deviceType]];
-        int codeSetIndex = [codeSets indexOfObject:codeSet];
-        if(codeSetIndex != NSNotFound) {
-            [[self codeSetPickerView] selectRow:codeSetIndex inComponent:0 animated:NO];
-            [self pickerView:[self codeSetPickerView] didSelectRow:codeSetIndex inComponent:0];
+        brandIndex = [brands indexOfObject:currentBrandWithDevice];
+        if(brandIndex == NSNotFound) {
+            [[self filterBrandButton] sendActionsForControlEvents:UIControlEventTouchUpInside];
+            brandIndex = 0;
         }
     }
+    [[self brandPickerView] selectRow:brandIndex inComponent:0 animated:NO];
+    [self pickerView:[self brandPickerView] didSelectRow:brandIndex inComponent:0];
+    NSString *codeSet = [[self appDelegate] getIRCodeSetForDeviceGroup:[self deviceGroup]];
+    int codeSetIndex = [codeSets indexOfObject:codeSet];
+    if(codeSetIndex == NSNotFound)
+        codeSetIndex = 0;
+    [[self codeSetPickerView] selectRow:codeSetIndex inComponent:0 animated:NO];
+    [self pickerView:[self codeSetPickerView] didSelectRow:codeSetIndex inComponent:0];
 }
 
 - (void)viewDidUnload
@@ -77,7 +97,7 @@ static NSArray *filterBrands(NSArray *bigListOfBrands);
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return NO;
 }
 
 // UIPickerViewDataSource
@@ -99,15 +119,23 @@ static NSArray *filterBrands(NSArray *bigListOfBrands);
 
 // UIPickerViewDelegate
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    NSString *currentPickerTitle = [self pickerView:[self brandPickerView] titleForRow:[[self brandPickerView] selectedRowInComponent:0] forComponent:0];
+    NSArray *brandAndDevice = [currentPickerTitle componentsSeparatedByString:@":"];
+    if([brandAndDevice count] != 2) {
+        NSLog(@"quickIRConfigViewController - didSelectRow: brand and device invalid");
+        return;
+    }
+    NSString *brand = [brandAndDevice objectAtIndex:0];
+    NSString *device = [brandAndDevice objectAtIndex:1];
     if(pickerView == [self brandPickerView]) {
-        codeSets = [SwitchamajigIRDeviceDriver getIRDatabaseCodeSetsOnDevice:[self deviceType] forBrand:[self pickerView:[self brandPickerView] titleForRow:row forComponent:0]];
+        codeSets = [SwitchamajigIRDeviceDriver getIRDatabaseCodeSetsOnDevice:device forBrand:brand];
         [[self codeSetPickerView] reloadAllComponents];
         [[self codeSetPickerView] selectRow:0 inComponent:0 animated:NO];
         [self pickerView:[self codeSetPickerView] didSelectRow:0 inComponent:0];
         return;
     }
     if(pickerView == [self codeSetPickerView]) {
-        [[self appDelegate] setIRBrand:[self pickerView:[self brandPickerView] titleForRow:[[self brandPickerView] selectedRowInComponent:0] forComponent:0] andCodeSet:[codeSets objectAtIndex:row] forDevice:[self deviceType]];
+        [[self appDelegate] setIRBrand:brand andCodeSet:[codeSets objectAtIndex:row] andDevice:device forDeviceGroup:[self deviceGroup]];
         return;
     }
     NSLog(@"quickIRConfigViewController: pickerView didSelectRow: PickerView unrecognized.");
@@ -142,10 +170,10 @@ static NSArray *filterBrands(NSArray *bigListOfBrands);
     NSString *currentBrand = [self pickerView:[self brandPickerView] titleForRow:[[self brandPickerView] selectedRowInComponent:0] forComponent:0];
     if([[[self filterBrandButton] titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"]) {
         [[self filterBrandButton] setTitle:@"Show Fewer Brands" forState:UIControlStateNormal];
-        brands = [SwitchamajigIRDeviceDriver getIRDatabaseBrandsForDevice:[self deviceType]];
+        [self setupBrandsForFiltering:NO];
     } else {
         [[self filterBrandButton] setTitle:@"Show More Brands" forState:UIControlStateNormal];
-        brands = filterBrands([SwitchamajigIRDeviceDriver getIRDatabaseBrandsForDevice:[self deviceType]]);
+        [self setupBrandsForFiltering:YES];
     }
     int brandIndex = [brands indexOfObject:currentBrand];
     [[self brandPickerView] reloadComponent:0];

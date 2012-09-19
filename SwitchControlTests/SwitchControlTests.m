@@ -41,16 +41,21 @@
 NSString *lastIRBrand;
 NSString *lastIRCodeSet;
 NSString *lastIRDevice;
-- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet forDevice:(NSString *)device {
+NSString *lastIRDeviceGroup;
+- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet andDevice:(NSString *) device forDeviceGroup:(NSString *)deviceGroup {
     lastIRBrand = brand;
     lastIRCodeSet = codeSet;
     lastIRDevice = device;
+    lastIRDeviceGroup = deviceGroup;
 }
-- (NSString *) getIRBrandForDevice:(NSString *)device {
+- (NSString *) getIRBrandForDeviceGroup:(NSString *)deviceGroup {
     return @"Panasonic";
 }
-- (NSString *) getIRCodeSetForDevice:(NSString *)device{
+- (NSString *) getIRCodeSetForDeviceGroup:(NSString *)deviceGroup {
     return nil;
+}
+- (NSString *) getIRDeviceForDeviceGroup:(NSString *)deviceGroup {
+    return @"TV";
 }
 
 @end
@@ -295,19 +300,22 @@ NSString *lastIRDevice;
 }
 
 - (void)test_000_AppDelegate_003_IRDefaults {
-    [app_delegate setIRBrand:@"Sony" andCodeSet:@"hoopy" forDevice:@"TV"];
-    NSString *brand = [app_delegate getIRBrandForDevice:@"TV"];
-    NSString *codeSet = [app_delegate getIRCodeSetForDevice:@"TV"];
+    [app_delegate setIRBrand:@"Sony" andCodeSet:@"hoopy" andDevice:@"DVD" forDeviceGroup:@"DVD/Blu Ray"];
+    NSString *brand = [app_delegate getIRBrandForDeviceGroup:@"DVD/Blu Ray"];
+    NSString *codeSet = [app_delegate getIRCodeSetForDeviceGroup:@"DVD/Blu Ray"];
+    NSString *device = [app_delegate getIRDeviceForDeviceGroup:@"DVD/Blu Ray"];
     STAssertTrue([brand isEqualToString:@"Sony"], @"Brand not set for ir defaults. Instead got %@", brand);
     STAssertTrue([codeSet isEqualToString:@"hoopy"], @"Code set not set for ir defaults. Instead got %@", codeSet);
-    [app_delegate setIRBrand:@"Panasonic" andCodeSet:@"frood" forDevice:@"TV"];
-    brand = [app_delegate getIRBrandForDevice:@"TV"];
-    codeSet = [app_delegate getIRCodeSetForDevice:@"TV"];
+    STAssertTrue([device isEqualToString:@"DVD"], @"Device not set for ir defaults. Instead got %@", codeSet);
+    [app_delegate setIRBrand:@"Panasonic" andCodeSet:@"frood" andDevice:@"Blu Ray" forDeviceGroup:@"DVD/Blu Ray"];
+    brand = [app_delegate getIRBrandForDeviceGroup:@"DVD/Blu Ray"];
+    codeSet = [app_delegate getIRCodeSetForDeviceGroup:@"DVD/Blu Ray"];
+    device = [app_delegate getIRDeviceForDeviceGroup:@"DVD/Blu Ray"];
     STAssertTrue([brand isEqualToString:@"Panasonic"], @"Brand not set for ir defaults. Instead got %@", brand);
     STAssertTrue([codeSet isEqualToString:@"frood"], @"Code set not set for ir defaults. Instead got %@", codeSet);
+    STAssertTrue([device isEqualToString:@"Blu Ray"], @"Device not set for ir defaults. Instead got %@", codeSet);
 }
 
-#endif // RUN_ALL_TESTS
 
 - (void)test_000_AppDelegate_004_QuickIRCommand {
     SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
@@ -322,15 +330,13 @@ NSString *lastIRDevice;
     // Verify that the command is passed to the controller
     NSError *error;
     DDXMLDocument *node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>" options:0 error:&error];
-    [app_delegate setIRBrand:@"Sony" andCodeSet:@"All Models All Types" forDevice:@"TV"];
+    [app_delegate setIRBrand:@"Sony" andCodeSet:@"All Models All Types" andDevice:@"TV" forDeviceGroup:@"TV"];
     [app_delegate performActionSequence:node1];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver1->commandsReceived count] == 1, @"Driver did not receive ir command.");
     NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
     STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"Did not receive simple command. Instead got %@", commandString);
 }
-
-#if RUN_ALL_TESTS
 
 - (void)test_001_RootViewController_001_Help
 {
@@ -1587,18 +1593,21 @@ NSString *lastIRDevice;
     STAssertTrue([[qsViewController allowEditingSwitch] isOn], @"Support Controller Switch not initialized correctly");
 }
 
+#endif // RUN_ALL_TESTS
+
+
 - (void)test_005_QuickIRConfigViewController_000_InitializationAndBasicFunctions {
     MockSwitchControlDelegate *mySwitchDelegate = [MockSwitchControlDelegate alloc];
     quickIRConfigViewController *qirVC = [[quickIRConfigViewController alloc] initWithNibName:@"quickIRConfigViewController" bundle:[NSBundle mainBundle]];
     [qirVC setAppDelegate:mySwitchDelegate];
-    [qirVC setDeviceType:@"TV"];
+    [qirVC setDeviceGroup:@"TV"];
     NSURL *tvControlURL = [NSURL fileURLWithPath: [[NSBundle mainBundle] pathForResource:@"qs_tv" ofType:@"xml"]];
     [qirVC setUrlForControlPanel:tvControlURL];
     [qirVC view];
     [qirVC viewDidLoad];
     // Check that the code set is configured correctly
     NSString *currentBrand = [qirVC pickerView:[qirVC brandPickerView] titleForRow:[[qirVC brandPickerView] selectedRowInComponent:0] forComponent:0];
-    STAssertTrue([currentBrand isEqualToString:@"Panasonic"], @"Brand failed to initialize from delegate");
+    STAssertTrue([currentBrand isEqualToString:@"Panasonic:TV"], @"Brand failed to initialize from delegate");
     // Check that the delegate was set to the proper value
     STAssertTrue([lastIRDevice isEqualToString:@"TV"], @"Did not update delegate with proper device. Instead is %@", lastIRDevice);
     STAssertTrue([lastIRBrand isEqualToString:@"Panasonic"], @"Did not update delegate with proper brand. Instead is %@", lastIRBrand);
@@ -1615,7 +1624,6 @@ NSString *lastIRDevice;
     STAssertTrue([lastIRCodeSet isEqualToString:@"Code Group 1 (Plasma Displays)"], @"Did not update delegate with proper code set. Instead is %@", lastIRCodeSet);
 }
 
-#endif // RUN_ALL_TESTS
 
 #if 0
 // Implement this once configuration working

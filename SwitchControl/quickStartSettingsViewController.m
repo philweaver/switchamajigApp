@@ -48,7 +48,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return NO;
 }
 
 - (IBAction)didChangeSupportSwitchamajigController:(id)sender {
@@ -67,9 +67,26 @@
     quickIRConfigViewController *qirViewCtrl = [quickIRConfigViewController alloc];
     [qirViewCtrl setAppDelegate:[self appDelegate]];
     [qirViewCtrl setUrlForControlPanel:[[NSBundle mainBundle] URLForResource:@"qs_tv" withExtension:@"xml"]];
-    [qirViewCtrl setDeviceType:@"TV"];
+    [qirViewCtrl setDeviceGroup:@"TV"];
     UINavigationController *navController = [self navigationController];
-    [navController popViewControllerAnimated:NO];
+    [navController pushViewController:qirViewCtrl animated:YES];
+}
+
+- (IBAction)didSelectQuickConfigDVD:(id)sender {
+    quickIRConfigViewController *qirViewCtrl = [quickIRConfigViewController alloc];
+    [qirViewCtrl setAppDelegate:[self appDelegate]];
+    [qirViewCtrl setUrlForControlPanel:[[NSBundle mainBundle] URLForResource:@"qs_dvd" withExtension:@"xml"]];
+    [qirViewCtrl setDeviceGroup:@"DVD/Blu Ray"];
+    UINavigationController *navController = [self navigationController];
+    [navController pushViewController:qirViewCtrl animated:YES];
+}
+
+- (IBAction)didSelectQuickConfigCable:(id)sender {
+    quickIRConfigViewController *qirViewCtrl = [quickIRConfigViewController alloc];
+    [qirViewCtrl setAppDelegate:[self appDelegate]];
+    [qirViewCtrl setUrlForControlPanel:[[NSBundle mainBundle] URLForResource:@"qs_cable" withExtension:@"xml"]];
+    [qirViewCtrl setDeviceGroup:@"Cable/Satellite"];
+    UINavigationController *navController = [self navigationController];
     [navController pushViewController:qirViewCtrl animated:YES];
 }
 @end

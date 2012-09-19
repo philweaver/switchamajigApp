@@ -256,15 +256,15 @@
                 // Try to find a device in the defaults where we can execute the command
                 for(deviceTypeNode in deviceTypeNodes) {
                     NSString *deviceType = [deviceTypeNode stringValue];
-                    NSString *brand, *codeSet;
-                    brand = [self getIRBrandForDevice:deviceType];
-                    codeSet = [self getIRCodeSetForDevice:deviceType];
+                    NSString *brand = [self getIRBrandForDeviceGroup:deviceType];
+                    NSString *codeSet = [self getIRCodeSetForDeviceGroup:deviceType];
+                    NSString *device = [self getIRDeviceForDeviceGroup:deviceType];
                     if(brand && codeSet) {
                         DDXMLNode *functionNode;
                         for(functionNode in functionNodes) {
                             NSString *function = [functionNode stringValue];
-                            NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeSet onDevice:deviceType forBrand:brand];
-                            NSLog(@"%@:%@:%@:%@  --  irCommand = %@", brand, deviceType, codeSet, function, irCommand);
+                            NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeSet onDevice:device forBrand:brand];
+                            NSLog(@"%@:%@:%@:%@  --  irCommand = %@", brand, device, codeSet, function, irCommand);
                             if(irCommand) {
                                 // Wrap the command up as xml
                                 NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"%@\" ch=\"0\"></docommand>", irCommand];
@@ -424,34 +424,51 @@
     [self addStatusAlertMessage:[NSString stringWithFormat:@"%@ needs its batteries replaced",friendlyname]  withColor:[UIColor redColor] displayForSeconds:5.0];
 }
 
-- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet forDevice:(NSString *)device {
-    NSDictionary *irBrandDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToBrandDictionary"];
+- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet andDevice:(NSString *)device forDeviceGroup:(NSString *)deviceGroup {
+    NSDictionary *irBrandDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceGroupToBrandDictionary"];
     if(!irBrandDictionary)
         irBrandDictionary = [NSDictionary dictionary];
     NSMutableDictionary *newIRBrandDictionary = [NSMutableDictionary dictionaryWithCapacity:5];
     [newIRBrandDictionary addEntriesFromDictionary:irBrandDictionary];
-    [newIRBrandDictionary setObject:brand forKey:device];
-    NSDictionary *irCodeSetDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToCodeSetDictionary"];
+    [newIRBrandDictionary setObject:brand forKey:deviceGroup];
+
+    NSDictionary *irCodeSetDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceGroupToCodeSetDictionary"];
     if(!irCodeSetDictionary)
         irCodeSetDictionary = [NSDictionary dictionary];
     NSMutableDictionary *newCodeSetBrandDictionary = [NSMutableDictionary dictionaryWithCapacity:5];
     [newCodeSetBrandDictionary addEntriesFromDictionary:irCodeSetDictionary];
-    [newCodeSetBrandDictionary setObject:codeSet forKey:device];
-    [[NSUserDefaults standardUserDefaults] setObject:newIRBrandDictionary forKey:@"irDeviceTypeToBrandDictionary"];
-    [[NSUserDefaults standardUserDefaults] setObject:newCodeSetBrandDictionary forKey:@"irDeviceTypeToCodeSetDictionary"];
+    [newCodeSetBrandDictionary setObject:codeSet forKey:deviceGroup];
+
+    NSDictionary *irDeviceDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceGroupToDeviceDictionary"];
+    if(!irDeviceDictionary)
+        irDeviceDictionary = [NSDictionary dictionary];
+    NSMutableDictionary *newIRDeviceDictionary = [NSMutableDictionary dictionaryWithCapacity:5];
+    [newIRDeviceDictionary addEntriesFromDictionary:irDeviceDictionary];
+    [newIRDeviceDictionary setObject:device forKey:deviceGroup];
+
+    [[NSUserDefaults standardUserDefaults] setObject:newIRBrandDictionary forKey:@"irDeviceGroupToBrandDictionary"];
+    [[NSUserDefaults standardUserDefaults] setObject:newCodeSetBrandDictionary forKey:@"irDeviceGroupToCodeSetDictionary"];
+    [[NSUserDefaults standardUserDefaults] setObject:newIRDeviceDictionary forKey:@"irDeviceGroupToDeviceDictionary"];
 }
-- (NSString *) getIRBrandForDevice:(NSString *)device {
-    NSDictionary *irBrandDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToBrandDictionary"];
+- (NSString *) getIRBrandForDeviceGroup:(NSString *)deviceGroup {
+    NSDictionary *irBrandDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceGroupToBrandDictionary"];
     if(!irBrandDictionary)
         return nil;
-    return [irBrandDictionary objectForKey:device];
+    return [irBrandDictionary objectForKey:deviceGroup];
 }
 
-- (NSString *) getIRCodeSetForDevice:(NSString *)device{
-    NSDictionary *irCodeSetDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceTypeToCodeSetDictionary"];
+- (NSString *) getIRCodeSetForDeviceGroup:(NSString *)deviceGroup{
+    NSDictionary *irCodeSetDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceGroupToCodeSetDictionary"];
     if(!irCodeSetDictionary)
         return nil;
-    return [irCodeSetDictionary objectForKey:device];
+    return [irCodeSetDictionary objectForKey:deviceGroup];
+}
+
+- (NSString *) getIRDeviceForDeviceGroup:(NSString *)deviceGroup{
+    NSDictionary *irDeviceDictionary = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"irDeviceGroupToDeviceDictionary"];
+    if(!irDeviceDictionary)
+        return nil;
+    return [irDeviceDictionary objectForKey:deviceGroup];
 }
 
 

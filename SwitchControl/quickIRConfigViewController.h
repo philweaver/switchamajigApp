@@ -11,12 +11,12 @@
 
 @interface quickIRConfigViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate> {
 @public
-    NSArray *brands;
+    NSMutableArray *brands;
     NSArray *codeSets;
 }
 @property (unsafe_unretained, nonatomic) IBOutlet UIPickerView *codeSetPickerView;
 @property (unsafe_unretained, nonatomic) IBOutlet UIPickerView *brandPickerView;
-@property NSString *deviceType;
+@property NSString *deviceGroup; // device types separated with '/'
 @property NSURL *urlForControlPanel;
 @property (unsafe_unretained, nonatomic) IBOutlet UIButton *filterBrandButton;
 @property SwitchControlAppDelegate *appDelegate;

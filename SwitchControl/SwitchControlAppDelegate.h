@@ -32,9 +32,10 @@
 - (NSString *) getLastLearnedIRCommand;
 - (NSError *) getLastLearnedIRError;
 - (void) clearLastLearnedIRInfo;
-- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet forDevice:(NSString *)device;
-- (NSString *) getIRBrandForDevice:(NSString *)device;
-- (NSString *) getIRCodeSetForDevice:(NSString *)device;
+- (void) setIRBrand:(NSString *)brand andCodeSet:(NSString *)codeSet andDevice:(NSString *)device forDeviceGroup:(NSString *)deviceGroup;
+- (NSString *) getIRBrandForDeviceGroup:(NSString *)deviceGroup;
+- (NSString *) getIRCodeSetForDeviceGroup:(NSString *)deviceGroup;
+- (NSString *) getIRDeviceForDeviceGroup:(NSString *)deviceGroup;
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 @property (nonatomic, retain) UINavigationController *navigationController;
 @property (strong, nonatomic) NSMutableDictionary *friendlyNameSwitchamajigDictionary;

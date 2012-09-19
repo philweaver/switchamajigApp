@@ -17,6 +17,8 @@
 		AD0BA773160406C7001A419A /* quickIRConfigViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0BA771160406C7001A419A /* quickIRConfigViewController.m */; };
 		AD0BA774160406C7001A419A /* quickIRConfigViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA772160406C7001A419A /* quickIRConfigViewController.xib */; };
 		AD0BA77716045B8C001A419A /* qs_tv.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA77616045B8C001A419A /* qs_tv.xml */; };
+		AD0BA779160A4B6E001A419A /* qs_dvd.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA778160A4B6E001A419A /* qs_dvd.xml */; };
+		AD0BA77B160A54A5001A419A /* qs_cable.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA77A160A54A5001A419A /* qs_cable.xml */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
@@ -120,6 +122,8 @@
 		AD0BA771160406C7001A419A /* quickIRConfigViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = quickIRConfigViewController.m; sourceTree = "<group>"; };
 		AD0BA772160406C7001A419A /* quickIRConfigViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = quickIRConfigViewController.xib; sourceTree = "<group>"; };
 		AD0BA77616045B8C001A419A /* qs_tv.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = qs_tv.xml; sourceTree = "<group>"; };
+		AD0BA778160A4B6E001A419A /* qs_dvd.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = qs_dvd.xml; sourceTree = "<group>"; };
+		AD0BA77A160A54A5001A419A /* qs_cable.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = qs_cable.xml; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -433,6 +437,8 @@
 				ADF7AB0015F6D52B0052F96C /* ir_movie_skip.xml */,
 				ADF7AB0215F6D5CC0052F96C /* ir_universal.xml */,
 				AD0BA77616045B8C001A419A /* qs_tv.xml */,
+				AD0BA778160A4B6E001A419A /* qs_dvd.xml */,
+				AD0BA77A160A54A5001A419A /* qs_cable.xml */,
 			);
 			name = Panels;
 			sourceTree = "<group>";
@@ -559,6 +565,8 @@
 				AD05170F1603B7A9005E240A /* quickStartSettingsViewController.xib in Resources */,
 				AD0BA774160406C7001A419A /* quickIRConfigViewController.xib in Resources */,
 				AD0BA77716045B8C001A419A /* qs_tv.xml in Resources */,
+				AD0BA779160A4B6E001A419A /* qs_dvd.xml in Resources */,
+				AD0BA77B160A54A5001A419A /* qs_cable.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

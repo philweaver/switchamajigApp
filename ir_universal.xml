@@ -102,135 +102,187 @@
     <panelelement>
         <frame>350 50 325 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
-        <switchtext>Cable/Satellite/DVR</switchtext>
+        <switchtext>Cable/Satellite</switchtext>
     </panelelement>
     <panelelement>
         <frame>350 125 50 50</frame>
         <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
         <icon>onoff.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     
     <panelelement>
         <frame>487 105 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>uparrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CURSOR UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 160 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>OK</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CURSOR ENTER</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 215 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>downarrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CURSOR DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>547 160 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>play.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CURSOR RIGHT</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>427 160 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>reverse.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CURSOR LEFT</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>350 220 75 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>Live TV</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>LIVE</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>600 220 75 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>Guide</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>GUIDE</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
 
     <panelelement>
         <frame>427 285 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>1</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 1</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 285 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>2</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 2</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>547 285 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>3</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 3</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>427 345 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>4</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 4</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 345 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>5</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 5</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>547 345 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>6</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 6</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>427 405 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>7</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 7</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 405 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>8</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 8</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>547 405 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>9</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 9</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>427 465 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>Clear</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CLEAR</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 465 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>0</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>DIGIT 0</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>547 465 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <switchtext>Enter</switchtext>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CURSOR ENTER</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
+    </panelelement>
+
+    <panelelement>
+        <frame>350 335 65 75</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>VOL_UpArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>VOLUME UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
+    </panelelement>
+    <panelelement>
+        <frame>350 425 65 75</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>VOL_DownArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>VOLUME DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
+    </panelelement>
+    <panelelement>
+        <frame>610 335 65 75</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>CH_UpArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CHANNEL UP</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
+    </panelelement>
+    <panelelement>
+        <frame>610 425 65 75</frame>
+        <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
+        <icon>CH_DownArrow.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>CHANNEL DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
 
     <panelelement>
         <frame>487 525 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>play.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>PLAY</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 580 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>pause.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>PAUSE</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>547 580 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>fastforward.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>FORWARD</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>427 580 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>fastbackward.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>REVERSE</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>487 635 50 50</frame>
         <rgbacolor>0.7 1.0 0.7 1.0</rgbacolor>
         <icon>slowplay.png</icon>
+        <onswitchactivate><actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>SLOW FORWARD</function></quickIrCommand></actionsequence></actionsequenceondevice></onswitchactivate>
     </panelelement>
 
     
@@ -244,57 +296,90 @@
         <frame>725 125 50 50</frame>
         <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
         <icon>onoff.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>885 125 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>eject.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>OPEN CLOSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>825 200 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>play.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>PLAY</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>885 200 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>fastforward.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>FORWARD</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>765 200 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>fastbackward.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>REVERSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>825 275 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>pause.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>PAUSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>885 275 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>skipforward.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>NEXT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>765 275 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>skipbackward.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>PREVIOUS</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>825 350 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>stop.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>STOP</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
 
     <panelelement>
         <frame>875 450 100 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Menu</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>MENU MAIN</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>725 450 100 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Home</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>MENU HOME</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
 
     
@@ -303,41 +388,65 @@
         <frame>825 525 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>uparrow.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR UP</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>825 585 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>OK</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR ENTER</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>825 645 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>downarrow.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>885 585 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>play.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR RIGHT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>765 585 50 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>reverse.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR LEFT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>900 525 75 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Exit</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>EXIT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>900 645 75 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Return</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>RETURN</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>710 645 90 50</frame>
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Submenu</switchtext>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>MENU SUB</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
 
 </panel>

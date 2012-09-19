@@ -18,5 +18,7 @@
 - (IBAction)didChangeSupportSwitchamajigIR:(id)sender;
 - (IBAction)didChangeAllowEditing:(id)sender;
 - (IBAction)didSelectQuickConfigIR:(id)sender;
+- (IBAction)didSelectQuickConfigDVD:(id)sender;
+- (IBAction)didSelectQuickConfigCable:(id)sender;
 
 @end
