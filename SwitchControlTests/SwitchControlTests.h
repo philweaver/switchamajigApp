@@ -36,8 +36,15 @@
 }
 @end
 
-@interface MockSwitchamajigDriver : SwitchamajigIRDeviceDriver {
+@interface MockSwitchamajigIRDriver : SwitchamajigIRDeviceDriver {
 @public
     NSMutableArray *commandsReceived;
 }
+@end
+
+@interface MockSwitchamajigControllerDriver : SwitchamajigControllerDeviceDriver {
+@public
+    NSMutableArray *commandsReceived;
+}
+
 @end

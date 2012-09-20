@@ -62,7 +62,7 @@ NSString *irCodeSetToSend = nil;
 
 @end
 
-@implementation MockSwitchamajigDriver
+@implementation MockSwitchamajigIRDriver
 - (void)issueCommandFromXMLNode:(DDXMLNode *)command error:(NSError **)err {
     //NSLog(@"Mock driver command issued. count = %d", [commandsReceived count]);
     //NSLog(@"Command = %@", [command XMLString]);
@@ -71,6 +71,17 @@ NSString *irCodeSetToSend = nil;
 }
 
 @end
+
+@implementation MockSwitchamajigControllerDriver
+- (void)issueCommandFromXMLNode:(DDXMLNode *)command error:(NSError **)err {
+    //NSLog(@"Mock driver command issued. count = %d", [commandsReceived count]);
+    //NSLog(@"Command = %@", [command XMLString]);
+    [commandsReceived addObject:[command XMLString]];
+    //NSLog(@"Mock driver count = %d on exit", [commandsReceived count]);
+}
+
+@end
+
 
 @implementation SwitchControlTests
 
@@ -185,42 +196,61 @@ NSString *irCodeSetToSend = nil;
     [simulatedController stopListening];
 }
 
+#endif // RUN_ALL_TESTS
+
 - (void)test_000_AppDelegate_001_Dispatch_Controller_Cmd {
     SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
     [[app_delegate friendlyNameSwitchamajigDictionary] removeAllObjects];
     [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"frood"];
     // Verify that the new device is in the dictionary
     STAssertNotNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"frood"], @"Device not in dictionary after being detected");
-    // Mock up a Sjig controller and to verify that commands come through
-    MockSwitchamajigDriver *driver1 = [MockSwitchamajigDriver alloc];
+    // Mock up two Sjig controllers and to verify that commands come through
+    MockSwitchamajigControllerDriver *driver1 = [MockSwitchamajigControllerDriver alloc];
     driver1->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
     [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
-    // Verify that the command is passed to the controller
+    MockSwitchamajigIRDriver *irDriver = [MockSwitchamajigIRDriver alloc];
+    irDriver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[app_delegate friendlyNameSwitchamajigDictionary] setObject:irDriver forKey:@"shrubbery"];
+    // Configure QuickIR so we know what command to expect
+    [app_delegate setIRBrand:@"Sony" andCodeSet:@"All Models All Types" andDevice:@"TV" forDeviceGroup:@"TV"];
+    // Verify that Default commands are passed to the correct controller
     NSError *error;
-    DDXMLDocument *node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    DDXMLDocument *node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node1];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
-    STAssertTrue([driver1->commandsReceived count] == 1, @"Driver did not receive simple command.");
+    node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    STAssertTrue([driver1->commandsReceived count] == 1, @"Controller driver received %d commands.", [driver1->commandsReceived count]);
+    STAssertTrue([irDriver->commandsReceived count] == 2, @"IR driver received %d commands.", [irDriver->commandsReceived count]);
     NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
-    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive simple command. Instead got %@", commandString);
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"IR driver command[1] is %@", commandString);
+    commandString = [irDriver->commandsReceived objectAtIndex:0];
+    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"IR driver command[0] is %@", commandString);
+    commandString = [irDriver->commandsReceived objectAtIndex:1];
+    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"/>"], @"Controller driver command[0] is %@", commandString);
     // Verify that the command is passed when sent to the default controller
-    DDXMLDocument *node2 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    DDXMLDocument *node2 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node2];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
-    STAssertTrue([driver1->commandsReceived count] == 2, @"Driver did not receive command sent to default.");
+    STAssertTrue([driver1->commandsReceived count] == 2, @"Driver did not receive command sent to it.");
     commandString = [driver1->commandsReceived objectAtIndex:1];
-    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive command sent to default. Instead got %@", commandString);
+    STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"Did not receive command sent to named driver. Instead got %@", commandString);
     // Mock up a second Sjig controller and register it with a different name
     [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"hoopy"];
     // Verify that the new device is in the dictionary
     STAssertNotNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"hoopy"], @"Second device not in dictionary after being detected");
     // Mock up a Sjig controller and to verify that commands come through
-    MockSwitchamajigDriver *driver2 = [MockSwitchamajigDriver alloc];
+    MockSwitchamajigControllerDriver *driver2 = [MockSwitchamajigControllerDriver alloc];
     driver2->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
     [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver2 forKey:@"hoopy"];
     // Verify that commands can go to both controllers
     DDXMLDocument *node3 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>hoopy</friendlyname><actionsequence><turnSwitchesOn>2</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node3];
+    node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node1];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver1->commandsReceived count] == 3, @"Driver did not receive command sent to first driver after second one registered.");
@@ -240,6 +270,7 @@ NSString *irCodeSetToSend = nil;
     [app_delegate performActionSequence:node1];
    
 }
+#if RUN_ALL_TESTS
 
 - (void)test_000_AppDelegate_002_Multi_Step_Commands {
     SimulatedSwitchamajigController *simulatedController = [SimulatedSwitchamajigController alloc];
@@ -248,7 +279,7 @@ NSString *irCodeSetToSend = nil;
     [[app_delegate friendlyNameSwitchamajigDictionary] removeAllObjects];
     [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"frood"];
     // Mock up a Sjig controller and to verify that commands come through
-    MockSwitchamajigDriver *driver1 = [MockSwitchamajigDriver alloc];
+    MockSwitchamajigControllerDriver *driver1 = [MockSwitchamajigControllerDriver alloc];
     driver1->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
     [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
     // Send a multi-step command with a delay to the controller
@@ -326,7 +357,7 @@ NSString *irCodeSetToSend = nil;
     // Verify that the new device is in the dictionary
     STAssertNotNil([[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"frood"], @"Device not in dictionary after being detected");
     // Mock up a Sjig controller and to verify that commands come through
-    MockSwitchamajigDriver *driver1 = [MockSwitchamajigDriver alloc];
+    MockSwitchamajigIRDriver *driver1 = [MockSwitchamajigIRDriver alloc];
     driver1->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
     [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver1 forKey:@"frood"];
     // Verify that the command is passed to the controller
@@ -1468,7 +1499,7 @@ NSString *irCodeSetToSend = nil;
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
     // Verify that testIR button appears when driver is present
-    MockSwitchamajigDriver *driver = [[MockSwitchamajigDriver alloc] initWithHostname:@"localhost"];
+    MockSwitchamajigIRDriver *driver = [[MockSwitchamajigIRDriver alloc] initWithHostname:@"localhost"];
     driver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
@@ -1509,7 +1540,7 @@ NSString *irCodeSetToSend = nil;
     // With no commands, action should be nil
     STAssertNil(xmlCommandString, @"Should not have valid action when nothing has been learned");
     // Re-open the UI when a driver is present
-    MockSwitchamajigDriver *driver = [[MockSwitchamajigDriver alloc] initWithHostname:@"localhost"];
+    MockSwitchamajigIRDriver *driver = [[MockSwitchamajigIRDriver alloc] initWithHostname:@"localhost"];
     driver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
@@ -1549,7 +1580,6 @@ NSString *irCodeSetToSend = nil;
     xmlCommandString = [actionUI XMLStringForAction];
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
 }
-#endif // RUN_ALL_TESTS
 
 - (void)test_003_defineActionViewController_004_QuickIR {
     irCodeSetToSend = nil;
@@ -1607,7 +1637,7 @@ NSString *irCodeSetToSend = nil;
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
     // Verify that testIR button appears when driver is present
-    MockSwitchamajigDriver *driver = [[MockSwitchamajigDriver alloc] initWithHostname:@"localhost"];
+    MockSwitchamajigIRDriver *driver = [[MockSwitchamajigIRDriver alloc] initWithHostname:@"localhost"];
     driver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
@@ -1626,7 +1656,6 @@ NSString *irCodeSetToSend = nil;
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
 }
 
-#if RUN_ALL_TESTS
 - (void)test_004_QuickStartViewController_000_AppearanceAndInitialization {
     // Check that the root controller will display the settings if the program hasn't been run before
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"firstRun"];

@@ -159,17 +159,26 @@
         return;
     }
     // Look up the driver for friendly name
-    [statusInfoLock lock];
+    SwitchamajigDriver *driver;
     if([friendlyName isEqualToString:@"Default"]) {
-        if(![[self friendlyNameSwitchamajigDictionary]count]) {
-            [statusInfoLock unlock];
-            NSLog(@"Received default request, but no drivers available");
-            return;
+        BOOL isIRCommand = NO;
+        // Check if the command is for the IR
+        NSArray *irCommandNodes = [actionSequenceOnDevice nodesForXPath:@".//docommand" error:&xmlError];
+        if([irCommandNodes count])
+            isIRCommand = YES;
+        irCommandNodes = [actionSequenceOnDevice nodesForXPath:@".//quickIrCommand" error:&xmlError];
+        if([irCommandNodes count])
+            isIRCommand = YES;
+        if(isIRCommand) {
+            driver = [self firstSwitchamajigIRDriver];
+        } else {
+            driver = [self firstSwitchamajigControllerDriver];
         }
-        friendlyName = [[[self friendlyNameSwitchamajigDictionary] allKeys] objectAtIndex:0];
+    } else {
+        [statusInfoLock lock];
+        driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
+        [statusInfoLock unlock];
     }
-    SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
-    [statusInfoLock unlock];
     if(driver == nil) {
         NSLog(@"performActionSequence: driver is nil for friendlyname %@", friendlyName);
         return;
@@ -365,6 +374,22 @@
         SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:name];
         if([driver isKindOfClass:[SwitchamajigControllerDeviceDriver class]]) {
             firstDriver = (SwitchamajigControllerDeviceDriver *)driver;
+            break;
+        }
+    }
+    [statusInfoLock unlock];
+    return firstDriver;
+}
+
+- (SwitchamajigIRDeviceDriver *) firstSwitchamajigIRDriver {
+    SwitchamajigIRDeviceDriver *firstDriver = nil;
+    [statusInfoLock lock];
+    NSArray *friendlyNames = [[self friendlyNameSwitchamajigDictionary] allKeys];
+    NSString *name;
+    for(name in friendlyNames) {
+        SwitchamajigDriver *driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:name];
+        if([driver isKindOfClass:[SwitchamajigIRDeviceDriver class]]) {
+            firstDriver = (SwitchamajigIRDeviceDriver *)driver;
             break;
         }
     }
