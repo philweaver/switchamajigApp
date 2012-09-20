@@ -11,6 +11,7 @@
 #import "defineActionViewController.h"
 #import "chooseIconViewController.h"
 #import "SJActionUIlearnedIRCommand.h"
+#import "SJActionUIIRQuickstart.h"
 #import "quickStartSettingsViewController.h"
 #import "quickIRConfigViewController.h"
 #define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
@@ -51,8 +52,9 @@ NSString *lastIRDeviceGroup;
 - (NSString *) getIRBrandForDeviceGroup:(NSString *)deviceGroup {
     return @"Panasonic";
 }
+NSString *irCodeSetToSend = nil;
 - (NSString *) getIRCodeSetForDeviceGroup:(NSString *)deviceGroup {
-    return nil;
+    return irCodeSetToSend;
 }
 - (NSString *) getIRDeviceForDeviceGroup:(NSString *)deviceGroup {
     return @"TV";
@@ -1227,6 +1229,8 @@ NSString *lastIRDeviceGroup;
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
+
+
 - (void)test_003_defineActionViewController_001_Initialization {
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
@@ -1246,7 +1250,7 @@ NSString *lastIRDeviceGroup;
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [defineVC loadView];
-    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:1] == 5, @"With both controller and IR supported, defineActionPicker should show five actions.");
+    STAssertTrue([defineVC->actionPicker numberOfRowsInComponent:1] == 6, @"With both controller and IR supported, defineActionPicker shows %d actions.", [defineVC->actionPicker numberOfRowsInComponent:1]);
    
     STAssertTrue([defineVC->actionPicker selectedRowInComponent:0] == 0, @"Default value not selected when no friendly names");
     STAssertTrue([[defineVC pickerView:defineVC->actionPicker titleForRow:0 forComponent:0] isEqualToString:@"Default"], @"With no friendly names, defineActionPicker should show only one value: 'Default'");
@@ -1397,11 +1401,11 @@ NSString *lastIRDeviceGroup;
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy1" forKey:@"hoopy"];
     defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [defineVC loadView];
-    SJActionUIIRDatabaseCommand *actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Standard IR Command"];
+    SJActionUIIRDatabaseCommand *actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"IR from Database"];
     STAssertTrue([actionUI->irPicker isHidden] && [actionUI->irPickerLabel isHidden] && [actionUI->filterBrandButton isHidden] && [actionUI->filterFunctionButton isHidden] && [actionUI->testIrButton isHidden], @"IR UI is visible when no action is passed in");
     // Select IR command from action picker
-    [defineVC->actionPicker selectRow:3 inComponent:1 animated:NO];
-    [defineVC pickerView:defineVC->actionPicker didSelectRow:3 inComponent:1];
+    [defineVC->actionPicker selectRow:4 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:4 inComponent:1];
     STAssertFalse([actionUI->irPicker isHidden] || [actionUI->irPickerLabel isHidden] || [actionUI->filterBrandButton isHidden] || [actionUI->filterFunctionButton isHidden], @"IR UI not visible after selecting IR action.");
     STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible with no IR devices connected");
     // Verify that we got the expected command
@@ -1469,7 +1473,7 @@ NSString *lastIRDeviceGroup;
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [defineVC loadView];
-    actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Standard IR Command"];
+    actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"IR from Database"];
     //STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible before IR driver selected");
     [defineVC->actionPicker selectRow:1 inComponent:0 animated:NO];
     [defineVC pickerView:defineVC->actionPicker didSelectRow:1 inComponent:0];
@@ -1495,8 +1499,8 @@ NSString *lastIRDeviceGroup;
     SJActionUIlearnedIRCommand *actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Learned IR Command"];
     STAssertTrue([actionUI->learnedIrPicker isHidden] && [actionUI->learnedIRPickerLabel isHidden] && [actionUI->learningIRInstructionsLabel isHidden] && [actionUI->learnIRButton isHidden] && [actionUI->testLearnedIRButton isHidden], @"Learned IR UI is visible when no action is passed in");
     // Select IR command from action picker
-    [defineVC->actionPicker selectRow:4 inComponent:1 animated:NO];
-    [defineVC pickerView:defineVC->actionPicker didSelectRow:4 inComponent:1];
+    [defineVC->actionPicker selectRow:5 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:5 inComponent:1];
     STAssertFalse([actionUI->learnedIrPicker isHidden] || [actionUI->learnedIRPickerLabel isHidden], @"Learned IR UI not visible after selecting IR action.");
     STAssertTrue([actionUI->testLearnedIRButton isHidden], @"Test IR button visible with no IR devices connected");
     STAssertTrue([actionUI->learnIRButton isHidden], @"Learn IR button visible with no IR devices connected");
@@ -1510,8 +1514,8 @@ NSString *lastIRDeviceGroup;
     [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
     [defineVC loadView];
-    [defineVC->actionPicker selectRow:4 inComponent:1 animated:NO];
-    [defineVC pickerView:defineVC->actionPicker didSelectRow:4 inComponent:1];
+    [defineVC->actionPicker selectRow:5 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:5 inComponent:1];
     actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Learned IR Command"];
     STAssertFalse([actionUI->testLearnedIRButton isHidden], @"Test Learned IR button not visible after IR driver selected");
     STAssertFalse([actionUI->learnIRButton isHidden], @"Learn IR button not visible after IR driver selected");
@@ -1545,7 +1549,84 @@ NSString *lastIRDeviceGroup;
     xmlCommandString = [actionUI XMLStringForAction];
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
 }
+#endif // RUN_ALL_TESTS
 
+- (void)test_003_defineActionViewController_004_QuickIR {
+    irCodeSetToSend = nil;
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
+    // Make sure the IR controls aren't visible by default
+    NSMutableArray *actions = [[NSMutableArray alloc] initWithCapacity:5];
+    MockSwitchControlDelegate *dummy_app_delegate = [MockSwitchControlDelegate alloc];
+    [dummy_app_delegate setFriendlyNameSwitchamajigDictionary:[[NSMutableDictionary alloc] initWithCapacity:5]];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:@"dummy1" forKey:@"hoopy"];
+    defineActionViewController *defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    [defineVC viewDidLoad];
+    SJActionUIIRQuickstart *actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Quickstart IR"];
+    STAssertTrue([actionUI->irPicker isHidden] && [actionUI->irPickerLabel isHidden] && [actionUI->filterFunctionButton isHidden] && [actionUI->testIrButton isHidden], @"Quick IR UI is visible when no action is passed in");
+    // Select Quick IR command from action picker
+    [defineVC->actionPicker selectRow:3 inComponent:1 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:3 inComponent:1];
+    STAssertFalse([actionUI->irPicker isHidden] || [actionUI->irPickerLabel isHidden] || [actionUI->filterFunctionButton isHidden], @"IR UI not visible after selecting IR action.");
+    STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible with no IR devices connected");
+    // Verify that we got the expected command
+    NSString *expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIRCommand><deviceType>TV</deviceType><function>POWER TOGGLE</function></quickIRCommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    DDXMLNode *action = [actions objectAtIndex:0];
+    NSString *actualCommand = [action XMLString];
+    STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Actual command mismatches. Got %@", actualCommand);
+    // Verify that we have the right number of device types
+    int numDeviceTypes = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:0];
+    STAssertTrue(numDeviceTypes == 3, @"Num device types wrong. Has %d device types.", numDeviceTypes);
+    // Verify that more/fewer functions works
+    int numFunctions = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:1];
+    STAssertTrue(numFunctions == 24, @"Num functions wrong when reduced list shown. Has %d functions.", numFunctions);
+    STAssertTrue([[actionUI->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"], @"Text wrong on show more functions");
+    [actionUI->filterFunctionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue([[actionUI->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show Fewer Functions"], @"Text wrong on show fewer functions");
+    numFunctions = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:1];
+    STAssertTrue(numFunctions == 24, @"Num functions wrong when expanded list shown. Has %d functions.", numFunctions);
+    [actionUI->filterFunctionButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    STAssertTrue([[actionUI->filterFunctionButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Functions"], @"Text wrong on show more functions after activating toggle twice");
+    numFunctions = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:1];
+    STAssertTrue(numFunctions == 24, @"Num functions wrong when reduced list reshown. Has %d functions.", numFunctions);
+    // Touch every wheel on the UI
+    [actionUI->irPicker selectRow:1 inComponent:0 animated:NO];
+    [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:0];
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIRCommand><deviceType>Cable/Satellite</deviceType><function>POWER TOGGLE</function></quickIRCommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    action = [actions objectAtIndex:0];
+    actualCommand = [action XMLString];
+    STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
+    [actionUI->irPicker selectRow:2 inComponent:1 animated:NO];
+    [actionUI pickerView:actionUI->irPicker didSelectRow:2 inComponent:1];
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIRCommand><deviceType>Cable/Satellite</deviceType><function>PLAY</function></quickIRCommand></actionsequence></actionsequenceondevice>";
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    action = [actions objectAtIndex:0];
+    actualCommand = [action XMLString];
+    STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
+    // Verify that testIR button appears when driver is present
+    MockSwitchamajigDriver *driver = [[MockSwitchamajigDriver alloc] initWithHostname:@"localhost"];
+    driver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[dummy_app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"hoopy"];
+    defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
+    [defineVC loadView];
+    actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Quickstart IR"];
+    //STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible before IR driver selected");
+    [defineVC->actionPicker selectRow:1 inComponent:0 animated:NO];
+    [defineVC pickerView:defineVC->actionPicker didSelectRow:1 inComponent:0];
+    STAssertFalse([actionUI->testIrButton isHidden], @"Test IR button not visible after IR driver selected");
+    irCodeSetToSend = @"All Models";
+    [actionUI->testIrButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    STAssertTrue([driver->commandsReceived count]==1, @"No command received for test IR command");
+    expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"Pec07 2909 1d4c 2d55 4bec 686e 2814 182d 51de d7e6 e659 ba76 375c 408d 44a1 9ae4 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 51de d7e6 e659 ba76 375c 408d 44a1 9ae4 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 60fc 9acd 15d6 33b4 a9a9 0abd bf3a 1412 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 4625 eca5 ad08 4902 0e10 b30b 0ef9 46bd 2e49 df47 631e 68c4 6f98 e445 f13b f4dc ca52 3505 6bc3 7438 bb04 91a3 124d 6eba 2e49 df47 631e 68c4 6f98 e445 f13b f4dc ff24 fe8f 727c 0e66 8a18 c639 177c 2846  \" ch=\"0\"></docommand>";
+    actualCommand = [driver->commandsReceived objectAtIndex:0];
+    STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
+}
+
+#if RUN_ALL_TESTS
 - (void)test_004_QuickStartViewController_000_AppearanceAndInitialization {
     // Check that the root controller will display the settings if the program hasn't been run before
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"firstRun"];
@@ -1593,9 +1674,6 @@ NSString *lastIRDeviceGroup;
     STAssertTrue([[qsViewController allowEditingSwitch] isOn], @"Support Controller Switch not initialized correctly");
 }
 
-#endif // RUN_ALL_TESTS
-
-
 - (void)test_005_QuickIRConfigViewController_000_InitializationAndBasicFunctions {
     MockSwitchControlDelegate *mySwitchDelegate = [MockSwitchControlDelegate alloc];
     quickIRConfigViewController *qirVC = [[quickIRConfigViewController alloc] initWithNibName:@"quickIRConfigViewController" bundle:[NSBundle mainBundle]];
@@ -1623,6 +1701,7 @@ NSString *lastIRDeviceGroup;
     STAssertTrue([lastIRBrand isEqualToString:@"Akai"], @"Did not update delegate with proper brand. Instead is %@", lastIRBrand);
     STAssertTrue([lastIRCodeSet isEqualToString:@"Code Group 1 (Plasma Displays)"], @"Did not update delegate with proper code set. Instead is %@", lastIRCodeSet);
 }
+#endif // RUN_ALL_TESTS
 
 
 #if 0

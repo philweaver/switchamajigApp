@@ -19,6 +19,7 @@
 		AD0BA77716045B8C001A419A /* qs_tv.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA77616045B8C001A419A /* qs_tv.xml */; };
 		AD0BA779160A4B6E001A419A /* qs_dvd.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA778160A4B6E001A419A /* qs_dvd.xml */; };
 		AD0BA77B160A54A5001A419A /* qs_cable.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA77A160A54A5001A419A /* qs_cable.xml */; };
+		AD0BA77E160A934C001A419A /* SJActionUIIRQuickstart.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
@@ -124,6 +125,8 @@
 		AD0BA77616045B8C001A419A /* qs_tv.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = qs_tv.xml; sourceTree = "<group>"; };
 		AD0BA778160A4B6E001A419A /* qs_dvd.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = qs_dvd.xml; sourceTree = "<group>"; };
 		AD0BA77A160A54A5001A419A /* qs_cable.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = qs_cable.xml; sourceTree = "<group>"; };
+		AD0BA77C160A934C001A419A /* SJActionUIIRQuickstart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUIIRQuickstart.h; sourceTree = "<group>"; };
+		AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUIIRQuickstart.m; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -388,6 +391,8 @@
 				ADDF3F2415F187DF00EA05C1 /* SJActionUIIRDatabaseCommand.m */,
 				ADDF3F2615F1966500EA05C1 /* SJActionUIlearnedIRCommand.h */,
 				ADDF3F2715F1966500EA05C1 /* SJActionUIlearnedIRCommand.m */,
+				AD0BA77C160A934C001A419A /* SJActionUIIRQuickstart.h */,
+				AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */,
 			);
 			name = DefineActions;
 			sourceTree = "<group>";
@@ -620,6 +625,7 @@
 				ADF7AAE315F673500052F96C /* chooseIconViewController.m in Sources */,
 				AD05170D1603B6B4005E240A /* quickStartSettingsViewController.m in Sources */,
 				AD0BA773160406C7001A419A /* quickIRConfigViewController.m in Sources */,
+				AD0BA77E160A934C001A419A /* SJActionUIIRQuickstart.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

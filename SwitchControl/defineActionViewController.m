@@ -12,6 +12,7 @@
 #import "SJActionUITurnSwitchesOnOff.h"
 #import "SJActionUIIRDatabaseCommand.h"
 #import "SJActionUIlearnedIRCommand.h"
+#import "SJActionUIIRQuickstart.h"
 
 @implementation defineActionViewController
 @synthesize actions;
@@ -32,8 +33,9 @@
         SJActionUITurnSwitchesOff *turnSwitchesOffUI = [[SJActionUITurnSwitchesOff alloc] init];
         SJActionUIIRDatabaseCommand *irDBUI = [[SJActionUIIRDatabaseCommand alloc] init];
         SJActionUIlearnedIRCommand *irLearnUI = [[SJActionUIlearnedIRCommand alloc] init];
+        SJActionUIIRQuickstart *irQuickStartUI = [[SJActionUIIRQuickstart alloc] init];
         SJActionUINoAction *noactionUI = [[SJActionUINoAction alloc] init];
-        actionNamesToSJActionUIDict = [[NSDictionary alloc] initWithObjectsAndKeys:turnSwitchesOnUI, [SJActionUITurnSwitchesOn name],turnSwitchesOffUI, [SJActionUITurnSwitchesOff name], irDBUI, [SJActionUIIRDatabaseCommand name], irLearnUI, [SJActionUIlearnedIRCommand name], noactionUI, [SJActionUINoAction name], nil];
+        actionNamesToSJActionUIDict = [[NSDictionary alloc] initWithObjectsAndKeys:turnSwitchesOnUI, [SJActionUITurnSwitchesOn name],turnSwitchesOffUI, [SJActionUITurnSwitchesOff name], irQuickStartUI, [SJActionUIIRQuickstart name], irDBUI, [SJActionUIIRDatabaseCommand name], irLearnUI, [SJActionUIlearnedIRCommand name], noactionUI, [SJActionUINoAction name], nil];
         // Maintain a separate array of which actions are supported right now
         availableActions = [[NSMutableArray alloc] initWithCapacity:5];
         [availableActions addObject:[SJActionUINoAction name]];
@@ -42,6 +44,7 @@
             [availableActions addObject:[SJActionUITurnSwitchesOff name]];
         }
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigIRPreference"]) {
+            [availableActions addObject:[SJActionUIIRQuickstart name]];
             [availableActions addObject:[SJActionUIIRDatabaseCommand name]];
             [availableActions addObject:[SJActionUIlearnedIRCommand name]];
         }

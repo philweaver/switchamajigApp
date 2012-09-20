@@ -9,11 +9,11 @@
 #import "SJActionUIIRDatabaseCommand.h"
 
 @implementation SJActionUIIRDatabaseCommand
-NSArray *filterBrands(NSArray *bigListOfBrands);
-NSArray *filterFunctions(NSArray *bigListOfFunctions);
+static NSArray *filterBrands(NSArray *bigListOfBrands);
+static NSArray *filterFunctions(NSArray *bigListOfFunctions);
 
 + (NSString *) name {
-    return @"Standard IR Command";
+    return @"IR from Database";
 };
 
 - (void) createUI {
@@ -136,7 +136,7 @@ NSArray *filterFunctions(NSArray *bigListOfFunctions);
     return YES;
 };
 
-NSArray *filterBrands(NSArray *bigListOfBrands) {
+static NSArray *filterBrands(NSArray *bigListOfBrands) {
     NSMutableArray *filteredBrands = [[NSMutableArray alloc] initWithCapacity:10];
     NSString *brand;
     for(brand in bigListOfBrands) {
@@ -164,7 +164,7 @@ NSArray *filterBrands(NSArray *bigListOfBrands) {
     return filteredBrands;
 }
 
-NSArray *filterFunctions(NSArray *bigListOfFunctions) {
+static NSArray *filterFunctions(NSArray *bigListOfFunctions) {
     NSMutableArray *filteredFunctions = [[NSMutableArray alloc] initWithCapacity:10];
     NSString *function;
     for(function in bigListOfFunctions) {
