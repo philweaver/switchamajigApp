@@ -7,6 +7,7 @@
 //
 
 #import "SJActionUIIRDatabaseCommand.h"
+#import "Flurry.h"
 
 @implementation SJActionUIIRDatabaseCommand
 static NSArray *filterBrands(NSArray *bigListOfBrands);
@@ -90,6 +91,8 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions);
     NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeset onDevice:device forBrand:brand];
     NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, codeset, function, irCommand];
     NSLog(@"irCommand = %@", irCommand);
+    NSDictionary *commandDict = [NSDictionary dictionaryWithObjectsAndKeys:@"brand", brand, @"device", device, @"function", function, nil];
+    [Flurry logEvent:@"IR Database Command XMLStringForAction" withParameters:commandDict];
     return irXmlCommand;
 };
 

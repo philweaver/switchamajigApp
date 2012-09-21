@@ -7,6 +7,7 @@
 //
 
 #import "SJActionUIIRQuickstart.h"
+#import "Flurry.h"
 
 @implementation SJActionUIIRQuickstart
 + (NSString *) name {
@@ -92,6 +93,7 @@
     NSString *function = [self getCurrentFunction];
     NSString *irXmlCommand = [NSString stringWithFormat:@"<quickIRCommand><deviceType>%@</deviceType><function>%@</function></quickIRCommand>", deviceType, function];
     NSLog(@"quickIrCommand = %@", irXmlCommand);
+    [Flurry logEvent:@"IR Quickstart Command XMLStringForAction"];
     return irXmlCommand;
 };
 

@@ -10,6 +10,7 @@
 #import "stdio.h"
 #import "../../KissXML/KissXML/DDXMLDocument.h"
 #import "SJUIStatusMessageLabel.h"
+#import "Flurry.h"
 
 @implementation SJUIButtonWithActions
 
@@ -457,6 +458,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     UIView *view = [newViewController view]; // Force initialization
     view = view; // Suppress warning
     [navController pushViewController:newViewController animated:YES];
+    [Flurry logEvent:@"EditPanel Pressed"];
 }
 
 
@@ -600,6 +602,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [newButton setActivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
     [newButton setDeactivateActions:[[NSMutableArray alloc] initWithCapacity:5]];
     [[self view] addSubview:newButton];
+    [Flurry logEvent:@"NewSwitch Pressed"];
 }
 
 - (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event {
@@ -709,6 +712,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     actionPopover = [[UIPopoverController alloc] initWithContentViewController:newViewController];
     [actionPopover setDelegate:self];
     [actionPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    [Flurry logEvent:@"DefineAction Pressed"];
 }
 
 - (void)chooseImage:(id)sender {
@@ -732,6 +736,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     mediaUI.delegate = self;
     imagePopover = [[UIPopoverController alloc] initWithContentViewController:mediaUI];
     [imagePopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    [Flurry logEvent:@"ChooseImage Pressed"];
 }
 
 - (void)recordAudio:(id)sender {
@@ -754,6 +759,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [currentButton setAudioFilePath:[audioURL path]];
     [audioPopover setDelegate:self];
     [audioPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    [Flurry logEvent:@"RecordAudio Pressed"];
 }
 
 - (void)chooseIcon:(id)sender {
@@ -767,6 +773,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     iconPopover = [[UIPopoverController alloc] initWithContentViewController:iconViewController];
     [iconPopover setDelegate:self];
     [iconPopover presentPopoverFromRect:[sender frame] inView:[self view] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+    [Flurry logEvent:@"ChooseIcon Pressed"];
 }
 
 

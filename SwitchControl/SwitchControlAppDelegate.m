@@ -8,6 +8,7 @@
 
 #import "SwitchControlAppDelegate.h"
 #import "rootSwitchViewController.h"
+#import "Flurry.h"
 
 // Silly widgit that probably means I should be signaling the action thread to stop in some better way
 @interface SwitchamajigMutableBool : NSObject {
@@ -32,9 +33,17 @@
 
 #define SETTINGS_UDP_PROTOCOL 0
 #define SETTINGS_TCP_PROTOCOL 1
+
+void uncaughtExceptionHandler(NSException *exception);
+void uncaughtExceptionHandler(NSException *exception) {
+    [Flurry logError:@"Uncaught" message:@"Crash!" exception:exception];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    [Flurry startSession:@"YW295HVM32JWRQ6QFYDW"];
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     // Initialize default settings values if needed
     [[NSUserDefaults standardUserDefaults] registerDefaults:[self defaultsFromPlistNamed:@"Root"]];
     // Disable SIGPIPE
@@ -70,7 +79,22 @@
         NSLog(@"Error loading IR database: %@", error);
     }
     switchamajigIRLock = [[NSLock alloc] init];
-    return YES;
+    // Report key settings
+    NSMutableDictionary *settingsDictionary = [[NSMutableDictionary alloc] initWithCapacity:5];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigControllerPreference"])
+        [settingsDictionary setObject:@"YES" forKey:@"supportSwitchamajigControllerPreference"];
+    else
+        [settingsDictionary setObject:@"NO" forKey:@"supportSwitchamajigControllerPreference"];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigIRPreference"])
+        [settingsDictionary setObject:@"YES" forKey:@"supportSwitchamajigIRPreference"];
+    else
+        [settingsDictionary setObject:@"NO" forKey:@"supportSwitchamajigIRPreference"];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"allowEditingOfSwitchPanelsPreference"])
+        [settingsDictionary setObject:@"YES" forKey:@"allowEditingOfSwitchPanelsPreference"];
+    else
+        [settingsDictionary setObject:@"NO" forKey:@"allowEditingOfSwitchPanelsPreference"];
+    [Flurry logEvent:@"Launch" withParameters:settingsDictionary];
+     return YES;
 }
 
 - (void) statusMessageCallback {
@@ -421,10 +445,12 @@
     if([listener isKindOfClass:[SwitchamajigControllerDeviceListener class]]) {
         SwitchamajigControllerDeviceDriver *sjcdriver = [SwitchamajigControllerDeviceDriver alloc];
         [sjcdriver setUseUDP:[[NSUserDefaults standardUserDefaults] boolForKey:@"useUDPWithSwitchamajigControllerPreference"]];
+        [Flurry logEvent:@"Found Switchamajig Controller"];
         driver = sjcdriver;
     }
     else if([listener isKindOfClass:[SwitchamajigIRDeviceListener class]]) {
         SwitchamajigIRDeviceDriver *sjirdriver = [SwitchamajigIRDeviceDriver alloc];
+        [Flurry logEvent:@"Found Switchamajig IR"];
         driver = sjirdriver;
     } else {
         // Unrecognized

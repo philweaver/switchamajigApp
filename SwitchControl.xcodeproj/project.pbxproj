@@ -20,6 +20,8 @@
 		AD0BA779160A4B6E001A419A /* qs_dvd.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA778160A4B6E001A419A /* qs_dvd.xml */; };
 		AD0BA77B160A54A5001A419A /* qs_cable.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA77A160A54A5001A419A /* qs_cable.xml */; };
 		AD0BA77E160A934C001A419A /* SJActionUIIRQuickstart.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */; };
+		AD0BA780160BEC22001A419A /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0BA77F160BEC22001A419A /* libFlurry.a */; };
+		AD0BA782160BED80001A419A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
@@ -127,6 +129,8 @@
 		AD0BA77A160A54A5001A419A /* qs_cable.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = qs_cable.xml; sourceTree = "<group>"; };
 		AD0BA77C160A934C001A419A /* SJActionUIIRQuickstart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUIIRQuickstart.h; sourceTree = "<group>"; };
 		AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUIIRQuickstart.m; sourceTree = "<group>"; };
+		AD0BA77F160BEC22001A419A /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFlurry.a; path = Flurry/libFlurry.a; sourceTree = "<group>"; };
+		AD0BA781160BEC35001A419A /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Flurry.h; path = Flurry/Flurry.h; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -236,6 +240,7 @@
 				ADB75BF213DB539C00448025 /* Foundation.framework in Frameworks */,
 				ADB75BF413DB539C00448025 /* CoreGraphics.framework in Frameworks */,
 				AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */,
+				AD0BA780160BEC22001A419A /* libFlurry.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,6 +248,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AD0BA782160BED80001A419A /* SystemConfiguration.framework in Frameworks */,
 				ADB75C0B13DB539C00448025 /* SenTestingKit.framework in Frameworks */,
 				ADB75C0C13DB539C00448025 /* UIKit.framework in Frameworks */,
 				ADB75C0D13DB539C00448025 /* Foundation.framework in Frameworks */,
@@ -269,6 +275,8 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				AD0BA781160BEC35001A419A /* Flurry.h */,
+				AD0BA77F160BEC22001A419A /* libFlurry.a */,
 				ADF7AAFF15F6D1D20052F96C /* Panels */,
 				ADF7AAE415F67A580052F96C /* icons */,
 				ADDF3F1615F01DC200EA05C1 /* learning_IR_1.png */,
@@ -753,6 +761,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../Library/Developer/Xcode/DerivedData/SwitchamajigAppSuper-culnnwdbkvllzwefwjdsquxsudwi/Build/Products/Debug-iphoneos\"",
+					"\"$(SRCROOT)/Flurry\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = NO;
@@ -774,6 +783,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../Library/Developer/Xcode/DerivedData/SwitchamajigAppSuper-culnnwdbkvllzwefwjdsquxsudwi/Build/Products/Debug-iphoneos\"",
+					"\"$(SRCROOT)/Flurry\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = NO;

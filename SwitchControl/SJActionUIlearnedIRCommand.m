@@ -7,7 +7,7 @@
 //
 
 #import "SJActionUIlearnedIRCommand.h"
-
+#import "Flurry.h"
 @implementation SJActionUIlearnedIRCommand
 + (NSString *) name {
     return @"Learned IR Command";
@@ -126,6 +126,7 @@
         return nil;
     NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Learned:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", learnedCommandName, learnedCommand];
     NSLog(@"Learned IR XML Command = %@", irXmlCommand);
+    [Flurry logEvent:@"IR Learned Command XMLStringForAction"];
     return irXmlCommand;
 };
 

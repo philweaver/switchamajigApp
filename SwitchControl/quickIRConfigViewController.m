@@ -8,6 +8,7 @@
 
 #import "quickIRConfigViewController.h"
 #import "switchPanelViewController.h"
+#import "Flurry.h"
 @interface quickIRConfigViewController ()
 
 @end
@@ -83,6 +84,7 @@ static NSArray *filterBrands(NSArray *bigListOfBrands);
         codeSetIndex = 0;
     [[self codeSetPickerView] selectRow:codeSetIndex inComponent:0 animated:NO];
     [self pickerView:[self codeSetPickerView] didSelectRow:codeSetIndex inComponent:0];
+    [Flurry logEvent:@"QuickStartIR" withParameters:[NSDictionary dictionaryWithObjectsAndKeys:@"deviceGroup", [self deviceGroup], nil]];
 }
 
 - (void)viewDidUnload
