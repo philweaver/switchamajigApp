@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0012991455E28D00BBEE91 /* switchamajig_50.png */; };
-		AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD00129A1455E28D00BBEE91 /* switchamajig_72.png */; };
 		AD05170D1603B6B4005E240A /* quickStartSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD05170C1603B6B4005E240A /* quickStartSettingsViewController.m */; };
 		AD05170F1603B7A9005E240A /* quickStartSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD05170E1603B7A9005E240A /* quickStartSettingsViewController.xib */; };
 		AD09604E15C728A4003F4212 /* unused_scanning_settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */; };
@@ -22,6 +20,8 @@
 		AD0BA77E160A934C001A419A /* SJActionUIIRQuickstart.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */; };
 		AD0BA780160BEC22001A419A /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0BA77F160BEC22001A419A /* libFlurry.a */; };
 		AD0BA782160BED80001A419A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
+		AD0BA785160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA783160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_50.png */; };
+		AD0BA786160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
@@ -112,8 +112,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		AD0012991455E28D00BBEE91 /* switchamajig_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_50.png; sourceTree = "<group>"; };
-		AD00129A1455E28D00BBEE91 /* switchamajig_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_72.png; sourceTree = "<group>"; };
 		AD05170B1603B6B4005E240A /* quickStartSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quickStartSettingsViewController.h; sourceTree = "<group>"; };
 		AD05170C1603B6B4005E240A /* quickStartSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = quickStartSettingsViewController.m; sourceTree = "<group>"; };
 		AD05170E1603B7A9005E240A /* quickStartSettingsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = quickStartSettingsViewController.xib; sourceTree = "<group>"; };
@@ -131,6 +129,8 @@
 		AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUIIRQuickstart.m; sourceTree = "<group>"; };
 		AD0BA77F160BEC22001A419A /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFlurry.a; path = Flurry/libFlurry.a; sourceTree = "<group>"; };
 		AD0BA781160BEC35001A419A /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Flurry.h; path = Flurry/Flurry.h; sourceTree = "<group>"; };
+		AD0BA783160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_icon_rects_remote_and_plug_50.png; sourceTree = "<group>"; };
+		AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_icon_rects_remote_and_plug_72.png; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -275,6 +275,8 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				AD0BA783160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_50.png */,
+				AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */,
 				AD0BA781160BEC35001A419A /* Flurry.h */,
 				AD0BA77F160BEC22001A419A /* libFlurry.a */,
 				ADF7AAFF15F6D1D20052F96C /* Panels */,
@@ -291,8 +293,6 @@
 				AD09605315CA0AE6003F4212 /* AVFoundation.framework */,
 				AD921B05157D6CAC00940981 /* Security.framework */,
 				AD921B03157D6CA000940981 /* CFNetwork.framework */,
-				AD0012991455E28D00BBEE91 /* switchamajig_50.png */,
-				AD00129A1455E28D00BBEE91 /* switchamajig_72.png */,
 				ADB75BF513DB539C00448025 /* SwitchControl */,
 				ADB75C1113DB539C00448025 /* SwitchControlTests */,
 				ADB75BEE13DB539C00448025 /* Frameworks */,
@@ -540,8 +540,6 @@
 				ADE97CE1143FBFC800521DE0 /* ctrl_4_steering.xml in Resources */,
 				ADE97CEB1443DA5500521DE0 /* helpDisplayViewController.xib in Resources */,
 				ADDF2813144CED7D000EB423 /* ctrl_4_fish_with_toggle.xml in Resources */,
-				AD00129B1455E28D00BBEE91 /* switchamajig_50.png in Resources */,
-				AD00129C1455E28D00BBEE91 /* switchamajig_72.png in Resources */,
 				AD4D39A014AAEF3600ADA893 /* ctrl_6_tworows.xml in Resources */,
 				AD86623514B567AB00C5860D /* configViewController.xib in Resources */,
 				AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */,
@@ -580,6 +578,8 @@
 				AD0BA77716045B8C001A419A /* qs_tv.xml in Resources */,
 				AD0BA779160A4B6E001A419A /* qs_dvd.xml in Resources */,
 				AD0BA77B160A54A5001A419A /* qs_cable.xml in Resources */,
+				AD0BA785160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_50.png in Resources */,
+				AD0BA786160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_72.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

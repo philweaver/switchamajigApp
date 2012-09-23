@@ -196,7 +196,6 @@ NSString *irCodeSetToSend = nil;
     [simulatedController stopListening];
 }
 
-#endif // RUN_ALL_TESTS
 
 - (void)test_000_AppDelegate_001_Dispatch_Controller_Cmd {
     SwitchamajigControllerDeviceListener *listener = [SwitchamajigControllerDeviceListener alloc];
@@ -270,7 +269,6 @@ NSString *irCodeSetToSend = nil;
     [app_delegate performActionSequence:node1];
    
 }
-#if RUN_ALL_TESTS
 
 - (void)test_000_AppDelegate_002_Multi_Step_Commands {
     SimulatedSwitchamajigController *simulatedController = [SimulatedSwitchamajigController alloc];
@@ -450,11 +448,15 @@ NSString *irCodeSetToSend = nil;
     STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
 }
 #endif
-
+#endif // RUN_ALL_TESTS
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
     NSArray *theSubviews = [view subviews];
     int numOverlaps = 0;
     int i;
+    if([view isKindOfClass:[UIButton class]]) {
+        // Starting in ios 6, I'm seeing lots of overlaps inside a UIButton. Since I'm not really worried about how buttons are constructed, exclude them.
+         return 0;
+    }
     for(i=0; i < [theSubviews count]; ++i) {
         CGRect rect1 = [[theSubviews objectAtIndex:i] frame];
         int j;
@@ -620,6 +622,8 @@ NSString *irCodeSetToSend = nil;
     }
     NSLog(@"Test 004c complete.");
 }
+
+#if RUN_ALL_TESTS
 
 
 // Confirm that we can launch a switch panel
