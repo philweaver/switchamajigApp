@@ -5,10 +5,16 @@
         <frame>50 50 437 638</frame>
         <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
         <icon>skipbackward.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>PREVIOUS</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
     <panelelement>
         <frame>537 50 437 638</frame>
         <rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
         <icon>skipforward.png</icon>
+        <onswitchactivate>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>NEXT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+        </onswitchactivate>
     </panelelement>
 </panel>
