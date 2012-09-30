@@ -98,7 +98,8 @@
 };
 
 - (BOOL) setAction:(DDXMLNode*)action {
-    if(![[action name] isEqualToString:@"quickIRCommand"])
+    NSString *actionName = [action name];
+    if(![actionName isEqualToString:@"quickIRCommand"])
         return NO;
     DDXMLElement *actionElement = (DDXMLElement *)action;
     NSError *xmlError;
@@ -132,7 +133,7 @@
         functionIndex = [functionsInList indexOfObject:functionName];
     }
     [irPicker selectRow:functionIndex inComponent:1 animated:NO];
-    [self pickerView:irPicker didSelectRow:functionIndex inComponent:0];
+    [self pickerView:irPicker didSelectRow:functionIndex inComponent:1];
     return YES;
 };
 

@@ -448,7 +448,6 @@ NSString *irCodeSetToSend = nil;
     STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
 }
 #endif
-#endif // RUN_ALL_TESTS
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
     NSArray *theSubviews = [view subviews];
     int numOverlaps = 0;
@@ -622,9 +621,6 @@ NSString *irCodeSetToSend = nil;
     }
     NSLog(@"Test 004c complete.");
 }
-
-#if RUN_ALL_TESTS
-
 
 // Confirm that we can launch a switch panel
 - (void)test_001_RootViewController_005_LaunchSwitchPanel {
@@ -1585,6 +1581,8 @@ NSString *irCodeSetToSend = nil;
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
 }
 
+#endif // RUN_ALL_TESTS
+
 - (void)test_003_defineActionViewController_004_QuickIR {
     irCodeSetToSend = nil;
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
@@ -1640,6 +1638,14 @@ NSString *irCodeSetToSend = nil;
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
+    // Verify setActions
+    expectedCommand = @"<quickIRCommand><deviceType>DVD/Blu Ray</deviceType><function>PAUSE</function></quickIRCommand>";
+    DDXMLDocument *initialActionDoc = [[DDXMLDocument alloc] initWithXMLString:expectedCommand options:0 error:nil];
+    DDXMLNode *initialActionNode = [[initialActionDoc children] objectAtIndex:0];
+    STAssertTrue([actionUI setAction:initialActionNode], @"Quick start UI doesn't recognize action");
+    actualCommand = [actionUI XMLStringForAction];
+    STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
+    
     // Verify that testIR button appears when driver is present
     MockSwitchamajigIRDriver *driver = [[MockSwitchamajigIRDriver alloc] initWithHostname:@"localhost"];
     driver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
@@ -1655,10 +1661,12 @@ NSString *irCodeSetToSend = nil;
     [actionUI->testIrButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver->commandsReceived count]==1, @"No command received for test IR command");
-    expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"Pec07 2909 1d4c 2d55 4bec 686e 2814 182d 51de d7e6 e659 ba76 375c 408d 44a1 9ae4 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 51de d7e6 e659 ba76 375c 408d 44a1 9ae4 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 60fc 9acd 15d6 33b4 a9a9 0abd bf3a 1412 83f4 3009 31a2 277c 4ae1 e277 61ac f79e 4625 eca5 ad08 4902 0e10 b30b 0ef9 46bd 2e49 df47 631e 68c4 6f98 e445 f13b f4dc ca52 3505 6bc3 7438 bb04 91a3 124d 6eba 2e49 df47 631e 68c4 6f98 e445 f13b f4dc ff24 fe8f 727c 0e66 8a18 c639 177c 2846  \" ch=\"0\"></docommand>";
+    expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"Pedc4 89d6 7d56 a9c8 a757 0d59 5a57 6131 69ad f67f 1603 f1f0 03f1 8e2e 91d6 dc80 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 69ad f67f 1603 f1f0 03f1 8e2e 91d6 dc80 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 915c 0451 0974 21e5 9629 07aa 26af 1aa7 bf23 820c c3fd c3ea 054c 350c 9fe1 2b02 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 11b4 6bc6 beac b29a 1d62 6584 cd9a 8f1e bf23 820c c3fd c3ea 054c 350c 9fe1 2b02 28bc 7199 bf62 289d 84f6 24d6 e8ae add2  \" ch=\"0\"></docommand>";
     actualCommand = [driver->commandsReceived objectAtIndex:0];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
 }
+
+#if RUN_ALL_TESTS
 
 - (void)test_004_QuickStartViewController_000_AppearanceAndInitialization {
     // Check that the root controller will display the settings if the program hasn't been run before
