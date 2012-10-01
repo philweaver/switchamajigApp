@@ -91,7 +91,7 @@
 - (NSString*) XMLStringForAction{
     NSString *deviceType = [self getCurrentDeviceType];
     NSString *function = [self getCurrentFunction];
-    NSString *irXmlCommand = [NSString stringWithFormat:@"<quickIRCommand><deviceType>%@</deviceType><function>%@</function></quickIRCommand>", deviceType, function];
+    NSString *irXmlCommand = [NSString stringWithFormat:@"<quickIrCommand><deviceType>%@</deviceType><function>%@</function></quickIrCommand>", deviceType, function];
     NSLog(@"quickIrCommand = %@", irXmlCommand);
     [Flurry logEvent:@"IR Quickstart Command XMLStringForAction"];
     return irXmlCommand;
@@ -99,7 +99,7 @@
 
 - (BOOL) setAction:(DDXMLNode*)action {
     NSString *actionName = [action name];
-    if(![actionName isEqualToString:@"quickIRCommand"])
+    if(![actionName isEqualToString:@"quickIrCommand"])
         return NO;
     DDXMLElement *actionElement = (DDXMLElement *)action;
     NSError *xmlError;
@@ -118,20 +118,29 @@
     
     // It's possible that there will be more than one function. Look for one in the picker list
     NSMutableArray *functionsInList = [deviceTypesToFunctionsDictionary objectForKey:deviceType];
+    [filterFunctionButton setTitle:@"Show More Functions" forState:UIControlStateNormal];
+    NSArray *filteredFunctionList = [self filterFunctions:functionsInList];
     DDXMLNode *functionNode;
     int functionIndex;
     for(functionNode in functionNodes) {
         NSString *functionName = [functionNode stringValue];
-        functionIndex = [functionsInList indexOfObject:functionName];
+        functionIndex = [filteredFunctionList indexOfObject:functionName];
         if(functionIndex != NSNotFound)
             break; // Found it
+        functionIndex = [functionsInList indexOfObject:functionName];
+        if(functionIndex != NSNotFound) {
+            [filterFunctionButton setTitle:@"Show Fewer Functions" forState:UIControlStateNormal];
+            break; // Found it
+        }
     }
     // If none of the functions are in the list, add it
     if(functionIndex == NSNotFound) {
         NSString *functionName = [[functionNodes objectAtIndex:0] stringValue];
         [functionsInList addObject:functionName];
         functionIndex = [functionsInList indexOfObject:functionName];
+        [filterFunctionButton setTitle:@"Show Fewer Functions" forState:UIControlStateNormal];
     }
+    [irPicker reloadComponent:1]; // We may have changed the state of the filterfunctionbutton
     [irPicker selectRow:functionIndex inComponent:1 animated:NO];
     [self pickerView:irPicker didSelectRow:functionIndex inComponent:1];
     return YES;

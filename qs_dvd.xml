@@ -5,7 +5,7 @@
         <rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
         <icon>onoff.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -13,7 +13,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>eject.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>OPEN CLOSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>OPEN CLOSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -21,7 +21,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>play.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>PLAY</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>PLAY</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -29,7 +29,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>fastforward.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>FORWARD</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>FORWARD</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -37,7 +37,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>fastbackward.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>REVERSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>REVERSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -45,7 +45,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>pause.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>PAUSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>PAUSE</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -53,7 +53,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>skipforward.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>NEXT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>NEXT</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -61,7 +61,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>skipbackward.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>PREVIOUS</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>PREVIOUS</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -69,7 +69,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>stop.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>STOP</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>STOP</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     
@@ -78,7 +78,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Menu</switchtext>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>MENU MAIN</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>MENU MAIN</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -86,7 +86,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Home</switchtext>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>MENU HOME</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>MENU HOME</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     
@@ -97,7 +97,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>uparrow.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR UP</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>CURSOR UP</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -105,7 +105,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>OK</switchtext>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR ENTER</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>CURSOR ENTER</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -113,7 +113,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>downarrow.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>CURSOR DOWN</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -121,7 +121,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>play.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR RIGHT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>CURSOR RIGHT</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -129,7 +129,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <icon>reverse.png</icon>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>CURSOR LEFT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>CURSOR LEFT</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -137,7 +137,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Exit</switchtext>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>EXIT</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>EXIT</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -145,7 +145,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Return</switchtext>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>RETURN</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>RETURN</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
     <panelelement>
@@ -153,7 +153,7 @@
         <rgbacolor>0.7 0.7 1.0 1.0</rgbacolor>
         <switchtext>Submenu</switchtext>
         <onswitchactivate>
-            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><deviceType>Blu Ray</deviceType><function>MENU SUB</function></quickIrCommand></actionsequence></actionsequenceondevice>
+            <actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>MENU SUB</function></quickIrCommand></actionsequence></actionsequenceondevice>
         </onswitchactivate>
     </panelelement>
 </panel>

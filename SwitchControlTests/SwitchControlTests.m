@@ -1603,7 +1603,7 @@ NSString *irCodeSetToSend = nil;
     STAssertFalse([actionUI->irPicker isHidden] || [actionUI->irPickerLabel isHidden] || [actionUI->filterFunctionButton isHidden], @"IR UI not visible after selecting IR action.");
     STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible with no IR devices connected");
     // Verify that we got the expected command
-    NSString *expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIRCommand><deviceType>TV</deviceType><function>POWER TOGGLE</function></quickIRCommand></actionsequence></actionsequenceondevice>";
+    NSString *expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     DDXMLNode *action = [actions objectAtIndex:0];
     NSString *actualCommand = [action XMLString];
@@ -1626,20 +1626,20 @@ NSString *irCodeSetToSend = nil;
     // Touch every wheel on the UI
     [actionUI->irPicker selectRow:1 inComponent:0 animated:NO];
     [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:0];
-    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIRCommand><deviceType>Cable/Satellite</deviceType><function>POWER TOGGLE</function></quickIRCommand></actionsequence></actionsequenceondevice>";
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
     [actionUI->irPicker selectRow:2 inComponent:1 animated:NO];
     [actionUI pickerView:actionUI->irPicker didSelectRow:2 inComponent:1];
-    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIRCommand><deviceType>Cable/Satellite</deviceType><function>PLAY</function></quickIRCommand></actionsequence></actionsequenceondevice>";
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>Cable/Satellite</deviceType><function>PLAY</function></quickIrCommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
     // Verify setActions
-    expectedCommand = @"<quickIRCommand><deviceType>DVD/Blu Ray</deviceType><function>PAUSE</function></quickIRCommand>";
+    expectedCommand = @"<quickIrCommand><deviceType>DVD/Blu Ray</deviceType><function>PAUSE</function></quickIrCommand>";
     DDXMLDocument *initialActionDoc = [[DDXMLDocument alloc] initWithXMLString:expectedCommand options:0 error:nil];
     DDXMLNode *initialActionNode = [[initialActionDoc children] objectAtIndex:0];
     STAssertTrue([actionUI setAction:initialActionNode], @"Quick start UI doesn't recognize action");
