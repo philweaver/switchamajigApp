@@ -1051,6 +1051,7 @@ NSString *irCodeSetToSend = nil;
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
+#endif // RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_009_ImagesOnSwitch {
     // Bring up the yellow panel to edit
@@ -1079,6 +1080,13 @@ NSString *irCodeSetToSend = nil;
     
     UIButton *chooseImageButton = [SwitchControlTests findSubviewOf:[viewController view] withText:@"Choose Image"];
     STAssertNotNil(chooseImageButton, @"No Choose Image Button");
+    
+    // Tap the button and then dismiss the dialog. All we can really to is verify that we don't crash
+    [chooseImageButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    [viewController->imagePopover dismissPopoverAnimated:YES];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    
     // Create an image and prepare to send it to the image picker delegate method
     UIImage *testImage = [UIImage imageNamed:@"iphone_delete_button.png"];
     NSDictionary *testImageDictionary = [NSDictionary dictionaryWithObject:testImage forKey:UIImagePickerControllerEditedImage];
@@ -1125,6 +1133,7 @@ NSString *irCodeSetToSend = nil;
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
+#if RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_009_AudioForSwitch {
     // Bring up the yellow panel to edit
@@ -1581,7 +1590,6 @@ NSString *irCodeSetToSend = nil;
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
 }
 
-#endif // RUN_ALL_TESTS
 
 - (void)test_003_defineActionViewController_004_QuickIR {
     irCodeSetToSend = nil;
@@ -1666,7 +1674,6 @@ NSString *irCodeSetToSend = nil;
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
 }
 
-#if RUN_ALL_TESTS
 
 - (void)test_004_QuickStartViewController_000_AppearanceAndInitialization {
     // Check that the root controller will display the settings if the program hasn't been run before

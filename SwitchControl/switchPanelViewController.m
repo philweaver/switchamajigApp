@@ -20,6 +20,20 @@
 @synthesize audioFilePath;
 @end
 
+// Workaround to prevent the imagePopover from trying to rotate the app, which can cause a crash
+@interface SJUIImagePickerController : UIImagePickerController {
+    
+}
+@end
+
+@implementation SJUIImagePickerController
+-(BOOL)shouldAutorotate{
+    return NO;
+}
+@end
+
+
+
 @implementation switchPanelViewController
 
 @synthesize urlToLoad;
@@ -353,7 +367,9 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-	return YES;
+    if(interfaceOrientation == UIInterfaceOrientationLandscapeRight)
+        return YES;
+    return NO;
 }
 
 // Handlers for switches activated/deactivated. Send XML node information to delegate.
@@ -730,7 +746,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     }
     if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary])
         return;
-    UIImagePickerController *mediaUI = [[UIImagePickerController alloc] init];
+    SJUIImagePickerController *mediaUI = [[SJUIImagePickerController alloc] init];
     mediaUI.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     mediaUI.allowsEditing = YES;
     mediaUI.delegate = self;
