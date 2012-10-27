@@ -1559,7 +1559,8 @@ NSString *irCodeSetToSend = nil;
     actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Learned IR Command"];
     STAssertFalse([actionUI->testLearnedIRButton isHidden], @"Test Learned IR button not visible after IR driver selected");
     STAssertFalse([actionUI->learnIRButton isHidden], @"Learn IR button not visible after IR driver selected");
-    STAssertTrue([actionUI->learnedIrPicker numberOfRowsInComponent:0] == 0, @"Command present before IR learning");
+    // This is 1 only because of a workaround because returning 0 in ios6 crashes the app
+    STAssertTrue([actionUI->learnedIrPicker numberOfRowsInComponent:0] == 1, @"Command present before IR learning");
     [actionUI->learnIRButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     // Verify that the learn IR UI is now visible

@@ -259,6 +259,9 @@
 
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+    // Apparently in iOS 6 if your touch an empty picker the app crashes with "request for rect at invalid index path"
+    if([learnedIRCommands count] == 0)
+        return 1;
     if(pickerView == learnedIrPicker)
         return [learnedIRCommands count];
     NSLog(@"SJActionUIlearnedIRCommand: pickerView numberOfRowsInComponent: PickerView unrecognized.");
@@ -277,6 +280,8 @@
     if(pickerView == learnedIrPicker) {
         if([learnedIRCommands count]>row)
             return[[learnedIRCommands allKeys] objectAtIndex:row];
+        if([learnedIRCommands count] == 0)
+            return nil; // Don't report an error in this case since we're working around an iOS 6 bug
         NSLog(@"SJActionUIlearnedIRCommand: pickerView titleForRow out of bounds for learnedIRCommands");
         return nil;
     }
