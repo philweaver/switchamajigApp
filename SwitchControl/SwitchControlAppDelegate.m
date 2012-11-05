@@ -203,10 +203,6 @@ void uncaughtExceptionHandler(NSException *exception) {
         driver = [[self friendlyNameSwitchamajigDictionary] objectForKey:friendlyName];
         [statusInfoLock unlock];
     }
-    if(driver == nil) {
-        NSLog(@"performActionSequence: driver is nil for friendlyname %@", friendlyName);
-        return;
-    }
     NSArray *actionSequences = [actionSequenceOnDevice nodesForXPath:@".//actionsequence" error:&xmlError];
     if([actionSequences count] < 1){
         NSLog(@"performActionSequence: no action sequences for string %@", [actionSequenceOnDevice XMLString]);
@@ -231,7 +227,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     [threadExitBool setValue:NO];
     // Add a dictionary entry for this thread
     [actionnameActionthreadDictionary setValue:threadExitBool forKey:actionName];
-    NSArray *threadInfoArray = [NSArray arrayWithObjects:driver, actionSequence, threadExitBool, nil];
+    NSArray *threadInfoArray = [NSArray arrayWithObjects:actionSequence, threadExitBool, driver, nil];
     // Start a thread to perform the action
     [self performSelectorInBackground:@selector(executeActionSequence:) withObject:threadInfoArray];
 }
@@ -240,10 +236,14 @@ void uncaughtExceptionHandler(NSException *exception) {
 - (void) executeActionSequence:(NSArray *)threadInfoArray {
     @autoreleasepool {
         // Unpack the thread info
-        SwitchamajigDriver *driver = [threadInfoArray objectAtIndex:0];
-        DDXMLNode *actionSequence = [threadInfoArray objectAtIndex:1];
-        SwitchamajigMutableBool *threadExitBool = [threadInfoArray objectAtIndex:2];
-        if((driver == nil) || (actionSequence == nil) || (threadExitBool == nil)) {
+        DDXMLNode *actionSequence = [threadInfoArray objectAtIndex:0];
+        SwitchamajigMutableBool *threadExitBool = [threadInfoArray objectAtIndex:1];
+        SwitchamajigDriver *driver = nil;
+        // Allow for the driver to be nil since actions that just stop a thread don't
+        // really need to have a driver associated with them.
+        if([threadInfoArray count] == 3)
+            driver = [threadInfoArray objectAtIndex:2];
+        if((actionSequence == nil) || (threadExitBool == nil)) {
             NSLog(@"executeActionSequence: values are nil. Aborting action.");
             return;
         }
@@ -255,7 +255,7 @@ void uncaughtExceptionHandler(NSException *exception) {
                 break;
             if([[action name] isEqualToString:@"loop"]) {
                 // Recursively call this function to perform the actions in the loop
-                NSArray *loopInfoArray = [NSArray arrayWithObjects:driver, action, threadExitBool, nil];
+                NSArray *loopInfoArray = [NSArray arrayWithObjects:action, threadExitBool, driver, nil];
                 while(![threadExitBool value]) {
                     [self executeActionSequence:loopInfoArray];
                 }
@@ -319,8 +319,12 @@ void uncaughtExceptionHandler(NSException *exception) {
         foundAction:
             // Send command to driver
             NSLog(@"Issuing command %@", [action XMLString]);
-            NSError *error;
-            [driver issueCommandFromXMLNode:action error:&error];
+            if(driver == nil) {
+                NSLog(@"executeActionSequence: driver is nil. Skipping action");
+            } else {
+                NSError *error;
+                [driver issueCommandFromXMLNode:action error:&error];
+            }
         }
     }
 }

@@ -150,6 +150,34 @@
 			<key>DefaultValue</key>
 			<true/>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>Title</key>
+			<string>Scanning</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Scanning Style</string>
+			<key>Key</key>
+			<string>scanningStylePreference</string>
+			<key>DefaultValue</key>
+			<string>0</string>
+			<key>Titles</key>
+			<array>
+				<string>None</string>
+				<string>Auto Scan</string>
+				<string>Step Scan</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<string>0</string>
+				<string>1</string>
+				<string>2</string>
+			</array>
+		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

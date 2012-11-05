@@ -65,6 +65,7 @@
 		ADC7C193142D64110045ABD0 /* ctrl_1_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C192142D64110045ABD0 /* ctrl_1_red.xml */; };
 		ADC7C195142D64980045ABD0 /* ctrl_2_green_red.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C194142D64980045ABD0 /* ctrl_2_green_red.xml */; };
 		ADC7C197142D64D40045ABD0 /* ctrl_4_across_g_r_b_y.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADC7C196142D64D40045ABD0 /* ctrl_4_across_g_r_b_y.xml */; };
+		ADCDFD81163FA20200980F78 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADCDFD80163FA20200980F78 /* QuartzCore.framework */; };
 		ADD3AEC3158D22CA0067602A /* SJUIStatusMessageLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = ADD3AEC2158D22CA0067602A /* SJUIStatusMessageLabel.m */; };
 		ADDF2813144CED7D000EB423 /* ctrl_4_fish_with_toggle.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF2812144CED7D000EB423 /* ctrl_4_fish_with_toggle.xml */; };
 		ADDF3F1315EEB05400EA05C1 /* blank.xml in Resources */ = {isa = PBXBuildFile; fileRef = ADDF3F1215EEB05400EA05C1 /* blank.xml */; };
@@ -182,6 +183,7 @@
 		ADC7C192142D64110045ABD0 /* ctrl_1_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ctrl_1_red.xml; sourceTree = "<group>"; };
 		ADC7C194142D64980045ABD0 /* ctrl_2_green_red.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ctrl_2_green_red.xml; sourceTree = "<group>"; };
 		ADC7C196142D64D40045ABD0 /* ctrl_4_across_g_r_b_y.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ctrl_4_across_g_r_b_y.xml; sourceTree = "<group>"; };
+		ADCDFD80163FA20200980F78 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		ADD3AEC1158D22CA0067602A /* SJUIStatusMessageLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJUIStatusMessageLabel.h; sourceTree = "<group>"; };
 		ADD3AEC2158D22CA0067602A /* SJUIStatusMessageLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJUIStatusMessageLabel.m; sourceTree = "<group>"; };
 		ADDF2812144CED7D000EB423 /* ctrl_4_fish_with_toggle.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ctrl_4_fish_with_toggle.xml; sourceTree = "<group>"; };
@@ -230,6 +232,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADCDFD81163FA20200980F78 /* QuartzCore.framework in Frameworks */,
 				AD59BDDA15E6CE4B001D5BFF /* libKissXML.a in Frameworks */,
 				AD59BDD815E6CE36001D5BFF /* libSwitchamajigDriver.a in Frameworks */,
 				AD59BDD515E6B9C1001D5BFF /* libsqlite3.dylib in Frameworks */,
@@ -275,6 +278,7 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				ADCDFD80163FA20200980F78 /* QuartzCore.framework */,
 				AD0BA783160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_50.png */,
 				AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */,
 				AD0BA781160BEC35001A419A /* Flurry.h */,

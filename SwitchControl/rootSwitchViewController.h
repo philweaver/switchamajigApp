@@ -10,12 +10,14 @@
 #import "SwitchControlAppDelegate.h"
 #import "SJUIStatusMessageLabel.h"
 
-@interface rootSwitchViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
+@interface rootSwitchViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate> {
     SwitchControlAppDelegate *appDelegate;
     BOOL isConfigAvailable;
+    int panelButtonWidth;
     int panelButtonHeight;
     int numberOfPanelsInScrollView;
     int indexOfCurrentScanSelection;
+    int scanningStyle;
 }
 - (void) ResetScrollPanel;
 - (void) initializeScrollPanelWithTextSize:(CGSize)textSize;
@@ -25,6 +27,7 @@
 - (void) scanPressed:(id)sender;
 - (void) selectPressed:(id)sender;
 - (void) highlightCurrentScanSelection:(BOOL)highlight;
+- (void) viewDidAppear:(BOOL)animated;
 @property (nonatomic, strong) UIButton *helpButton;
 @property (nonatomic, strong) UIButton *showQuickstartWizardButton;
 @property (nonatomic, strong) UIScrollView *panelSelectionScrollView;
@@ -32,6 +35,6 @@
 @property (strong, nonatomic) UIButton *configButton;
 @property (strong, nonatomic) UIButton *scanButton;
 @property (strong, nonatomic) UIButton *selectButton;
-@property (strong, nonatomic) UIView *highlighting;
+//@property (strong, nonatomic) UIView *highlighting;
 @property (strong, nonatomic) NSMutableDictionary *switchPanelURLDictionary;
 @end

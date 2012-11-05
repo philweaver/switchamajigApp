@@ -19,6 +19,7 @@
     SwitchControlAppDelegate *app_delegate;
     UINavigationController *nav_controller;
     rootSwitchViewController *rootViewController;
+    NSDictionary *savedDefaults;
 }
 @end
 

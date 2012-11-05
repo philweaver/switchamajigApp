@@ -102,12 +102,18 @@ NSString *irCodeSetToSend = nil;
     app_delegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication] delegate];
     nav_controller = [app_delegate navigationController];
     rootViewController = [[nav_controller viewControllers] objectAtIndex:0];
+    savedDefaults = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"scanningStylePreference"];
+
 }
 
 - (void)tearDown
 {
     // Tear-down code here.
-    
+    NSString *key;
+    for(key in [savedDefaults allKeys]) {
+        [[NSUserDefaults standardUserDefaults] setObject:[savedDefaults objectForKey:key] forKey:key];
+    }
     [super tearDown];
 }
 
@@ -400,54 +406,6 @@ NSString *irCodeSetToSend = nil;
 
 }
 
-#if 0
-// Scanning not supported
-- (void)test_001_RootViewController_002_ScanningEnabled
-{
-    // Disable scanning
-    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"enableScanningPreference"];
-    [self reloadRootViewController];
-    // Confirm no scan or select button
-    STAssertNil([rootViewController scanButton], @"Scan Button not nil when scanning disabled");
-    STAssertNil([rootViewController selectButton], @"Scan Button not nil when scanning disabled");
-    // Enable scanning, set select on left
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
-    [self reloadRootViewController];
-    // Confirm scan and select buttons exist
-    STAssertNotNil([rootViewController scanButton], @"Scan Button nil when scanning enabled");
-    STAssertNotNil([rootViewController selectButton], @"Scan Button nil when scanning enabled");
-}
-
-- (void)test_001_RootViewController_003_ScanningOptions
-{
-    // Enable scanning, select button on left and green, scan button yellow
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"selectButtonOnLeftPreference"];
-    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"selectButtonColorPreference"];
-    [[NSUserDefaults standardUserDefaults] setInteger:3 forKey:@"scanButtonColorPreference"];
-    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
-    [rootViewController view];
-    // Confirm everything is set up as specified
-    STAssertTrue([[rootViewController scanButton] backgroundColor] == [UIColor yellowColor], @"Scan Button not yellow as preferences specify");
-    STAssertTrue([[rootViewController selectButton] backgroundColor] == [UIColor greenColor], @"Select Button not green as preferences specify");
-    CGRect scanFrame = [[rootViewController scanButton] frame];
-    CGRect selectFrame = [[rootViewController selectButton] frame];
-    STAssertTrue((selectFrame.origin.x < scanFrame.origin.x), @"Select Button x coord %f not left of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
-    // Move select button to right, make it red, make scan button blue
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"enableScanningPreference"];
-    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"selectButtonOnLeftPreference"];
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"selectButtonColorPreference"];
-    [[NSUserDefaults standardUserDefaults] setInteger:2 forKey:@"scanButtonColorPreference"];
-    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
-    [rootViewController view];
-    // Confirm everything is set up as specified
-    STAssertTrue([[rootViewController scanButton] backgroundColor] == [UIColor blueColor], @"Scan Button not yellow as preferences specify");
-    STAssertTrue([[rootViewController selectButton] backgroundColor] == [UIColor redColor], @"Select Button not green as preferences specify");
-    scanFrame = [[rootViewController scanButton] frame];
-    selectFrame = [[rootViewController selectButton] frame];
-    STAssertTrue((selectFrame.origin.x > scanFrame.origin.x), @"Select Button x coord %f not right of scan button x coord %f", selectFrame.origin.x, scanFrame.origin.x);
-}
-#endif
 + (int) numberOfSubviewOverlapsInView:(UIView *)view {
     NSArray *theSubviews = [view subviews];
     int numOverlaps = 0;
@@ -533,8 +491,8 @@ NSString *irCodeSetToSend = nil;
 }
 
 - (void) gutsOfSizeTestWithTextSize:(float)textSize buttonSize:(float)buttonSize conditionIndex:(int)testConditionIndex {
-    const int num_expected_overlaps = 2; // Highlighting overlaps one button and one text label
-    const int num_expected_outofbounds = 1; // Highlighting goes outside the scroll view
+    const int num_expected_overlaps = 0; 
+    const int num_expected_outofbounds = 0;
     [[NSUserDefaults standardUserDefaults] setFloat:textSize forKey:@"textSizePreference"];
     switch(testConditionIndex) {
         case 0:
@@ -629,7 +587,7 @@ NSString *irCodeSetToSend = nil;
     naviControl->didReceivePushViewController = NO;
     [rootViewController view]; 
     // Select the first switch panel
-    [[[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:1] sendActionsForControlEvents:UIControlEventTouchUpInside];
+    [[[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:0] sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue(naviControl->didReceivePushViewController, @"Selecting switch panel did not push view controller");
     STAssertTrue([naviControl->lastViewController isKindOfClass:[switchPanelViewController class]], @"Switch panel did not display");
 }
@@ -654,6 +612,55 @@ NSString *irCodeSetToSend = nil;
     STAssertNotNil([SwitchControlTests findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel not shown with editing support enabled.");
 
 }
+
+#endif  // RUN_ALL_TESTS
+- (void)test_001_RootViewController_007_Scanning {
+    // Disable scanning
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"scanningStylePreference"];
+    // Create a root view controller
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    MockNavigationController *naviControl = [[MockNavigationController alloc] initWithRootViewController:rootViewController];
+    UIView *rootView = [rootViewController view];
+    UIView *subView;
+    for (subView in [rootView subviews]) {
+        STAssertFalse([subView isKindOfClass:[UITextField class]], @"There should be no UITextField in the root view controller when scanning is off");
+    }
+    // Enable step scanning; should get UITextView
+    [[NSUserDefaults standardUserDefaults] setInteger:2 forKey:@"scanningStylePreference"];
+    rootViewController = [[rootSwitchViewController alloc] initWithNibName:nil bundle:nil];
+    naviControl = [[MockNavigationController alloc] initWithRootViewController:rootViewController];
+    rootView = [rootViewController view];
+    [rootViewController viewDidAppear:NO];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    UITextField *scanningTextField = nil;
+    for (subView in [rootView subviews]) {
+        if([subView isKindOfClass:[UITextField class]]) {
+            scanningTextField = (UITextField *)subView;
+            scanningTextField = (UITextField *) subView;
+            STAssertTrue([scanningTextField isHidden], @"Scanning textField is not first hidden");
+        }
+    }
+    STAssertNotNil(scanningTextField, @"Cannot find UITextField in root view controller for step scanning");
+    // Make sure the first subview of the scroll panel is highlighted
+    UIButton *firstButton = (UIButton *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:0];
+    UIButton *secondButton = (UIButton *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:2];
+    UITextView *firstText = (UITextView *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:1];
+    UITextView *secondText = (UITextView *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:3];
+    STAssertTrue([firstButton frame].size.width > [secondButton frame].size.width, @"With step scanning enabled, first button should be larger to show selection");
+    STAssertTrue([[firstText textColor] isEqual:[UIColor blackColor]], @"Initial selection of scanning does not have highlighted text");
+    STAssertTrue([[secondText textColor] isEqual:[UIColor whiteColor]], @"Highlighed text found on unselected panel");
+    // Advance the scanning
+    [[scanningTextField delegate] textField:scanningTextField shouldChangeCharactersInRange:NSMakeRange(0,0) replacementString:@" "];
+    STAssertTrue([firstButton frame].size.width < [secondButton frame].size.width, @"Button size suggests that scanning did not work");
+    STAssertTrue([[firstText textColor] isEqual:[UIColor whiteColor]], @"Text didn't return to white after scanning");
+    STAssertTrue([[secondText textColor] isEqual:[UIColor blackColor]], @"New selection didn't turn blue for scanning");
+    // Launch a panel
+    naviControl->didReceivePushViewController = NO;
+    [[scanningTextField delegate] textField:scanningTextField shouldChangeCharactersInRange:NSMakeRange(0,0) replacementString:@"3"];
+    STAssertTrue(naviControl->didReceivePushViewController, @"Scanning didn't launch a switch panel");
+}
+#if RUN_ALL_TESTS
+
 
 - (void)test_002_SwitchPanelViewController_001_PanelLayout {
     // Make sure panel displays properly
@@ -1051,7 +1058,6 @@ NSString *irCodeSetToSend = nil;
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
-#endif // RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_009_ImagesOnSwitch {
     // Bring up the yellow panel to edit
@@ -1133,7 +1139,6 @@ NSString *irCodeSetToSend = nil;
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"New image path %@ did not get deleted when deleting panel", [newFileURL path]);
 }
-#if RUN_ALL_TESTS
 
 - (void)test_002_SwitchPanelViewController_009_AudioForSwitch {
     // Bring up the yellow panel to edit
