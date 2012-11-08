@@ -69,5 +69,6 @@
                 </actionsequence>
             </actionsequenceondevice>
         </onswitchdeactivate>
-    </panelelement>    
+    </panelelement>
+    <scanorder>1 2 </scanorder>
 </panel>

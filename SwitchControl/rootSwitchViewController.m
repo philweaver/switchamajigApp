@@ -21,7 +21,6 @@
 @synthesize statusText;
 @synthesize scanButton;
 @synthesize selectButton;
-//@synthesize highlighting;
 @synthesize switchPanelURLDictionary;
 
 #pragma mark - View lifecycle
@@ -29,8 +28,6 @@
 #define button_spacing 50
 #define FRAME_WIDTH 1024
 #define FRAME_HEIGHT 748
-
-enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=2};
 
 - (void) loadView {
     appDelegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication]delegate];
@@ -48,7 +45,6 @@ enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=
     [[NSUserDefaults standardUserDefaults] setFloat:494 forKey:@"switchPanelSizePreference"];
 #endif
     panelButtonHeight = [[NSUserDefaults standardUserDefaults] integerForKey:@"switchPanelSizePreference"];
-    scanningStyle = [[NSUserDefaults standardUserDefaults] integerForKey:@"scanningStylePreference"];
     int textFontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     [self setView:[[UIView alloc] initWithFrame:CGRectMake(0, border, FRAME_WIDTH, FRAME_HEIGHT-border)]];
     [[self view] setBackgroundColor:[UIColor blackColor]];
@@ -119,86 +115,21 @@ enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=
     [self setPanelSelectionScrollView:[[UIScrollView alloc] initWithFrame:CGRectMake(border, textHeight, FRAME_WIDTH-2*border, scrollPanelHeight)]];
     [[self panelSelectionScrollView] setScrollEnabled:YES];
     [[self view] addSubview:[self panelSelectionScrollView]];
+    // Do any additional setup after loading the view from its nib.
+    switchScanner = [[SJUIExternalSwitchScanner alloc] initWithSuperview:[self view] andScanType:[[NSUserDefaults standardUserDefaults] integerForKey:@"scanningStylePreference"]];
+    [switchScanner setDelegate:self];
     [self initializeScrollPanelWithTextSize:textSize];
-    indexOfCurrentScanSelection = 0;
-    if(scanningStyle != SCANNING_STYLE_NONE) {
-        // Set up for scanning
-        UITextField *scanningInputTextField = [[UITextField alloc] initWithFrame:CGRectMake(0,0,1,1)];
-        [scanningInputTextField setHidden:YES];
-        [scanningInputTextField setDelegate:self];
-        [[self view] addSubview:scanningInputTextField];
-        [scanningInputTextField becomeFirstResponder];
-    }
 }
 
-#define HIGHLIGHT_RECT_THICKNESS 3
 // Scanning support
-- (void) scanPressed:(id)sender {
-    if(scanningStyle == SCANNING_STYLE_STEP_SCAN) {
-        [self highlightCurrentScanSelection:NO];
-        indexOfCurrentScanSelection++;
-        [self highlightCurrentScanSelection:YES];
-    }
+- (void) SJUIExternalSwitchScannerItemWasSelected:(id)item {
+    // Make sure current selection is visible in scroll panel
+    UIButton *button = (UIButton *) item;
+    [panelSelectionScrollView scrollRectToVisible:[button frame] animated:YES];
 }
 
-- (void) selectPressed:(id)sender {
-    if(scanningStyle == SCANNING_STYLE_STEP_SCAN) {
-        UIButton *panel = [[panelSelectionScrollView subviews] objectAtIndex:indexOfCurrentScanSelection*2];
-        [self launchSwitchPanel:panel];
-    }
-}
-
-- (BOOL) textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    for(int i=0; i < [string length]; ++i) {
-        unichar keystroke = [string characterAtIndex:i];
-        if((keystroke == ' ') || (keystroke == '1'))
-            [self scanPressed:nil];
-        if((keystroke == '\n') || (keystroke == '3'))
-            [self selectPressed:nil];
-    }
-    return NO; // This field isn't visible anyway; don't update it
-}
-
-- (void) highlightCurrentScanSelection:(BOOL)highlight {
-    if(indexOfCurrentScanSelection < 0)
-        indexOfCurrentScanSelection = numberOfPanelsInScrollView-1;
-    if(indexOfCurrentScanSelection >= numberOfPanelsInScrollView)
-        indexOfCurrentScanSelection = 0;
-    UIButton *panel = [[panelSelectionScrollView subviews] objectAtIndex:indexOfCurrentScanSelection*2 + 0];
-    UITextView *text = [[panelSelectionScrollView subviews] objectAtIndex:indexOfCurrentScanSelection*2 + 1];
-    // Expand panel when selected
-    CGRect currentPanelRect = panel.layer.bounds;
-    CGRect newPanelRect = currentPanelRect;
-    newPanelRect.size.width = (highlight) ? panelButtonWidth+button_spacing : panelButtonWidth;
-    newPanelRect.size.height = (highlight) ? panelButtonHeight+button_spacing : panelButtonHeight;
-    [UIView beginAnimations:nil context:NULL];
-    CGAffineTransform scaling = CGAffineTransformMakeScale(newPanelRect.size.width/currentPanelRect.size.width, newPanelRect.size.height/currentPanelRect.size.height);
-    CGAffineTransform translateText = CGAffineTransformMakeTranslation(0, (newPanelRect.size.height-currentPanelRect.size.height)/2);
-    panel.transform = scaling;
-    text.transform = translateText;
-    [UIView commitAnimations];
-    //CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"bounds"];
-    //animation.fromValue = [NSValue valueWithCGRect:currentPanelFrame];
-    //animation.toValue = [NSValue valueWithCGRect:newPanelFrame];
-    //panel.layer.bounds = newPanelFrame;
-    //[panel.layer addAnimation:animation forKey:@"bounds"];
-/*    UIColor *newColor = ((highlight)?[UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:1.0]:[UIColor blackColor]);
-    CGRect highlightFrame = [panel frame];
-    highlightFrame.size.width += HIGHLIGHT_RECT_THICKNESS*2;
-    highlightFrame.size.height += HIGHLIGHT_RECT_THICKNESS*2;
-    highlightFrame.origin.x -= HIGHLIGHT_RECT_THICKNESS;
-    highlightFrame.origin.y -= HIGHLIGHT_RECT_THICKNESS;
-    [highlighting setFrame:highlightFrame];
-    [highlighting setBackgroundColor:newColor];*/
-    if(highlight) {
-        // Reposition scroll to center the panel
-        [panelSelectionScrollView scrollRectToVisible:[panel frame] animated:YES];
-        [text setBackgroundColor:[UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:1.0]];
-        [text setTextColor:[UIColor blackColor]];
-    } else {
-        [text setTextColor:[UIColor whiteColor]];
-        [text setBackgroundColor:[UIColor blackColor]];
-    }
+- (void) SJUIExternalSwitchScannerItemWasActivated:(id)item {
+    [self launchSwitchPanel:item];
 }
 
 - (void)didReceiveMemoryWarning
@@ -212,8 +143,6 @@ enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-
     // Initially the config button is not visible
     //[ConfigButton setHidden:YES];
     // Determine if we will enable config - need flexible alert views
@@ -229,8 +158,7 @@ enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=
 }
 
 - (void) viewDidAppear:(BOOL)animated {
-    if(scanningStyle == SCANNING_STYLE_STEP_SCAN)
-        [self highlightCurrentScanSelection:YES];
+    [switchScanner superviewDidAppear];
 }
 
 - (UIImage *) imageFromViewController:(UIViewController*)viewController scaledTo:(CGSize)scaledSize {
@@ -294,6 +222,7 @@ enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=
     [panelNameLabel setFont:[UIFont systemFontOfSize:fontSize]];
     [panelSelectionScrollView addSubview:panelNameLabel];
     [[self switchPanelURLDictionary] setObject:url forKey:[NSValue valueWithNonretainedObject:myButton]];
+    [switchScanner addButtonToScan:myButton withLabel:panelNameLabel];
     return true;
 }
 

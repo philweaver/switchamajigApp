@@ -68,7 +68,7 @@
     [myView setBackgroundColor:bgColor];
     [[self view] setClipsToBounds:YES];
 	myView.autoresizesSubviews = YES;
-    
+    settingScanOrder = NO;
     NSError *xmlError=nil, *fileError=nil;
     NSString *xmlString = [NSString stringWithContentsOfURL:urlToLoad encoding:NSUTF8StringEncoding error:&fileError];
     
@@ -176,7 +176,7 @@
         
         [myView addSubview:myButton];
     }
-    
+
     oneButtonNavigation = [[NSUserDefaults standardUserDefaults] boolForKey:@"singleTapBackButtonPreference"] & !editingActive;
     bool allowEditing = [[NSUserDefaults standardUserDefaults] boolForKey:@"allowEditingOfSwitchPanelsPreference"];
     CGRect backButtonRect;
@@ -238,11 +238,13 @@
             [myView addSubview:deleteButton];
         }
     }
-    // Show status
-    CGRect textRect = CGRectMake(700, 0, 324, 36);
-    textToShowSwitchName = [[SJUIStatusMessageLabel alloc] initWithFrame:textRect];
-    [textToShowSwitchName setBackgroundColor:bgColor];
-    [myView addSubview:textToShowSwitchName];
+    if(!editingActive) {
+        // Show status
+        CGRect textRect = CGRectMake(700, 0, 324, 36);
+        textToShowSwitchName = [[SJUIStatusMessageLabel alloc] initWithFrame:textRect];
+        [textToShowSwitchName setBackgroundColor:bgColor];
+        [myView addSubview:textToShowSwitchName];
+    }
     
     // OK always to create hidden button
     confirmDeleteButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -259,6 +261,7 @@
     
     // Display configuration UI
     if(editingActive) {
+        configurationUIElements = [NSMutableArray arrayWithCapacity:20];
         UIPinchGestureRecognizer *pinchRecognizer = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(onPinch:)];
         [myView addGestureRecognizer:pinchRecognizer];
         lastPinchScale = 1.0;
@@ -274,79 +277,92 @@
         [panelNameTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
         [panelNameTextField setReturnKeyType:UIReturnKeyDone];
         [myView addSubview:panelNameTextField];
-        
+        [configurationUIElements addObject:panelNameTextField];
         // Color buttons
         UIButton *colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [colorButton setFrame:CGRectMake(980, 604, 44, 44)];
         [colorButton setBackgroundColor:[UIColor redColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
+        [configurationUIElements addObject:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [colorButton setFrame:CGRectMake(980, 554, 44, 44)];
         [colorButton setBackgroundColor:[UIColor blueColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
+        [configurationUIElements addObject:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [colorButton setFrame:CGRectMake(980, 504, 44, 44)];
         [colorButton setBackgroundColor:[UIColor greenColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
+        [configurationUIElements addObject:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [colorButton setFrame:CGRectMake(980, 454, 44, 44)];
         [colorButton setBackgroundColor:[UIColor yellowColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
+        [configurationUIElements addObject:colorButton];
         colorButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [colorButton setFrame:CGRectMake(980, 404, 44, 44)];
         [colorButton setBackgroundColor:[UIColor orangeColor]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
+        [configurationUIElements addObject:colorButton];
         [colorButton setFrame:CGRectMake(980, 654, 44, 44)];
         [colorButton setBackgroundColor:[UIColor colorWithRed:0.7 green:0.7 blue:0.7 alpha:1.0]];
         [colorButton addTarget:self action:@selector(onSetColor:) forControlEvents:UIControlEventTouchUpInside];
         [myView addSubview:colorButton];
+        [configurationUIElements addObject:colorButton];
         
         UIButton *newSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [newSwitchButton setFrame:CGRectMake(150, 704, 100, 44)];
         [newSwitchButton addTarget:self action:@selector(newSwitch:) forControlEvents:UIControlEventTouchUpInside];
         [newSwitchButton setTitle:@"New Switch" forState:UIControlStateNormal];
         [myView addSubview:newSwitchButton];
+        [configurationUIElements addObject:newSwitchButton];
         
         UIButton *deleteSwitchButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [deleteSwitchButton setFrame:CGRectMake(0, 704, 125, 44)];
         [deleteSwitchButton addTarget:self action:@selector(deleteSwitch:) forControlEvents:UIControlEventTouchUpInside];
         [deleteSwitchButton setTitle:@"Delete Switch" forState:UIControlStateNormal];
         [myView addSubview:deleteSwitchButton];
+        [configurationUIElements addObject:deleteSwitchButton];
         
         UIButton *pressActionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [pressActionButton setFrame:CGRectMake(275, 704, 150, 44)];
         [pressActionButton addTarget:self action:@selector(defineAction:) forControlEvents:UIControlEventTouchUpInside];
         [pressActionButton setTitle:@"Action For Touch" forState:UIControlStateNormal];
         [myView addSubview:pressActionButton];
+        [configurationUIElements addObject:pressActionButton];
         
         UIButton *releaseActionButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [releaseActionButton setFrame:CGRectMake(450, 704, 150, 44)];
         [releaseActionButton addTarget:self action:@selector(defineAction:) forControlEvents:UIControlEventTouchUpInside];
         [releaseActionButton setTitle:@"Action For Release" forState:UIControlStateNormal];
         [myView addSubview:releaseActionButton];
+        [configurationUIElements addObject:releaseActionButton];
         
         chooseIconButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [chooseIconButton setFrame:CGRectMake(625, 704, 100, 44)];
         [chooseIconButton addTarget:self action:@selector(chooseIcon:) forControlEvents:UIControlEventTouchUpInside];
         [chooseIconButton setTitle:@"Choose Icon" forState:UIControlStateNormal];
         [myView addSubview:chooseIconButton];
+        [configurationUIElements addObject:chooseIconButton];
         
         chooseImageButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [chooseImageButton setFrame:CGRectMake(750, 704, 125, 44)];
         [chooseImageButton addTarget:self action:@selector(chooseImage:) forControlEvents:UIControlEventTouchUpInside];
         [chooseImageButton setTitle:@"Choose Image" forState:UIControlStateNormal];
         [myView addSubview:chooseImageButton];
+        [configurationUIElements addObject:chooseImageButton];
         
         recordAudioButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
         [recordAudioButton setFrame:CGRectMake(900, 704, 124, 44)];
         [recordAudioButton addTarget:self action:@selector(recordAudio:) forControlEvents:UIControlEventTouchUpInside];
         [recordAudioButton setTitle:@"Record Sound" forState:UIControlStateNormal];
         [myView addSubview:recordAudioButton];
+        [configurationUIElements addObject:recordAudioButton];
         
         CGRect switchNameTextFieldRect = CGRectMake(250, 0, 200, 44);
         switchNameTextField = [[UITextField alloc] initWithFrame:switchNameTextFieldRect];
@@ -358,11 +374,43 @@
         [switchNameTextField setClearButtonMode:UITextFieldViewModeWhileEditing];
         [switchNameTextField setReturnKeyType:UIReturnKeyDone];
         [myView addSubview:switchNameTextField];
+        [configurationUIElements addObject:switchNameTextField];
+ 
+        UIButton *setScanOrderButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+        [setScanOrderButton setFrame:CGRectMake(700, 0, 124, 44)];
+        [setScanOrderButton addTarget:self action:@selector(setScanOrder:) forControlEvents:UIControlEventTouchUpInside];
+        [setScanOrderButton setTitle:@"Set Scan Order" forState:UIControlStateNormal];
+        [myView addSubview:setScanOrderButton];
+        [configurationUIElements addObject:setScanOrderButton];
+    } else {
+        // If we're not editing, support scanning
+        switchScanner = [[SJUIExternalSwitchScanner alloc] initWithSuperview:[self view] andScanType:[[NSUserDefaults standardUserDefaults] integerForKey:@"scanningStylePreference"]];
+        [switchScanner setDelegate:self];
     }
+    // Set up scanning
+    NSArray *scanOrderNodes = [xmlDoc nodesForXPath:@".//panel/scanorder" error:&xmlError];
+    scanOrderIndices = [NSMutableArray arrayWithCapacity:20];
+    if([scanOrderNodes count]) {
+        DDXMLNode *scanOrderNode = [scanOrderNodes objectAtIndex:0];
+        NSString *scanOrderString = [scanOrderNode stringValue];
+        NSScanner *scanOrderScan = [[NSScanner alloc] initWithString:scanOrderString];
+        int scanIndex;
+        while([scanOrderScan scanInt:&scanIndex]) {
+            [scanOrderIndices addObject:[NSNumber numberWithInt:scanIndex]];
+            if(switchScanner)
+                [switchScanner addButtonToScan:[[[self view] subviews] objectAtIndex:scanIndex] withLabel:nil];
+        }
+    }
+
     if(userButtonsHidden)
         [self hideUserButtons];
+
 }
 
+- (void) viewDidAppear:(BOOL)animated {
+    if(switchScanner != nil)
+        [switchScanner superviewDidAppear];
+}
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
@@ -371,6 +419,20 @@
         return YES;
     return NO;
 }
+
+// Scanning support
+- (void) SJUIExternalSwitchScannerItemWasSelected:(id)item {
+    // Nothing for now
+}
+
+- (void) SJUIExternalSwitchScannerItemWasActivated:(id)item {
+    if(item == backButton)
+        [self goBack:item];
+    else
+        [self onSwitchActivated:item];
+}
+
+
 
 // Handlers for switches activated/deactivated. Send XML node information to delegate.
 - (IBAction)onSwitchActivated:(id)sender {
@@ -493,7 +555,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         SJUIButtonWithActions *button = (SJUIButtonWithActions *)view;
         // Don't save UI buttons
         NSString *buttonTitle = [button titleForState:UIControlStateNormal];
-        if(([buttonTitle isEqualToString:@"Back"]) || ([buttonTitle isEqualToString:@"Enable Back Button"]) || ([buttonTitle isEqualToString:@"Edit Panel"]) || ([buttonTitle isEqualToString:@"Delete Panel"]) || ([buttonTitle isEqualToString:@"Confirm Delete"])) {
+        if(([buttonTitle isEqualToString:@"Back"]) || ([buttonTitle isEqualToString:@"Enable Back Button"]) || ([buttonTitle isEqualToString:@"Edit Panel"]) || ([buttonTitle isEqualToString:@"Delete Panel"]) || ([buttonTitle isEqualToString:@"Confirm Delete"]) || ([buttonTitle isEqualToString:@"Set Scan Order"])) {
             continue;  
         }
         // Ignore buttons along the bottom and on the right - color changers, etc
@@ -544,6 +606,14 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         [stringToSave appendString:@"\t\t</onswitchdeactivate>\n"];
         [stringToSave appendString:@"\t</panelelement>\n"];
     }
+    // Add scanning info
+    [stringToSave appendString:@"<scanorder>"];
+    NSNumber *num;
+    for(num in scanOrderIndices) {
+        [stringToSave appendString:[NSString stringWithFormat:@"%d ", [num integerValue]]];
+    }
+    [stringToSave appendString:@"</scanorder>"];
+    
     [stringToSave appendString:@"</panel>"];
     NSError *fileError;
     [stringToSave writeToURL:url atomically:YES encoding:NSASCIIStringEncoding error:&fileError];
@@ -623,6 +693,8 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
 
 - (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event {
     [confirmDeleteButton setHidden:YES];
+    if(settingScanOrder)
+        return;
     CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
     UIControl *control = sender;
     control.center = point;
@@ -631,6 +703,16 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
 - (void)onButtonSelect:(id)sender {
     [confirmDeleteButton setHidden:YES];
     currentButton = sender;
+    if(settingScanOrder) {
+        int index = [[[self view] subviews] indexOfObject:sender];
+        if(index == NSNotFound) {
+            NSLog(@"switchPanelViewController: onButtonSelect: index not found.\n");
+            return;
+        }
+        NSNumber *indexForArray = [NSNumber numberWithInt:index];
+        [scanOrderIndices addObject:indexForArray];
+        return;
+    }
     // Highlight button
     [currentButton setHighlighted:YES];
     // Update switch name field
@@ -792,6 +874,33 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [Flurry logEvent:@"ChooseIcon Pressed"];
 }
 
+- (void) setScanOrder:(id)sender {
+    UIButton *setScanOrderButton = (UIButton *)sender;
+    NSString *currentTitle = [setScanOrderButton titleForState:UIControlStateNormal];
+    if([currentTitle isEqualToString:@"Set Scan Order"]) {
+        [setScanOrderButton setTitle:@"End of Scan" forState:UIControlStateNormal];
+        // Hide rest of UI
+        UIView *view;
+        for(view in configurationUIElements)
+            [view setHidden:YES];
+        [backButton setHidden:YES];
+        [setScanOrderButton setHidden:NO]; // Keep this button
+        settingScanOrder = YES;
+        scanOrderIndices = [NSMutableArray arrayWithCapacity:10];
+    } else {
+        [setScanOrderButton setTitle:@"Set Scan Order" forState:UIControlStateNormal];
+        [Flurry logEvent:@"Scan Order Set"];
+        // Bring back UI
+        UIView *view;
+        for(view in configurationUIElements)
+            [view setHidden:NO];
+        [backButton setHidden:NO];
+        //NSNumber *num;
+        //for (num in scanOrderIndices)
+        //    NSLog(@"Scan order: %d", [num integerValue]);
+        settingScanOrder = NO;
+    }
+}
 
 - (void) imagePickerController: (UIImagePickerController *) picker didFinishPickingMediaWithInfo: (NSDictionary *) info {
     UIImage *imageToUse;
@@ -865,6 +974,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     }
 }
 
+// This function is useful when displaying the viewcontroller as a sub-view of a larger view
 - (void) hideUserButtons {
     if(backButton)
         [backButton setHidden:YES];

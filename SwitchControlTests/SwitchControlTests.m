@@ -5,7 +5,7 @@
 //  Created by Phil Weaver on 7/23/11.
 //  Copyright 2012 PAW Solutions. All rights reserved.
 //
-#define RUN_ALL_TESTS 1
+#define RUN_ALL_TESTS 0
 #import "SwitchControlTests.h"
 #import "SJUIStatusMessageLabel.h"
 #import "defineActionViewController.h"
@@ -613,7 +613,6 @@ NSString *irCodeSetToSend = nil;
 
 }
 
-#endif  // RUN_ALL_TESTS
 - (void)test_001_RootViewController_007_Scanning {
     // Disable scanning
     [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"scanningStylePreference"];
@@ -644,22 +643,17 @@ NSString *irCodeSetToSend = nil;
     // Make sure the first subview of the scroll panel is highlighted
     UIButton *firstButton = (UIButton *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:0];
     UIButton *secondButton = (UIButton *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:2];
-    UITextView *firstText = (UITextView *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:1];
-    UITextView *secondText = (UITextView *) [[[rootViewController panelSelectionScrollView] subviews] objectAtIndex:3];
-    STAssertTrue([firstButton frame].size.width > [secondButton frame].size.width, @"With step scanning enabled, first button should be larger to show selection");
-    STAssertTrue([[firstText textColor] isEqual:[UIColor blackColor]], @"Initial selection of scanning does not have highlighted text");
-    STAssertTrue([[secondText textColor] isEqual:[UIColor whiteColor]], @"Highlighed text found on unselected panel");
+    int width1 = [firstButton frame].size.width;
+    int width2 = [secondButton frame].size.width;
+    STAssertTrue(width1 > width2, @"With step scanning enabled, first button should be larger to show selection width1 = %d, width2 = %d", width1, width2);
     // Advance the scanning
     [[scanningTextField delegate] textField:scanningTextField shouldChangeCharactersInRange:NSMakeRange(0,0) replacementString:@" "];
     STAssertTrue([firstButton frame].size.width < [secondButton frame].size.width, @"Button size suggests that scanning did not work");
-    STAssertTrue([[firstText textColor] isEqual:[UIColor whiteColor]], @"Text didn't return to white after scanning");
-    STAssertTrue([[secondText textColor] isEqual:[UIColor blackColor]], @"New selection didn't turn blue for scanning");
     // Launch a panel
     naviControl->didReceivePushViewController = NO;
     [[scanningTextField delegate] textField:scanningTextField shouldChangeCharactersInRange:NSMakeRange(0,0) replacementString:@"3"];
     STAssertTrue(naviControl->didReceivePushViewController, @"Scanning didn't launch a switch panel");
 }
-#if RUN_ALL_TESTS
 
 
 - (void)test_002_SwitchPanelViewController_001_PanelLayout {
@@ -1274,6 +1268,11 @@ NSString *irCodeSetToSend = nil;
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
+
+#endif // RUN_ALL_TESTS
+
+
+#if RUN_ALL_TESTS
 
 
 - (void)test_003_defineActionViewController_001_Initialization {

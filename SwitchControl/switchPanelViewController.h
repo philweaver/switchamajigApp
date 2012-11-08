@@ -11,7 +11,7 @@
 #import "SJUIRecordAudioViewController.h"
 #import "defineActionViewController.h"
 #import "chooseIconViewController.h"
-
+#import "SJUIExternalSwitchScanner.h"
 @interface SJUIButtonWithActions : UIButton 
 @property (nonatomic) NSMutableArray *activateActions;
 @property (nonatomic) NSMutableArray *deactivateActions;
@@ -20,7 +20,7 @@
 @property NSString *iconName;
 @end
 
-@interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, SJUIRecordAudioViewControllerDelegate, SJUIDefineActionViewController, UIPopoverControllerDelegate>{
+@interface switchPanelViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, SJUIRecordAudioViewControllerDelegate, SJUIDefineActionViewController, UIPopoverControllerDelegate, SJUIExternalSwitchScannerDelegate>{
 @public
     SwitchControlAppDelegate *appDelegate;
     id backButton;
@@ -34,8 +34,10 @@
     SJUIButtonWithActions *currentButton;
     float lastPinchScale;
     BOOL userButtonsHidden;
+    SJUIExternalSwitchScanner *switchScanner;
     
     // Configuration UI
+    NSMutableArray *configurationUIElements;
     UITextField *panelNameTextField;
     UITextField *switchNameTextField;
     UIPopoverController *actionPopover;
@@ -45,6 +47,8 @@
     UIButton *chooseImageButton;
     UIButton *recordAudioButton;
     UIButton *chooseIconButton;
+    BOOL settingScanOrder;
+    NSMutableArray *scanOrderIndices;
     AVAudioPlayer *player;
 }
 - (IBAction)allowNavigation:(id)sender;
