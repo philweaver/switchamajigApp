@@ -23,29 +23,8 @@
 }
 @end
 
-@interface MockNavigationController : UINavigationController {
-    @public
-    UIViewController *lastViewController;
-    BOOL didReceivePushViewController;
-    BOOL didReceivePopViewController;
-}
-@end
-
-@interface MockSwitchControlDelegate : SwitchControlAppDelegate {
-@public
-    NSMutableArray *commandsReceived;
-}
-@end
-
-@interface MockSwitchamajigIRDriver : SwitchamajigIRDeviceDriver {
-@public
-    NSMutableArray *commandsReceived;
-}
-@end
-
-@interface MockSwitchamajigControllerDriver : SwitchamajigControllerDeviceDriver {
-@public
-    NSMutableArray *commandsReceived;
-}
-
-@end
+#define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
+#define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+#define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
