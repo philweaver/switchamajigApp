@@ -519,6 +519,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
 
 // Replace the current panel with one that enables editing
 - (void)editPanel:(id)sender {
+    appDelegate->panelWasEdited = YES;
     switchPanelViewController *newViewController = [switchPanelViewController alloc];
     // If this is a built-in panel, save it to a new file that we'll edit
     if(isBuiltInPanel) {
@@ -630,6 +631,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
 
 - (void)deletePanel:(id)sender {
     if(sender == confirmDeleteButton) {
+        appDelegate->panelWasEdited = YES;
         NSError *fileError;
         [[NSFileManager defaultManager] removeItemAtURL:urlToLoad error:&fileError];
         if(fileError) {

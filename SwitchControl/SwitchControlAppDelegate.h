@@ -22,6 +22,8 @@
     NSLock *switchamajigIRLock;
     NSString *lastLearnedIRCommand;
     NSError *lastLearnedIRError;
+@public
+    BOOL panelWasEdited; // Flag for a switch panel being edited and needing re-rendering on root view controller
 }
 - (void)performActionSequence:(DDXMLNode *)actionSequenceOnDevice;
 - (void) addStatusAlertMessage:(NSString *)message withColor:(UIColor*)color displayForSeconds:(float)seconds;

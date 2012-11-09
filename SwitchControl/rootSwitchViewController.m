@@ -119,6 +119,7 @@
     switchScanner = [[SJUIExternalSwitchScanner alloc] initWithSuperview:[self view] andScanType:[[NSUserDefaults standardUserDefaults] integerForKey:@"scanningStylePreference"]];
     [switchScanner setDelegate:self];
     [self initializeScrollPanelWithTextSize:textSize];
+    appDelegate->panelWasEdited = NO;
 }
 
 // Scanning support
@@ -334,7 +335,10 @@
 
 -(void) viewWillAppear:(BOOL)animated {
     [[self navigationController] setNavigationBarHidden:YES];
-    [self ResetScrollPanel];
+    if(appDelegate->panelWasEdited) {
+        appDelegate->panelWasEdited = NO;
+        [self ResetScrollPanel];
+    }
 }
 
 - (void)launchSwitchPanel:(id)sender {
