@@ -24,6 +24,7 @@
 		AD0BA786160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */; };
 		AD1D3B40164B99B900550A23 /* switchPanelViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B3F164B99B900550A23 /* switchPanelViewControllerTests.m */; };
 		AD1D3B44164D863200550A23 /* TestMocks.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B43164D863200550A23 /* TestMocks.m */; };
+		AD1D3B48164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B47164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
@@ -140,6 +141,8 @@
 		AD1D3B42164D863200550A23 /* TestMocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestMocks.h; sourceTree = "<group>"; };
 		AD1D3B43164D863200550A23 /* TestMocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestMocks.m; sourceTree = "<group>"; };
 		AD1D3B45164D9A3200550A23 /* TestEnables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestEnables.h; sourceTree = "<group>"; };
+		AD1D3B46164DE7D600550A23 /* SJUIExternalSwitchScannerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJUIExternalSwitchScannerTests.h; sourceTree = "<group>"; };
+		AD1D3B47164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJUIExternalSwitchScannerTests.m; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -394,6 +397,8 @@
 				AD1D3B42164D863200550A23 /* TestMocks.h */,
 				AD1D3B43164D863200550A23 /* TestMocks.m */,
 				AD1D3B45164D9A3200550A23 /* TestEnables.h */,
+				AD1D3B46164DE7D600550A23 /* SJUIExternalSwitchScannerTests.h */,
+				AD1D3B47164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m */,
 			);
 			path = SwitchControlTests;
 			sourceTree = "<group>";
@@ -667,6 +672,7 @@
 				ADB1EE2315C0D34E003BABDC /* defineActionViewController.m in Sources */,
 				AD1D3B40164B99B900550A23 /* switchPanelViewControllerTests.m in Sources */,
 				AD1D3B44164D863200550A23 /* TestMocks.m in Sources */,
+				AD1D3B48164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

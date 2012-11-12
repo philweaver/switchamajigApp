@@ -178,8 +178,38 @@
 				<string>2</string>
 			</array>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Auto-Scan Interval</string>
+			<key>Key</key>
+			<string>autoScanIntervalPreference</string>
+			<key>DefaultValue</key>
+			<string>1</string>
+			<key>Titles</key>
+			<array>
+				<string>0.5 Seconds</string>
+				<string>1 Second</string>
+				<string>2 Seconds</string>
+				<string>3 Seconds</string>
+				<string>4 Seconds</string>
+				<string>5 Seconds</string>
+			</array>
+			<key>Values</key>
+			<array>
+				<real>0.5</real>
+				<real>1</real>
+				<integer>2</integer>
+				<integer>3</integer>
+				<integer>4</integer>
+				<integer>5</integer>
+			</array>
+		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>
+	<key>Title</key>
+	<string></string>
 </dict>
 </plist>

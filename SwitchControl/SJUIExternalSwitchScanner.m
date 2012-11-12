@@ -11,6 +11,7 @@
 
 @implementation SJUIExternalSwitchScanner
 @synthesize delegate;
+@synthesize autoScanInterval;
 
 const int button_highlight_size_increase = 50;
 
@@ -19,6 +20,7 @@ const int button_highlight_size_increase = 50;
     self = [super init];
     if (self) {
         scanType = scanTypeInit;
+        [self setAutoScanInterval:[NSNumber numberWithInt:1]];
         indexOfSelection = -1;
         if(scanType != SCANNING_STYLE_NONE) {
             // Set up for scanning
@@ -28,6 +30,7 @@ const int button_highlight_size_increase = 50;
             [textField becomeFirstResponder];
             [superview addSubview:textField];
             buttonsToScan = [NSMutableArray arrayWithCapacity:10];
+            autoScanTimer = nil;
         }
     }
     return self;
@@ -47,47 +50,71 @@ const int button_highlight_size_increase = 50;
     return [controlDictionary objectForKey:@"button"];
 }
 
+- (void) moveToNextSelectedItem {
+    if(indexOfSelection >= 0)
+        [self removeHighlightFromCurrentSelection];
+    if(++indexOfSelection < 0)
+        indexOfSelection = 0;
+    if(indexOfSelection >= [buttonsToScan count])
+        indexOfSelection = 0;
+    [self highlightCurrentSelection];
+    NSDictionary *scanItem = [buttonsToScan objectAtIndex:indexOfSelection];
+    if(!scanItem) {
+        NSLog(@"SJUIExternalSwitchScanner:highlightCurrentScanSelection: scan item is null (code bug");
+        return;
+    }
+    UIButton *button = [scanItem objectForKey:@"button"];
+    [delegate SJUIExternalSwitchScannerItemWasSelected:button];
+}
+
 - (void) scanPressed:(id)sender {
     if(![buttonsToScan count])
         return;
     if(scanType == SCANNING_STYLE_STEP_SCAN) {
-        [self removeHighlightFromCurrentSelection];
-        if(++indexOfSelection < 0)
-            indexOfSelection = 0;
-        if(indexOfSelection >= [buttonsToScan count])
-            indexOfSelection = 0;
-        [self highlightCurrentSelection];
-        NSDictionary *scanItem = [buttonsToScan objectAtIndex:indexOfSelection];
-        if(!scanItem) {
-            NSLog(@"SJUIExternalSwitchScanner:highlightCurrentScanSelection: scan item is null (code bug");
-            return;
-        }
-        UIButton *button = [scanItem objectForKey:@"button"];
-        [delegate SJUIExternalSwitchScannerItemWasSelected:button];
+        [self moveToNextSelectedItem];
     }
 }
 
+- (void) activateCurrentSelection {
+    if(indexOfSelection < 0)
+        return; // Nothing selected
+    NSDictionary *scanItem = [buttonsToScan objectAtIndex:indexOfSelection];
+    if(!scanItem) {
+        NSLog(@"SJUIExternalSwitchScanner:highlightCurrentScanSelection: scan item is null (code bug");
+        return;
+    }
+    UIButton *button = [scanItem objectForKey:@"button"];
+    [delegate SJUIExternalSwitchScannerItemWasActivated:button];
+}
+
 - (void) selectPressed:(id)sender {
+    if(![buttonsToScan count])
+        return;
     if(scanType == SCANNING_STYLE_STEP_SCAN) {
-        if(indexOfSelection < 0)
-            return; // Nothing selected
-        NSDictionary *scanItem = [buttonsToScan objectAtIndex:indexOfSelection];
-        if(!scanItem) {
-            NSLog(@"SJUIExternalSwitchScanner:highlightCurrentScanSelection: scan item is null (code bug");
-            return;
+        [self activateCurrentSelection];
+    }
+    if(scanType == SCANNING_STYLE_AUTO_SCAN) {
+        if(indexOfSelection >= 0) {
+            // If a switch is already highlighted, activate it
+            [self activateCurrentSelection];
+            // Reset the scanning
+            [self removeHighlightFromCurrentSelection];
+            indexOfSelection = -1;
+            [autoScanTimer invalidate];
+            autoScanTimer = nil;
         }
-        UIButton *button = [scanItem objectForKey:@"button"];
-        [delegate SJUIExternalSwitchScannerItemWasActivated:button];
+        else {
+            [self moveToNextSelectedItem];
+            // Start timer to scan
+            autoScanTimer = [NSTimer scheduledTimerWithTimeInterval:[[self autoScanInterval] floatValue] target:self selector:@selector(moveToNextSelectedItem) userInfo:nil repeats:YES];
+        }
     }
 }
 
 - (void) superviewDidAppear {
     if(scanType == SCANNING_STYLE_STEP_SCAN) {
-        if(indexOfSelection >= 0)
-            [self removeHighlightFromCurrentSelection];
-        if((indexOfSelection < 0) && [buttonsToScan count])
-            indexOfSelection = 0;
-        [self highlightCurrentSelection];
+        if(indexOfSelection == -1)
+            [self moveToNextSelectedItem];
     }
 }
 

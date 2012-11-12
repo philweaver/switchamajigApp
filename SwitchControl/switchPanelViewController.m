@@ -71,6 +71,7 @@
     settingScanOrder = NO;
     NSError *xmlError=nil, *fileError=nil;
     NSString *xmlString = [NSString stringWithContentsOfURL:urlToLoad encoding:NSUTF8StringEncoding error:&fileError];
+    scanOrderIndices = [NSMutableArray arrayWithCapacity:20];
     
     DDXMLDocument *xmlDoc = [[DDXMLDocument alloc] initWithXMLString:xmlString options:0 error:&xmlError];
     if(xmlDoc == nil) {
@@ -175,6 +176,7 @@
         [[myButton titleLabel] setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
         
         [myView addSubview:myButton];
+        [scanOrderIndices addObject:[NSNumber numberWithInt:[scanOrderIndices count]]];
     }
 
     oneButtonNavigation = [[NSUserDefaults standardUserDefaults] boolForKey:@"singleTapBackButtonPreference"] & !editingActive;
@@ -389,16 +391,21 @@
     }
     // Set up scanning
     NSArray *scanOrderNodes = [xmlDoc nodesForXPath:@".//panel/scanorder" error:&xmlError];
-    scanOrderIndices = [NSMutableArray arrayWithCapacity:20];
     if([scanOrderNodes count]) {
+        // Override any defaults we have
+        scanOrderIndices = [NSMutableArray arrayWithCapacity:20];
         DDXMLNode *scanOrderNode = [scanOrderNodes objectAtIndex:0];
         NSString *scanOrderString = [scanOrderNode stringValue];
         NSScanner *scanOrderScan = [[NSScanner alloc] initWithString:scanOrderString];
         int scanIndex;
         while([scanOrderScan scanInt:&scanIndex]) {
             [scanOrderIndices addObject:[NSNumber numberWithInt:scanIndex]];
-            if(switchScanner)
-                [switchScanner addButtonToScan:[[[self view] subviews] objectAtIndex:scanIndex] withLabel:nil];
+        }
+    }
+    if(switchScanner ) {
+        NSNumber *scanIndexNumber;
+        for(scanIndexNumber in scanOrderIndices) {
+            [switchScanner addButtonToScan:[[[self view] subviews] objectAtIndex:[scanIndexNumber integerValue]] withLabel:nil];
         }
     }
 
