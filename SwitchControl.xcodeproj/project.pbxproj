@@ -25,6 +25,8 @@
 		AD1D3B40164B99B900550A23 /* switchPanelViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B3F164B99B900550A23 /* switchPanelViewControllerTests.m */; };
 		AD1D3B44164D863200550A23 /* TestMocks.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B43164D863200550A23 /* TestMocks.m */; };
 		AD1D3B48164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B47164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m */; };
+		AD1D3B4B1652D63D00550A23 /* SJActionUIBack.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B4A1652D63D00550A23 /* SJActionUIBack.m */; };
+		AD1D3B4E165594ED00550A23 /* SJActionUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B4D165594ED00550A23 /* SJActionUITests.m */; };
 		AD3DD725141ACA0900DB8AEB /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD724141ACA0900DB8AEB /* Reachability.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		AD3DD728141AD54E00DB8AEB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
 		AD3DD72B141B1DF100DB8AEB /* switchPanelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD3DD72A141B1DF100DB8AEB /* switchPanelViewController.m */; };
@@ -143,6 +145,10 @@
 		AD1D3B45164D9A3200550A23 /* TestEnables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestEnables.h; sourceTree = "<group>"; };
 		AD1D3B46164DE7D600550A23 /* SJUIExternalSwitchScannerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJUIExternalSwitchScannerTests.h; sourceTree = "<group>"; };
 		AD1D3B47164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJUIExternalSwitchScannerTests.m; sourceTree = "<group>"; };
+		AD1D3B491652D63D00550A23 /* SJActionUIBack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUIBack.h; sourceTree = "<group>"; };
+		AD1D3B4A1652D63D00550A23 /* SJActionUIBack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUIBack.m; sourceTree = "<group>"; };
+		AD1D3B4C165594ED00550A23 /* SJActionUITests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SJActionUITests.h; sourceTree = "<group>"; };
+		AD1D3B4D165594ED00550A23 /* SJActionUITests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUITests.m; sourceTree = "<group>"; };
 		AD3DD723141ACA0800DB8AEB /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		AD3DD724141ACA0900DB8AEB /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -399,6 +405,8 @@
 				AD1D3B45164D9A3200550A23 /* TestEnables.h */,
 				AD1D3B46164DE7D600550A23 /* SJUIExternalSwitchScannerTests.h */,
 				AD1D3B47164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m */,
+				AD1D3B4C165594ED00550A23 /* SJActionUITests.h */,
+				AD1D3B4D165594ED00550A23 /* SJActionUITests.m */,
 			);
 			path = SwitchControlTests;
 			sourceTree = "<group>";
@@ -427,6 +435,8 @@
 				ADDF3F2715F1966500EA05C1 /* SJActionUIlearnedIRCommand.m */,
 				AD0BA77C160A934C001A419A /* SJActionUIIRQuickstart.h */,
 				AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */,
+				AD1D3B491652D63D00550A23 /* SJActionUIBack.h */,
+				AD1D3B4A1652D63D00550A23 /* SJActionUIBack.m */,
 			);
 			name = DefineActions;
 			sourceTree = "<group>";
@@ -661,6 +671,7 @@
 				AD0BA773160406C7001A419A /* quickIRConfigViewController.m in Sources */,
 				AD0BA77E160A934C001A419A /* SJActionUIIRQuickstart.m in Sources */,
 				AD8A725E164ACC1B009C5A5C /* SJUIExternalSwitchScanner.m in Sources */,
+				AD1D3B4B1652D63D00550A23 /* SJActionUIBack.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -673,6 +684,7 @@
 				AD1D3B40164B99B900550A23 /* switchPanelViewControllerTests.m in Sources */,
 				AD1D3B44164D863200550A23 /* TestMocks.m in Sources */,
 				AD1D3B48164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m in Sources */,
+				AD1D3B4E165594ED00550A23 /* SJActionUITests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -20,7 +20,10 @@
     didReceivePopViewController = YES;
     return [super popViewControllerAnimated:animated];
 }
-
+- (NSArray *) popToRootViewControllerAnimated:(BOOL)animated {
+    didReceivePopToRootViewController = YES;
+    return [super popToRootViewControllerAnimated:animated];
+}
 @end
 
 @implementation MockSwitchControlDelegate

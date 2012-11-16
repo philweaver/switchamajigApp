@@ -135,6 +135,15 @@
     if(![[action name] isEqualToString:@"docommand"])
         return NO;
     DDXMLElement *actionElement = (DDXMLElement *)action;
+    DDXMLNode *commandNode = [actionElement attributeForName:@"command"];
+    if(!commandNode)
+        return NO;
+    NSString *IRCommand = [commandNode stringValue];
+    NSArray *irCommandParts = [IRCommand componentsSeparatedByString:@":"];
+    if([irCommandParts count] < 1)
+        return NO;
+    if(![[irCommandParts objectAtIndex:0] isEqualToString:@"Learned"])
+        return NO;
     DDXMLNode *IRDataNode = [actionElement attributeForName:@"ir_data"];
     if(!IRDataNode)
         return NO;

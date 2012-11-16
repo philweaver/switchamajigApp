@@ -758,7 +758,7 @@
     STAssertTrue([expectedScanOrder isEqualToArray:panelVC->scanOrderIndices], @"Scan order indices wrong");
 }
 
-#endif // RUN_ALL_TESTS
+#endif // RUN_ALL_SWITCH_PANEL_VC_TESTS
 
 
 @end

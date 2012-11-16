@@ -13,6 +13,7 @@
 #import "SJActionUIIRDatabaseCommand.h"
 #import "SJActionUIlearnedIRCommand.h"
 #import "SJActionUIIRQuickstart.h"
+#import "SJActionUIBack.h"
 
 @implementation defineActionViewController
 @synthesize actions;
@@ -34,11 +35,13 @@
         SJActionUIIRDatabaseCommand *irDBUI = [[SJActionUIIRDatabaseCommand alloc] init];
         SJActionUIlearnedIRCommand *irLearnUI = [[SJActionUIlearnedIRCommand alloc] init];
         SJActionUIIRQuickstart *irQuickStartUI = [[SJActionUIIRQuickstart alloc] init];
+        SJActionUIBack *backUI = [[SJActionUIBack alloc] init];
         SJActionUINoAction *noactionUI = [[SJActionUINoAction alloc] init];
-        actionNamesToSJActionUIDict = [[NSDictionary alloc] initWithObjectsAndKeys:turnSwitchesOnUI, [SJActionUITurnSwitchesOn name],turnSwitchesOffUI, [SJActionUITurnSwitchesOff name], irQuickStartUI, [SJActionUIIRQuickstart name], irDBUI, [SJActionUIIRDatabaseCommand name], irLearnUI, [SJActionUIlearnedIRCommand name], noactionUI, [SJActionUINoAction name], nil];
+        actionNamesToSJActionUIDict = [[NSDictionary alloc] initWithObjectsAndKeys:turnSwitchesOnUI, [SJActionUITurnSwitchesOn name],turnSwitchesOffUI, [SJActionUITurnSwitchesOff name], irQuickStartUI, [SJActionUIIRQuickstart name], irDBUI, [SJActionUIIRDatabaseCommand name], irLearnUI, [SJActionUIlearnedIRCommand name], backUI, [SJActionUIBack name], noactionUI, [SJActionUINoAction name], nil];
         // Maintain a separate array of which actions are supported right now
-        availableActions = [[NSMutableArray alloc] initWithCapacity:5];
+        availableActions = [[NSMutableArray alloc] initWithCapacity:6];
         [availableActions addObject:[SJActionUINoAction name]];
+        [availableActions addObject:[SJActionUIBack name]];
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigControllerPreference"]) {
             [availableActions addObject:[SJActionUITurnSwitchesOn name]];
             [availableActions addObject:[SJActionUITurnSwitchesOff name]];
@@ -134,12 +137,16 @@
             NSArray *actionNodes = [actionSequence children];
             if([actionNodes count] >= 1) {
                 DDXMLNode *actionNode = [actionNodes objectAtIndex:0];
-                // Check if any of the actions can handle th
+                // Check if any of the actions can handle this action. This code isn't my best work. It has a
+                // problem that it assumes that the dictionary values will be in the same order they were when
+                // I created the dictionary. That assumption is not always true. To work around it, we check if
+                // the action is "No Action" and skip it. We already initialized the actions to "No Action" above.
                 for(actionUI in [actionNamesToSJActionUIDict allValues]) {
-                    if([actionUI setAction:actionNode]) {
-                        // This action UI can handle this action
-                        initialActionName = [[actionUI class] name];
-                        break;
+                    if(![[[actionUI class] name] isEqualToString:[SJActionUINoAction name]])
+                        if([actionUI setAction:actionNode]) {
+                            // This action UI can handle this action
+                            initialActionName = [[actionUI class] name];
+                            break;
                     }
                 }
             }

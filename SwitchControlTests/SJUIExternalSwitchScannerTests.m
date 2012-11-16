@@ -9,7 +9,6 @@
 #import "SJUIExternalSwitchScannerTests.h"
 #import "TestEnables.h"
 
-#if RUN_ALL_SCANNER_TESTS
 @implementation SJUIExternalSwitchScannerTests
 - (void) SJUIExternalSwitchScannerItemWasSelected:(id)item {
     lastSelectedItem = item;
@@ -74,6 +73,7 @@ BOOL rectsEqual(CGRect rect1, CGRect rect2) {
     }
     return YES;
 }
+#if RUN_ALL_SCANNER_TESTS
 
 - (void)test_000_no_scanning {
     // Set the scanner for no scanning

@@ -16,6 +16,7 @@
     UIViewController *lastViewController;
     BOOL didReceivePushViewController;
     BOOL didReceivePopViewController;
+    BOOL didReceivePopToRootViewController;
 }
 @end
 

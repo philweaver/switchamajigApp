@@ -185,6 +185,11 @@ void uncaughtExceptionHandler(NSException *exception) {
     // Look up the driver for friendly name
     SwitchamajigDriver *driver;
     if([friendlyName isEqualToString:@"Default"]) {
+        // If the command is to go back, handle it here
+        NSArray *backNodes = [actionSequenceOnDevice nodesForXPath:@".//back" error:&xmlError];
+        if([backNodes count]) {
+            [[self navigationController] popToRootViewControllerAnimated:YES];
+        }
         BOOL isIRCommand = NO;
         // Check if the command is for the IR
         NSArray *irCommandNodes = [actionSequenceOnDevice nodesForXPath:@".//docommand" error:&xmlError];
