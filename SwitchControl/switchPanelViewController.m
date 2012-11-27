@@ -121,9 +121,14 @@
             continue;
         CGRect buttonRect = CGRectMake((CGFloat)x, (CGFloat)y, (CGFloat)w, (CGFloat)h);
         
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
         // Image
         if([imageNodes count]) {
             NSString *imageNodePath = [[imageNodes objectAtIndex:0] stringValue];
+            // Put the path in the proper directory
+            NSString *fileName = [imageNodePath lastPathComponent];
+            imageNodePath = [documentsDirectory stringByAppendingPathComponent:fileName];
             [myButton setImageFilePath:imageNodePath];
             UIImage *image = [UIImage imageWithContentsOfFile:imageNodePath];
             [myButton setBackgroundImage:image forState:UIControlStateNormal];
@@ -138,6 +143,8 @@
         // Audio
         if([audioNodes count]) {
             NSString *audioNodePath = [[audioNodes objectAtIndex:0] stringValue];
+            NSString *fileName = [audioNodePath lastPathComponent];
+            audioNodePath = [documentsDirectory stringByAppendingPathComponent:fileName];
             [myButton setAudioFilePath:audioNodePath];
         }
         
