@@ -26,7 +26,6 @@
             NSLog(@"SJUIRecordAudioViewController: Audio session error: %@", sessionError);
         [self setDelegate:theDelegate];
         [self setContentSizeForViewInPopover:CGSizeMake(320, 250)];
-
     }
     return self;
 }
@@ -106,24 +105,30 @@
     }
 }
 - (void) cancel:(id)sender {
-    // Remove the image
-    NSError *fileError;
-    [[NSFileManager defaultManager] removeItemAtPath:[audioURL path] error:&fileError];
-    [delegate SJUIRecordAudioViewControllerReadyForDismissal:self];
+    [self done:sender];
+    [[NSFileManager defaultManager] removeItemAtPath:[audioURL path] error:nil];
 }
+
 - (void) done:(id)sender {
+    if(recorder && [recorder isRecording]) {
+        [recorder stop];
+        [recorder setDelegate:nil];
+        recorder = nil;
+    }
+    if(player && [player isPlaying]) {
+        [player stop];
+        [player setDelegate:nil];
+        player = nil;
+    }
     [delegate SJUIRecordAudioViewControllerReadyForDismissal:self];
-    
 }
 
 - (void)audioRecorderDidFinishRecording:(AVAudioRecorder *)theRecorder successfully:(BOOL)flag {
-    [recorder stop];
     recorder = nil;
     [recordButton setTitle:@"Record" forState:UIControlStateNormal];
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)thePlayer successfully:(BOOL)flag {
-    [player stop];
     player = nil;
     [playButton setTitle:@"Play" forState:UIControlStateNormal];    
 }

@@ -49,6 +49,10 @@
     [super tearDown];
 }
 
+- (void) SJUIRecordAudioViewControllerReadyForDismissal:(id)viewController {
+    didCallSJUIRecordAudioViewControllerReadyForDismissal = true;
+}
+
 #if RUN_ALL_TESTS_IN_MAIN_FILE
 - (void)test_000_AppDelegate_Exists
 {
@@ -647,8 +651,77 @@
     STAssertTrue([mySwitchDelegate->lastIRBrand isEqualToString:@"Akai"], @"Did not update delegate with proper brand. Instead is %@", mySwitchDelegate->lastIRBrand);
     STAssertTrue([mySwitchDelegate->lastIRCodeSet isEqualToString:@"Code Group 1 (Plasma Displays)"], @"Did not update delegate with proper code set. Instead is %@", mySwitchDelegate->lastIRCodeSet);
 }
-#endif // RUN_ALL_TESTS
 
+- (void)test006_SJUIRecordAudioViewController_000_LifeCycle {
+    // Create a view controller
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSURL *tempSoundURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:@"__tempSound.caf"]];
+    didCallSJUIRecordAudioViewControllerReadyForDismissal = false;
+    SJUIRecordAudioViewController *audioRecorder;
+    
+    // Cancel while recording
+    audioRecorder = [[SJUIRecordAudioViewController alloc] initWithURL:tempSoundURL andDelegate:self];
+    [audioRecorder record:nil];
+    [audioRecorder cancel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    STAssertTrue(didCallSJUIRecordAudioViewControllerReadyForDismissal, @"Audio recorder did not try to dismiss itself on cancel");
+    audioRecorder = nil;
+    // File should not exist
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[tempSoundURL path]], @"Audio file not deleted on cancel");
+    
+    // Hit done while recording
+    audioRecorder = [[SJUIRecordAudioViewController alloc] initWithURL:tempSoundURL andDelegate:self];
+    didCallSJUIRecordAudioViewControllerReadyForDismissal = false;
+    // Done during record
+    [audioRecorder record:nil];
+    [audioRecorder done:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    STAssertTrue(didCallSJUIRecordAudioViewControllerReadyForDismissal, @"Audio recorder did not try to dismiss itself on done");
+    audioRecorder = nil;
+    STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[tempSoundURL path]], @"Audio file not present after done");
+    [[NSFileManager defaultManager] removeItemAtPath:[tempSoundURL path] error:nil];
+   
+    // Record and play back
+    audioRecorder = [[SJUIRecordAudioViewController alloc] initWithURL:tempSoundURL andDelegate:self];
+    didCallSJUIRecordAudioViewControllerReadyForDismissal = false;
+    // Record a brief segment
+    [audioRecorder record:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    [audioRecorder record:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[tempSoundURL path]], @"Audio file not present after recording");
+    // Play the audio
+    [audioRecorder play:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+    // Play it again and hit done during playback
+    [audioRecorder play:nil];
+    [audioRecorder done:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    STAssertTrue(didCallSJUIRecordAudioViewControllerReadyForDismissal, @"Audio recorder did not try to dismiss itself on done");
+    audioRecorder = nil;
+    STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[tempSoundURL path]], @"Audio file not present after hitting done during playback");
+
+    [[NSFileManager defaultManager] removeItemAtPath:[tempSoundURL path] error:nil];
+    // Cancel during playback
+    audioRecorder = [[SJUIRecordAudioViewController alloc] initWithURL:tempSoundURL andDelegate:self];
+    didCallSJUIRecordAudioViewControllerReadyForDismissal = false;
+    // Record a brief segment
+    [audioRecorder record:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    [audioRecorder record:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    STAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[tempSoundURL path]], @"Audio file not present after recording");
+    // Play it again and hit cancel during playback
+    [audioRecorder play:nil];
+    [audioRecorder cancel:nil];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
+    STAssertTrue(didCallSJUIRecordAudioViewControllerReadyForDismissal, @"Audio recorder did not try to dismiss itself on done");
+    audioRecorder = nil;
+    STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[tempSoundURL path]], @"Audio file present after hitting cancel during playback");
+}
+
+#endif // RUN_ALL_TESTS
 
 #if 0
 // Implement this once configuration working

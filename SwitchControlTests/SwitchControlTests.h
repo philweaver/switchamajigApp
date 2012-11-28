@@ -13,11 +13,14 @@
 #import "configViewController.h"
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigControllerDeviceDriver.h"
-@interface SwitchControlTests : SenTestCase {
+#import "SJUIRecordAudioViewController.h"
+
+@interface SwitchControlTests : SenTestCase <SJUIRecordAudioViewControllerDelegate> {
     SwitchControlAppDelegate *app_delegate;
     UINavigationController *nav_controller;
     rootSwitchViewController *rootViewController;
     NSDictionary *savedDefaults;
+    bool didCallSJUIRecordAudioViewControllerReadyForDismissal;
 }
 @end
 
