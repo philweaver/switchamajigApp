@@ -555,13 +555,13 @@
     NSString *currentTitle = [recordSoundButton titleForState:UIControlStateNormal];
     STAssertTrue([currentTitle isEqualToString:@"Delete Sound"], @"Sound button didn't switch to delete after sound file created. Current title is %@", currentTitle);
     
-    // Delete the image
+    // Delete the sound
     [recordSoundButton sendActionsForControlEvents:UIControlEventTouchUpInside];
-    // Confirm that the image is gone
+    // Confirm that the sound is gone
     STAssertNil([yellowButton audioFilePath], @"Removing audio didn't eliminate path from button");
-    // Confirm that image was deleted
+    // Confirm that sound was deleted
     STAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]], @"Audio still in file system after being removed. file = %@", [newFileURL path]);
-    // Confirm that the button again says "Choose Image"
+    // Confirm that the button again says "Record Sound"
     STAssertTrue([[recordSoundButton titleForState:UIControlStateNormal] isEqualToString:@"Record Sound"], @"Record sound button didn't switch to Record Sound when audio removed");
     
     // Add the audio again in order to delete it with the switch
