@@ -311,7 +311,7 @@
     STAssertFalse([actionUI->learnedIrPicker isHidden] || [actionUI->learnedIRPickerLabel isHidden], @"Learned IR UI not visible after selecting IR action.");
     STAssertTrue([actionUI->testLearnedIRButton isHidden], @"Test IR button visible with no IR devices connected");
     STAssertTrue([actionUI->learnIRButton isHidden], @"Learn IR button visible with no IR devices connected");
-    STAssertTrue([actionUI->learningIRInstructionsLabel isHidden] && [actionUI->learningIRCancelButton isHidden] && [actionUI->learnIRImage isHidden], @"IR learning UI visible without activating IR learning");
+    STAssertTrue([actionUI->learningIRInstructionsLabel isHidden] /*&& [actionUI->learningIRCancelButton isHidden]*/ && [actionUI->learnIRImage isHidden], @"IR learning UI visible without activating IR learning");
     NSString *xmlCommandString = [actionUI XMLStringForAction];
     // With no commands, action should be nil
     STAssertNil(xmlCommandString, @"Should not have valid action when nothing has been learned");
@@ -331,14 +331,14 @@
     [actionUI->learnIRButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     // Verify that the learn IR UI is now visible
-    STAssertFalse([actionUI->learningIRInstructionsLabel isHidden] || [actionUI->learningIRCancelButton isHidden] || [actionUI->learnIRImage isHidden], @"IR learning UI not visible after pressing IR learning button");
+    STAssertFalse([actionUI->learningIRInstructionsLabel isHidden] /*|| [actionUI->learningIRCancelButton isHidden]*/ || [actionUI->learnIRImage isHidden], @"IR learning UI not visible after pressing IR learning button");
     // Verify that other buttons are disabled
     STAssertFalse([defineVC->doneButton isUserInteractionEnabled] || [defineVC->cancelButton isUserInteractionEnabled] || [defineVC->cancelButton isUserInteractionEnabled] || [defineVC->actionPicker isUserInteractionEnabled] || [actionUI->testLearnedIRButton isUserInteractionEnabled], @"Rest of UI not disabled during IR learning");
     // Learn an IR command
     [dummy_app_delegate SwitchamajigIRDeviceDriverDelegateDidReceiveLearnedIRCommand:driver irCommand:@"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320"];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.5]];
     // Verify that the learn IR UI disappeared
-    STAssertTrue([actionUI->learningIRInstructionsLabel isHidden] && [actionUI->learningIRCancelButton isHidden] && [actionUI->learnIRImage isHidden], @"Learned IR UI is visible after learned IR command arrived.");
+    STAssertTrue([actionUI->learningIRInstructionsLabel isHidden] /*&& [actionUI->learningIRCancelButton isHidden]*/ && [actionUI->learnIRImage isHidden], @"Learned IR UI is visible after learned IR command arrived.");
     // Verify that rest of UI now enabled
     STAssertTrue([defineVC->doneButton isUserInteractionEnabled] && [defineVC->cancelButton isUserInteractionEnabled] && [defineVC->cancelButton isUserInteractionEnabled] && [defineVC->actionPicker isUserInteractionEnabled] && [actionUI->testLearnedIRButton isUserInteractionEnabled], @"UI not re-enabled after IR learning command arrived");
     // Verify that the IR picker now has a command

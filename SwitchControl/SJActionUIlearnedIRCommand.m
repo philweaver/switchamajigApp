@@ -80,12 +80,12 @@
     learnIRImage = [[UIImageView alloc] initWithFrame:CGRectMake(250, 350, 300, 150)];
     [learnIRImage setImage:[UIImage imageNamed:@"learning_IR.png"]];
     [[[self defineActionVC] view] addSubview:learnIRImage];
-    // Cancel button
+    /* Cancel button
     learningIRCancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [learningIRCancelButton setFrame:CGRectMake(325, 550, 150, 44)];
     [learningIRCancelButton setTitle:@"Cancel IR Learning" forState:UIControlStateNormal];
     [learningIRCancelButton addTarget:self action:@selector(cancelIRLearning:) forControlEvents:UIControlEventTouchUpInside];
-    [[[self defineActionVC] view] addSubview:learningIRCancelButton];
+    [[[self defineActionVC] view] addSubview:learningIRCancelButton];*/
 };
 - (void) driverSelectionDidChange {
     [testLearnedIRButton setHidden:[learnedIrPicker isHidden]];
@@ -109,7 +109,7 @@
         //[confirmDeleteLearnedIRCommandButton setHidden:hidden];
         [learnIRImage setHidden:hidden];
         [learningIRInstructionsLabel setHidden:hidden];
-        [learningIRCancelButton setHidden:hidden];
+        //[learningIRCancelButton setHidden:hidden];
     }
     // Other parts of the UI are shown only if the current driver supports IR
    [self driverSelectionDidChange];
@@ -178,7 +178,7 @@
     // Show the learning UI
     [learnIRImage setHidden:NO];
     [learningIRInstructionsLabel setHidden:NO];
-    [learningIRCancelButton setHidden:NO];
+    //[learningIRCancelButton setHidden:NO];
     // Disable the rest of the UI
     [[self defineActionVC]->actionPicker setUserInteractionEnabled:NO];
     [[self defineActionVC]->doneButton setUserInteractionEnabled:NO];
@@ -197,6 +197,7 @@
 
 -(void)learnIRPollCallback {
     NSString *learnedIRCommand = [[[self defineActionVC] appDelegate] getLastLearnedIRCommand];
+    NSError *irError = [[[self defineActionVC] appDelegate] getLastLearnedIRError];
     learnIRAnimationCounter++;
     switch(learnIRAnimationCounter & 0x03) {
         case 0: [learnIRImage setImage:[UIImage imageNamed:@"learning_IR.png"]]; break;
@@ -204,17 +205,22 @@
         case 2: [learnIRImage setImage:[UIImage imageNamed:@"learning_IR_2.png"]]; break;
         case 3: [learnIRImage setImage:[UIImage imageNamed:@"learning_IR_3.png"]]; break;
     }
-    if(learnedIRCommand) {
+    if(learnedIRCommand || irError) {
         [learnIRPollTimer invalidate];
         NSLog(@"Receive IR command: %@", learnedIRCommand);
-        // Add command to dictionary
-        NSString *commandName;
-        unsigned int i=0;
-        do {
-            ++i;
-            commandName = [NSString stringWithFormat:@"Learned IR Command %d", i];
-        } while ([learnedIRCommands objectForKey:commandName]);
-        [learnedIRCommands setObject:learnedIRCommand forKey:commandName];
+        if(irError) {
+            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"IR Timeout" message:@"Make sure to send the IR command right after starting learning." delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alertView show];
+        } else {
+            // Add command to dictionary
+            NSString *commandName;
+            unsigned int i=0;
+            do {
+                ++i;
+                commandName = [NSString stringWithFormat:@"Learned IR Command %d", i];
+            } while ([learnedIRCommands objectForKey:commandName]);
+            [learnedIRCommands setObject:learnedIRCommand forKey:commandName];
+        }
         [learnedIrPicker reloadAllComponents];
         // Drop back to the standard UI
         [self cancelIRLearning:nil];
@@ -227,7 +233,7 @@
     // Make the learning UI disappear
     [learnIRImage setHidden:YES];
     [learningIRInstructionsLabel setHidden:YES];
-    [learningIRCancelButton setHidden:YES];
+    //[learningIRCancelButton setHidden:YES];
     NSLog(@"learnIRImage ishidden: %d", (int)[learnIRImage isHidden]);
     // Enable the rest of the UI
     [[self defineActionVC]->actionPicker setUserInteractionEnabled:YES];

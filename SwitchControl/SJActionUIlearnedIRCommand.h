@@ -13,7 +13,7 @@
     UIPickerView *learnedIrPicker;
     UILabel *learnedIRPickerLabel;
     UILabel *learningIRInstructionsLabel;
-    UIButton *learningIRCancelButton;
+    //UIButton *learningIRCancelButton;
     UIButton *learnIRButton;
     UIImageView *learnIRImage;
     //UIButton *renameLearnedIRCommandButton;
