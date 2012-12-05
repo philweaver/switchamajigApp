@@ -170,7 +170,7 @@
         // Associate different actions for the buttons depending on whether or not we're editing
         if(editingActive) {
             [myButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)];
-            [myButton addTarget:self action:@selector(onButtonSelect:) forControlEvents:(UIControlEventTouchDown)];
+            [myButton addTarget:self action:@selector(onButtonSelect:withEvent:) forControlEvents:(UIControlEventTouchDown)];
         } else {
             [myButton addTarget:self action:@selector(onSwitchActivated:) forControlEvents:(UIControlEventTouchDown | UIControlEventTouchDragEnter)];
             [myButton addTarget:self action:@selector(onSwitchDeactivated:) forControlEvents:(UIControlEventTouchUpInside | UIControlEventTouchUpOutside | UIControlEventTouchDragExit)];
@@ -711,14 +711,25 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [confirmDeleteButton setHidden:YES];
     if(settingScanOrder)
         return;
-    CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
+    NSSet *touches = [event allTouches];
+    if([touches count] != 1)
+        return;
+    CGPoint point = [[touches anyObject] locationInView:self.view];
     UIControl *control = sender;
-    control.center = point;
+    if(sender == currentButtonBeingDragged) {
+        CGPoint newCenter = CGPointMake(control.center.x + point.x - currentButtonBeingDraggedLastPoint.x, control.center.y + point.y - currentButtonBeingDraggedLastPoint.y);
+        control.center = newCenter;
+    } else {
+        currentButtonBeingDragged = sender;
+    }
+    currentButtonBeingDraggedLastPoint = [[[event allTouches] anyObject] locationInView:self.view];
 }
 
-- (void)onButtonSelect:(id)sender {
+- (void)onButtonSelect:(id)sender withEvent:(UIEvent *)event {
     [confirmDeleteButton setHidden:YES];
     currentButton = sender;
+    currentButtonBeingDragged = sender;
+    currentButtonBeingDraggedLastPoint = [[[event allTouches] anyObject] locationInView:self.view];
     if(settingScanOrder) {
         int index = [[[self view] subviews] indexOfObject:sender];
         if(index == NSNotFound) {

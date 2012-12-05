@@ -35,6 +35,8 @@
     float lastPinchScale;
     BOOL userButtonsHidden;
     SJUIExternalSwitchScanner *switchScanner;
+    id currentButtonBeingDragged;
+    CGPoint currentButtonBeingDraggedLastPoint;
     
     // Configuration UI
     NSMutableArray *configurationUIElements;

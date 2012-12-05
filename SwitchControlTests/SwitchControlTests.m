@@ -148,7 +148,7 @@
     node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><quickIrCommand><deviceType>TV</deviceType><function>POWER ON/OFF</function><function>POWER TOGGLE</function></quickIrCommand></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node1];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
-    node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node1];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver1->commandsReceived count] == 1, @"Controller driver received %d commands.", [driver1->commandsReceived count]);
@@ -156,9 +156,9 @@
     NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
     STAssertTrue([commandString isEqualToString:@"<turnSwitchesOn>1</turnSwitchesOn>"], @"IR driver command[1] is %@", commandString);
     commandString = [irDriver->commandsReceived objectAtIndex:0];
-    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"IR driver command[0] is %@", commandString);
+    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"IR driver command[0] is %@", commandString);
     commandString = [irDriver->commandsReceived objectAtIndex:1];
-    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"/>"], @"Controller driver command[0] is %@", commandString);
+    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"/>"], @"Controller driver command[0] is %@", commandString);
     // Verify that the command is passed when sent to the default controller
     DDXMLDocument *node2 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>frood</friendlyname><actionsequence><turnSwitchesOn>1</turnSwitchesOn></actionsequence></actionsequenceondevice>" options:0 error:&error];
     [app_delegate performActionSequence:node2];
@@ -294,7 +294,7 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver1->commandsReceived count] == 1, @"Driver did not receive ir command.");
     NSString *commandString = [driver1->commandsReceived objectAtIndex:0];
-    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"Did not receive simple command. Instead got %@", commandString);
+    STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"Did not receive simple command. Instead got %@", commandString);
 }
 
 - (void)test_001_RootViewController_001_Help

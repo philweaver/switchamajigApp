@@ -206,7 +206,7 @@
         NSLog(@"%@:%@:%@:%@  --  irCommand = %@", brand, device, codeSet, function, irCommand);
         if(irCommand) {
             // Wrap the command up as xml
-            NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"%@\" ch=\"0\"></docommand>", irCommand];
+            NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"0\" ir_data=\"%@\" ch=\"0\"></docommand>", irCommand];
             NSError *xmlError;
             DDXMLDocument *action = [[DDXMLDocument alloc] initWithXMLString:irXmlCommand options:0 error:&xmlError];
             if(action == nil) {

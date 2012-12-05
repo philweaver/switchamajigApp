@@ -89,7 +89,7 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions);
     NSString *codeset = [self getCurrentCodeSet];
     NSString *function = [self getCurrentFunction];
     NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeset onDevice:device forBrand:brand];
-    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"%@:%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, codeset, function, irCommand];
+    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"%@:%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, codeset, function, irCommand];
     NSLog(@"irCommand = %@", irCommand);
     NSDictionary *commandDict = [NSDictionary dictionaryWithObjectsAndKeys:@"brand", brand, @"device", device, @"function", function, nil];
     [Flurry logEvent:@"IR Database Command XMLStringForAction" withParameters:commandDict];

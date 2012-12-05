@@ -215,7 +215,7 @@
     STAssertFalse([actionUI->irPicker isHidden] || [actionUI->irPickerLabel isHidden] || [actionUI->filterBrandButton isHidden] || [actionUI->filterFunctionButton isHidden], @"IR UI not visible after selecting IR action.");
     STAssertTrue([actionUI->testIrButton isHidden], @"Test IR button visible with no IR devices connected");
     // Verify that we got the expected command
-    NSString *expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    NSString *expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Apple:Audio Accessory:UEI Setup Code 1115:PAUSE\" ir_data=\"UT111526\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     DDXMLNode *action = [actions objectAtIndex:0];
     NSString *actualCommand = [action XMLString];
@@ -247,28 +247,28 @@
     // Touch every wheel on the UI
     [actionUI->irPicker selectRow:1 inComponent:0 animated:NO];
     [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:0];
-    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DTA Converter:UEI Setup Code 2667:CHANNEL DOWN\" ir_data=\"UT26675\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Coby:DTA Converter:UEI Setup Code 2667:CHANNEL DOWN\" ir_data=\"UT26675\" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
     [actionUI->irPicker selectRow:2 inComponent:1 animated:NO];
     [actionUI pickerView:actionUI->irPicker didSelectRow:2 inComponent:1];
-    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 1:NEXT\" ir_data=\"P141f 1f26 7e1d 2595 018b 56a8 3032 b9a4 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa e2fd 670d 1b21 4432 ec1b b994 12df fcaa 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee 5ef0 d152 e750 eb37 9785 838d 5f3b db42 6cb1 e039 98fa 9321 4a15 5627 fe87 486a 3c7c 84e2 390c 7b16 b638 3b12 6903 a545  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Coby:DVD:Code Group 1:NEXT\" ir_data=\"P141f 1f26 7e1d 2595 018b 56a8 3032 b9a4 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa e2fd 670d 1b21 4432 ec1b b994 12df fcaa 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee 5ef0 d152 e750 eb37 9785 838d 5f3b db42 6cb1 e039 98fa 9321 4a15 5627 fe87 486a 3c7c 84e2 390c 7b16 b638 3b12 6903 a545  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
     [actionUI->irPicker selectRow:1 inComponent:2 animated:NO];
     [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:2];
-    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 2:FORWARD\" ir_data=\"P9464 7681 617b 5328 b4a2 abdd e391 6116 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa e2fd 670d 1b21 4432 ec1b b994 12df fcaa d95c 04e7 037b 83eb 5146 4643 5211 c619 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee e2fd 670d 1b21 4432 ec1b b994 12df fcaa 1c3b de22 9f02 46e7 a341 90a8 212c 9071 395d da19 85c7 ad30 ca0b e6c2 27e3 8562  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Coby:DVD:Code Group 2:FORWARD\" ir_data=\"P9464 7681 617b 5328 b4a2 abdd e391 6116 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa e2fd 670d 1b21 4432 ec1b b994 12df fcaa d95c 04e7 037b 83eb 5146 4643 5211 c619 9898 3e97 2ac3 90f9 5d0b 60b1 9030 2cee e2fd 670d 1b21 4432 ec1b b994 12df fcaa 1c3b de22 9f02 46e7 a341 90a8 212c 9071 395d da19 85c7 ad30 ca0b e6c2 27e3 8562  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatches. Got %@", actualCommand);
     [actionUI->irPicker selectRow:1 inComponent:3 animated:NO];
     [actionUI pickerView:actionUI->irPicker didSelectRow:1 inComponent:3];
-    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 2:NEXT\" ir_data=\"Pa99a 533c fbc7 4574 b7cd 5bfe 1469 5e76 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa 4a1e 30e8 3e1c 8ea7 f51a fa30 6840 2414 9a09 e9c6 3593 4e7d d90b 9fd7 b774 9c96 9945 1207 d1e0 701d 533d bac8 e2ae d8bc 4a58 3f03 6eb4 4c41 8b69 06de 27bc 5281 65cb 7fa2 bc40 7e47 c758 d9a6 75be 1e10 310b 3e9d 126d d57c f98b d8d3 7504 1c7f  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
+    expectedCommand = @"<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Coby:DVD:Code Group 2:NEXT\" ir_data=\"Pa99a 533c fbc7 4574 b7cd 5bfe 1469 5e76 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa 4a1e 30e8 3e1c 8ea7 f51a fa30 6840 2414 9a09 e9c6 3593 4e7d d90b 9fd7 b774 9c96 9945 1207 d1e0 701d 533d bac8 e2ae d8bc 4a58 3f03 6eb4 4c41 8b69 06de 27bc 5281 65cb 7fa2 bc40 7e47 c758 d9a6 75be 1e10 310b 3e9d 126d d57c f98b d8d3 7504 1c7f  \" ch=\"0\"></docommand></actionsequence></actionsequenceondevice>";
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     action = [actions objectAtIndex:0];
     actualCommand = [action XMLString];
@@ -288,7 +288,7 @@
     [actionUI->testIrButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver->commandsReceived count]==1, @"No command received for test IR command");
-    expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Coby:DVD:Code Group 2:NEXT\" ir_data=\"Pa99a 533c fbc7 4574 b7cd 5bfe 1469 5e76 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa 4a1e 30e8 3e1c 8ea7 f51a fa30 6840 2414 9a09 e9c6 3593 4e7d d90b 9fd7 b774 9c96 9945 1207 d1e0 701d 533d bac8 e2ae d8bc 4a58 3f03 6eb4 4c41 8b69 06de 27bc 5281 65cb 7fa2 bc40 7e47 c758 d9a6 75be 1e10 310b 3e9d 126d d57c f98b d8d3 7504 1c7f  \" ch=\"0\"></docommand>";
+    expectedCommand = @"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Coby:DVD:Code Group 2:NEXT\" ir_data=\"Pa99a 533c fbc7 4574 b7cd 5bfe 1469 5e76 d95c 04e7 037b 83eb 5146 4643 5211 c619 f5d3 201b fc5c be57 a76a e9d5 ae7b 85a3 e2fd 670d 1b21 4432 ec1b b994 12df fcaa 4a1e 30e8 3e1c 8ea7 f51a fa30 6840 2414 9a09 e9c6 3593 4e7d d90b 9fd7 b774 9c96 9945 1207 d1e0 701d 533d bac8 e2ae d8bc 4a58 3f03 6eb4 4c41 8b69 06de 27bc 5281 65cb 7fa2 bc40 7e47 c758 d9a6 75be 1e10 310b 3e9d 126d d57c f98b d8d3 7504 1c7f  \" ch=\"0\"></docommand>";
     actualCommand = [driver->commandsReceived objectAtIndex:0];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
 }
@@ -347,7 +347,7 @@
     // Confirm that command is correct
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     xmlCommandString = [actionUI XMLStringForAction];
-    NSString *expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"Learned:Learned IR Command 1\" ir_data=\"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320\" ch=\"0\"></docommand>";
+    NSString *expectedCommand = @"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Learned:Learned IR Command 1\" ir_data=\"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320\" ch=\"0\"></docommand>";
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Actual command mismatches. Got %@", xmlCommandString);
     
     // Re-initialize the UI with with the command
@@ -437,7 +437,7 @@
     [actionUI->testIrButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
     STAssertTrue([driver->commandsReceived count]==1, @"No command received for test IR command");
-    expectedCommand = @"<docommand key=\"0\" repeat=\"n\" seq=\"n\" command=\"0\" ir_data=\"Pedc4 89d6 7d56 a9c8 a757 0d59 5a57 6131 69ad f67f 1603 f1f0 03f1 8e2e 91d6 dc80 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 69ad f67f 1603 f1f0 03f1 8e2e 91d6 dc80 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 915c 0451 0974 21e5 9629 07aa 26af 1aa7 bf23 820c c3fd c3ea 054c 350c 9fe1 2b02 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 11b4 6bc6 beac b29a 1d62 6584 cd9a 8f1e bf23 820c c3fd c3ea 054c 350c 9fe1 2b02 28bc 7199 bf62 289d 84f6 24d6 e8ae add2  \" ch=\"0\"></docommand>";
+    expectedCommand = @"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"0\" ir_data=\"Pedc4 89d6 7d56 a9c8 a757 0d59 5a57 6131 69ad f67f 1603 f1f0 03f1 8e2e 91d6 dc80 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 69ad f67f 1603 f1f0 03f1 8e2e 91d6 dc80 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 915c 0451 0974 21e5 9629 07aa 26af 1aa7 bf23 820c c3fd c3ea 054c 350c 9fe1 2b02 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 1cdd f511 21fa 5dd2 c024 97e3 d947 3a3e 11b4 6bc6 beac b29a 1d62 6584 cd9a 8f1e bf23 820c c3fd c3ea 054c 350c 9fe1 2b02 28bc 7199 bf62 289d 84f6 24d6 e8ae add2  \" ch=\"0\"></docommand>";
     actualCommand = [driver->commandsReceived objectAtIndex:0];
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Command mismatch for test IR. Got %@", actualCommand);
 }
