@@ -570,7 +570,9 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         SJUIButtonWithActions *button = (SJUIButtonWithActions *)view;
         // Don't save UI buttons
         NSString *buttonTitle = [button titleForState:UIControlStateNormal];
-        if(([buttonTitle isEqualToString:@"Back"]) || ([buttonTitle isEqualToString:@"Enable Back Button"]) || ([buttonTitle isEqualToString:@"Edit Panel"]) || ([buttonTitle isEqualToString:@"Delete Panel"]) || ([buttonTitle isEqualToString:@"Confirm Delete"]) || ([buttonTitle isEqualToString:@"Set Scan Order"])) {
+        
+        UIButtonType buttonType = [button buttonType];
+        if(([buttonTitle isEqualToString:@"Confirm Delete"]) || (buttonType == UIButtonTypeRoundedRect)) {
             continue;  
         }
         // Ignore buttons along the bottom and on the right - color changers, etc
@@ -697,7 +699,7 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [newButton setFrame:CGRectMake(100,100,400,200)];
     [newButton setBackgroundColor:[UIColor blueColor]];
     [newButton addTarget:self action:@selector(onButtonDrag:withEvent:) forControlEvents:(UIControlEventTouchDragInside)]; 
-    [newButton addTarget:self action:@selector(onButtonSelect:) forControlEvents:(UIControlEventTouchDown)]; 
+    [newButton addTarget:self action:@selector(onButtonSelect:withEvent:) forControlEvents:(UIControlEventTouchDown)]; 
     [newButton setTitle:@"Switch" forState:UIControlStateNormal];
     [newButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     [[newButton titleLabel] setFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];

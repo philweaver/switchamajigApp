@@ -64,7 +64,7 @@
 // Configuration UI
 - (void)onPanelNameChange:(id)sender;
 - (void)onButtonDrag:(id)sender withEvent:(UIEvent *)event;
-- (void)onButtonSelect:(id)sender;
+- (void)onButtonSelect:(id)sender withEvent:(UIEvent *)event;
 - (void)onSetColor:(id)sender;
 - (void)onSwitchTextChange:(id)sender;
 - (void)deleteSwitch:(id)sender;
