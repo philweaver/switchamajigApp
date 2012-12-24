@@ -17,22 +17,22 @@
     if(![self defineActionVC])
         return;
     learnedIRCommands = [[NSMutableDictionary alloc] initWithCapacity:5];
-    learnedIrPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(250, 250, 300, 162)];
+    learnedIrPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(200, 250, 400, 162)];
     [learnedIrPicker setDelegate:self];
     [learnedIrPicker setDataSource:self];
     [learnedIrPicker setShowsSelectionIndicator:YES];
     [[[self defineActionVC] view] addSubview:learnedIrPicker];
     
-    learnedIRPickerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 200, 800, 44)];
+    learnedIRPickerLabel = [[UILabel alloc] initWithFrame:CGRectMake(200, 200, 400, 44)];
     [learnedIRPickerLabel setBackgroundColor:[UIColor blackColor]];
     [learnedIRPickerLabel setTextColor:[UIColor whiteColor]];
-    [learnedIRPickerLabel setText:@"Learned IR Command"];
+    [learnedIRPickerLabel setText:@"Learned IR Command          Sent"];
     [learnedIRPickerLabel setTextAlignment:UITextAlignmentCenter];
     [learnedIRPickerLabel setFont:[UIFont systemFontOfSize:20]];
     [[[self defineActionVC] view] addSubview:learnedIRPickerLabel];
     
     learnIRButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [learnIRButton setFrame:CGRectMake(250, 462, 300, 44)];
+    [learnIRButton setFrame:CGRectMake(150, 462, 250, 44)];
     [learnIRButton setTitle:@"Learn New IR Command" forState:UIControlStateNormal];
     [learnIRButton addTarget:self action:@selector(learnNewIRCommand:) forControlEvents:UIControlEventTouchUpInside];
     [[[self defineActionVC] view] addSubview:learnIRButton];
@@ -61,7 +61,7 @@
 #endif
     
     testLearnedIRButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [testLearnedIRButton setFrame:CGRectMake(600, 350, 200, 44)];
+    [testLearnedIRButton setFrame:CGRectMake(450, 462, 250, 44)];
     [testLearnedIRButton setTitle:@"Test IR Command" forState:UIControlStateNormal];
     [testLearnedIRButton addTarget:self action:@selector(testLearnedIRCommand:) forControlEvents:UIControlEventTouchUpInside];
     [[[self defineActionVC] view] addSubview:testLearnedIRButton];
@@ -124,7 +124,7 @@
     NSString *learnedCommand = [learnedIRCommands objectForKey:learnedCommandName];
     if(!learnedCommand)
         return nil;
-    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Learned:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", learnedCommandName, learnedCommand];
+    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"%d\" seq=\"0\" command=\"Learned:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", [learnedIrPicker selectedRowInComponent:1], learnedCommandName, learnedCommand];
     NSLog(@"Learned IR XML Command = %@", irXmlCommand);
     [Flurry logEvent:@"IR Learned Command XMLStringForAction"];
     return irXmlCommand;
@@ -150,6 +150,17 @@
     NSString *IRDataString = [IRDataNode stringValue];
     if(!IRDataString)
         return NO;
+    DDXMLNode *repeatNode = [actionElement attributeForName:@"repeat"];
+    if(!repeatNode)
+        return NO;
+    NSString *repeatString = [repeatNode stringValue];
+    if(!repeatString)
+        return NO;
+    NSScanner *repeatScan = [[NSScanner alloc] initWithString:repeatString];
+    int repeatCount;
+    if(![repeatScan scanInt:&repeatCount])
+        repeatCount = 0;
+    [learnedIrPicker selectRow:repeatCount inComponent:1 animated:NO];
     // Add command to dictionary
     NSString *commandName;
     unsigned int i=0;
@@ -183,6 +194,7 @@
     [[self defineActionVC]->actionPicker setUserInteractionEnabled:NO];
     [[self defineActionVC]->doneButton setUserInteractionEnabled:NO];
     [[self defineActionVC]->cancelButton setUserInteractionEnabled:NO];
+    [learnedIrPicker setUserInteractionEnabled:NO];
     //[confirmDeleteLearnedIRCommandButton setHidden:YES];
     //[renameLearnedIRCommandButton setUserInteractionEnabled:NO];
     //[deleteLearnedIRCommandButton setUserInteractionEnabled:NO];
@@ -242,6 +254,7 @@
     //[renameLearnedIRCommandButton setUserInteractionEnabled:YES];
     //[deleteLearnedIRCommandButton setUserInteractionEnabled:YES];
     [testLearnedIRButton setUserInteractionEnabled:YES];
+    [learnedIrPicker setUserInteractionEnabled:YES];
 }
 
 -(void) testLearnedIRCommand:(id)sender {
@@ -264,21 +277,33 @@
     [[[[self defineActionVC] appDelegate] statusInfoLock] unlock];
 }
 
+#define NUM_REPEAT_COUNT_STRINGS 10
+NSString *RepeatCountStrings[NUM_REPEAT_COUNT_STRINGS] = {
+  @"Once", @"2x", @"3x", @"4x", @"5x", @"6x", @"7x", @"8x", @"9x", @"10x" 
+};
 // UIPickerViewDataSource
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
     if(pickerView == learnedIrPicker)
-        return 1;
+        return 2;
     NSLog(@"SJActionUIlearnedIRCommand: numberOfComponentsInPickerView: PickerView unrecognized.");
     return 0;
 }
 
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-    // Apparently in iOS 6 if your touch an empty picker the app crashes with "request for rect at invalid index path"
-    if([learnedIRCommands count] == 0)
-        return 1;
-    if(pickerView == learnedIrPicker)
-        return [learnedIRCommands count];
+    if(pickerView == learnedIrPicker) {
+        if(component == 0) {
+            // Apparently in iOS 6 if your touch an empty picker the app crashes with "request for rect at invalid index path"
+            if([learnedIRCommands count] == 0)
+                return 1;
+            return [learnedIRCommands count];
+        } else if (component == 1)
+            return NUM_REPEAT_COUNT_STRINGS;
+        else {
+            NSLog(@"SJActionUIlearnedIRCommand: pickerView numberOfRowsInComponent: Invalid component %d.", component);
+            return 0;
+        }
+    }
     NSLog(@"SJActionUIlearnedIRCommand: pickerView numberOfRowsInComponent: PickerView unrecognized.");
     return 0;
 }
@@ -293,12 +318,22 @@
 
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
     if(pickerView == learnedIrPicker) {
-        if([learnedIRCommands count]>row)
-            return[[learnedIRCommands allKeys] objectAtIndex:row];
-        if([learnedIRCommands count] == 0)
-            return nil; // Don't report an error in this case since we're working around an iOS 6 bug
-        NSLog(@"SJActionUIlearnedIRCommand: pickerView titleForRow out of bounds for learnedIRCommands");
-        return nil;
+        if(component == 0) {
+            if([learnedIRCommands count]>row)
+                return[[learnedIRCommands allKeys] objectAtIndex:row];
+            if([learnedIRCommands count] == 0)
+                return nil; // Don't report an error in this case since we're working around an iOS 6 bug
+            NSLog(@"SJActionUIlearnedIRCommand: pickerView titleForRow out of bounds for learnedIRCommands");
+            return nil;
+        } else if (component == 1) {
+            if(row < NUM_REPEAT_COUNT_STRINGS)
+                return RepeatCountStrings[row];
+            NSLog(@"SJActionUIlearnedIRCommand: pickerView titleForRow out of bounds for RepeatCountStrings");
+            return nil;
+        } else {
+            NSLog(@"SJActionUIlearnedIRCommand: Invalid component %d.", component);
+            return nil;
+        }
     }
     NSLog(@"SJActionUIlearnedIRCommand: pickerView titleForRow: PickerView unrecognized.");
     return nil;
@@ -306,8 +341,16 @@
 
 
 - (CGFloat)pickerView:(UIPickerView *)pickerView widthForComponent:(NSInteger)component {
-    if(pickerView == learnedIrPicker)
-        return 250;
+    if(pickerView == learnedIrPicker) {
+        if(component == 0)
+            return 250;
+        else if(component == 1)
+            return 100;
+        else {
+            NSLog(@"SJActionUIlearnedIRCommand: pickerView widthForComponent: asked for component %d.", component);
+            return 0;
+        }
+    }
     NSLog(@"SJActionUIlearnedIRCommand: pickerView widthForComponent: PickerView unrecognized.");
     return 0;
 }

@@ -30,6 +30,7 @@
         [[NSUserDefaults standardUserDefaults] setObject:[savedDefaults objectForKey:key] forKey:key];
     }
     [super tearDown];
+    [HandyTestStuff logMemUsage];
 }
 
 #if RUN_ALL_SWITCH_PANEL_VC_TESTS
@@ -182,7 +183,17 @@
     UINavigationController *nav_controller = [app_delegate navigationController];
     rootSwitchViewController *rootViewController = [[nav_controller viewControllers] objectAtIndex:0];
     [rootViewController ResetScrollPanel];
-    
+    // Determine the next panel's default name
+    NSMutableString *nextPanelName = [[NSMutableString alloc] initWithCapacity:15];
+    int i=0;
+    NSURL *newFileURL;
+    do {
+        ++i;
+        [nextPanelName setString:[NSString stringWithFormat:@"Panel %d", i]];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        NSString *documentsDirectory = [paths objectAtIndex:0];
+        newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.xml", nextPanelName]]];
+    } while ([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]]);
     // Create a panel from a test XML file and enable configuration mode
     switchPanelViewController *viewController = [switchPanelViewController alloc];
     // Open the test xml file
@@ -195,22 +206,12 @@
     STAssertNil(configButton, @"Edit button shown when preferences say not to.");
     // Enable display of config button
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
-    // Determine the next panel's default name
-    NSMutableString *nextPanelName = [[NSMutableString alloc] initWithCapacity:15];
-    int i=0;
-    NSURL *newFileURL;
-    do {
-        ++i;
-        [nextPanelName setString:[NSString stringWithFormat:@"Panel %d", i]];
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *documentsDirectory = [paths objectAtIndex:0];
-        newFileURL = [NSURL fileURLWithPath:[documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.xml", nextPanelName]]];
-    } while ([[NSFileManager defaultManager] fileExistsAtPath:[newFileURL path]]);
     // Press Yellow button on root controller
     id yellowButton = [HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"];
     //NSLog(@"Yellowbutton = %@", yellowButton);
     [yellowButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
+
     // Verify that button does appear
     viewController = (switchPanelViewController *) [nav_controller visibleViewController];
     configButton = [HandyTestStuff findSubviewOf:[viewController view] withText:@"Edit Panel"];
@@ -240,7 +241,6 @@
     backButton = [HandyTestStuff findSubviewOf:[viewController view] withText:@"Back"];
     [backButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
-    
     // Check that new panel exists with default name
     id newPanelButton = [HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:nextPanelName];
     STAssertNotNil(newPanelButton, @"New panel button not displayed. Expected name %@", nextPanelName);
@@ -297,7 +297,6 @@
     newPanelButton = [HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"hoopy"];
     STAssertNil(newPanelButton, @"Panel still appears after being deleted.");
 }
-
 
 - (void)test_002_SwitchPanelViewController_006_EditingSwitchTextAndColor {
     SwitchControlAppDelegate *app_delegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication] delegate];

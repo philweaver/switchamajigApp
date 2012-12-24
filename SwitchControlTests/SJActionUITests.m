@@ -34,6 +34,7 @@
         [[NSUserDefaults standardUserDefaults] setObject:[savedDefaults objectForKey:key] forKey:key];
     }
     [super tearDown];
+    [HandyTestStuff logMemUsage];
 }
 
 #if RUN_ALL_ACTIONUI_TESTS
@@ -347,8 +348,15 @@
     // Confirm that command is correct
     [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     xmlCommandString = [actionUI XMLStringForAction];
-    NSString *expectedCommand = @"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"Learned:Learned IR Command 1\" ir_data=\"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320\" ch=\"0\"></docommand>";
+    NSString *expectedCommand = @"<docommand key=\"0\" repeat=\"0\" seq=\"0\" command=\"Learned:Learned IR Command 1\" ir_data=\"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320\" ch=\"0\"></docommand>";
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Actual command mismatches. Got %@", xmlCommandString);
+    // Set the picker wheel to repeat five times
+    [actionUI->learnedIrPicker selectRow:5 inComponent:1 animated:NO];
+    [defineVC->doneButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    xmlCommandString = [actionUI XMLStringForAction];
+
+    expectedCommand = @"<docommand key=\"0\" repeat=\"5\" seq=\"0\" command=\"Learned:Learned IR Command 1\" ir_data=\"L30 12d00 da0400da 92cc06d0 36f00da 29000da dbb213 23333333 33332333 33322323 33333332 32222332 32233320\" ch=\"0\"></docommand>";
+    STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Actual command mismatches with repeat count = 5. Got %@", xmlCommandString);
     
     // Re-initialize the UI with with the command
     defineVC = [[defineActionViewController alloc] initWithActions:actions appDelegate:dummy_app_delegate];
@@ -356,6 +364,9 @@
     actionUI = [defineVC->actionNamesToSJActionUIDict objectForKey:@"Learned IR Command"];
     xmlCommandString = [actionUI XMLStringForAction];
     STAssertTrue([xmlCommandString isEqualToString:expectedCommand], @"Command is wrong after reloading it. Got %@", xmlCommandString);
+    // Confirm that picker is properly initialized
+    int currentRepeatCount = [actionUI->learnedIrPicker selectedRowInComponent:1];
+    STAssertTrue(currentRepeatCount == 5, @"Repeat count did not initialize correctly. Value is %d", currentRepeatCount);
 }
 
 

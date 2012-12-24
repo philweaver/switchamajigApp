@@ -47,6 +47,7 @@
         [[NSUserDefaults standardUserDefaults] setObject:[savedDefaults objectForKey:key] forKey:key];
     }
     [super tearDown];
+    [HandyTestStuff logMemUsage];
 }
 
 - (void) SJUIRecordAudioViewControllerReadyForDismissal:(id)viewController {
@@ -437,27 +438,26 @@
     @autoreleasepool {
         [[NSUserDefaults standardUserDefaults] setFloat:buttonSize forKey:@"switchPanelSizePreference"];
         // Update the view, and then run the tests
-        UIView *viewToRemove;
-        for(viewToRemove in [[rootViewController view] subviews])
-            [viewToRemove removeFromSuperview];
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
+         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigControllerPreference"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"supportSwitchamajigIRPreference"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"allowEditingOfSwitchPanelsPreference"];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showQuickStartWizardButtonPreference"];
         [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
-        [rootViewController loadView];
-        [rootViewController viewDidLoad];
+        rootSwitchViewController *tempRootViewController = [rootSwitchViewController alloc];
+         tempRootViewController = [tempRootViewController init];
+        [tempRootViewController.view setFrame:CGRectMake(0, 20, 1024, 748)];
         // Confirm text sizes
-        STAssertTrue([SwitchControlTests CheckAllTextInView:[rootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
+        STAssertTrue([SwitchControlTests CheckAllTextInView:[tempRootViewController view] hasSize:textSize], @"Text Size Check Failed. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
         // Make sure we don't have inappropriate overlaps
-        int numOverlaps = [SwitchControlTests numberOfSubviewOverlapsInView:[rootViewController view]];
+        int numOverlaps = [SwitchControlTests numberOfSubviewOverlapsInView:[tempRootViewController view]];
         STAssertTrue((numOverlaps == num_expected_overlaps), @"Overlapping views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOverlaps, num_expected_overlaps, textSize, testConditionIndex, buttonSize);
         // Stuff should (generally) be inside its parent view
-        int numOutOfBounds = [SwitchControlTests numberOfSubviewsOutsideParents:[rootViewController view]];
+        int numOutOfBounds = [SwitchControlTests numberOfSubviewsOutsideParents:[tempRootViewController view]];
         STAssertTrue((numOutOfBounds == num_expected_outofbounds), @"Out of bounds views: found %d != expected %d textSize = %f, conditionsIndex = %d, buttonSize = %f", numOutOfBounds, num_expected_outofbounds, textSize, testConditionIndex, buttonSize);
+        [nav_controller popViewControllerAnimated:NO];
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
         NSLog(@"Test iteration complete. textSize = %f, conditionsIndex = %d, buttonSize = %f", textSize, testConditionIndex, buttonSize);
     }
-
 }
 
 - (void)test_001_RootViewController_004a_TextAndButtonSizesWithTextSize15 {
@@ -534,7 +534,6 @@
     STAssertNotNil([HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel not shown with editing support enabled.");
 
 }
-
 - (void)test_001_RootViewController_007_Scanning {
     // Disable scanning
     [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"scanningStylePreference"];

@@ -799,7 +799,7 @@
 				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "SwitchControl/SwitchControl-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../Library/Developer/Xcode/DerivedData/SwitchamajigAppSuper-culnnwdbkvllzwefwjdsquxsudwi/Build/Products/Debug-iphoneos\"",
@@ -821,7 +821,7 @@
 				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "SwitchControl/SwitchControl-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../../../../Library/Developer/Xcode/DerivedData/SwitchamajigAppSuper-culnnwdbkvllzwefwjdsquxsudwi/Build/Products/Debug-iphoneos\"",
@@ -848,6 +848,7 @@
 				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "SwitchControlTests/SwitchControlTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				"USER_HEADER_SEARCH_PATHS[arch=*]" = "../SwitchamajigDriver/SwitchamajigDriver/CocoaAsyncSocket/GCD/**";
@@ -868,6 +869,7 @@
 				GCC_PREFIX_HEADER = "SwitchControl/SwitchControl-Prefix.pch";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				INFOPLIST_FILE = "SwitchControlTests/SwitchControlTests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				USER_HEADER_SEARCH_PATHS = "";

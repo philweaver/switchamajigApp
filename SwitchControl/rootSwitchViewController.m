@@ -163,6 +163,7 @@
 }
 
 - (UIImage *) imageFromViewController:(UIViewController*)viewController scaledTo:(CGSize)scaledSize {
+    UIImage *scaledImage = nil;
     // Create a graphics context large enough to hold the entire viewController image
     CGSize originalViewSize = [[viewController view] bounds].size;
     int unscaledBitmapByteCount = originalViewSize.width * originalViewSize.height * 4;
@@ -171,6 +172,7 @@
     CGContextRef context1 = CGBitmapContextCreate(bitmapData1, originalViewSize.width, originalViewSize.height, 8, originalViewSize.width*4, colorSpace, kCGImageAlphaPremultipliedLast);
     [[[viewController view] layer] renderInContext:context1];
     CGImageRef unscaledImageCG = CGBitmapContextCreateImage(context1);
+
     
     // Repeat process to scale image
     int scaledBitmapByteCount = scaledSize.width * scaledSize.height * 4;
@@ -182,14 +184,15 @@
     CGContextClearRect(context2, scaledImageRect);
     CGContextDrawImage(context2, scaledImageRect, unscaledImageCG);
     CGImageRef scaledImageCG = CGBitmapContextCreateImage(context2);
-    UIImage *scaledImage = [UIImage imageWithCGImage:scaledImageCG];
+    scaledImage = [UIImage imageWithCGImage:scaledImageCG];
     CGImageRelease(scaledImageCG);
     CGContextRelease(context2);
     free(bitmapData2);
     CGImageRelease(unscaledImageCG);
-    viewController.view.layer.contents = nil; // Stackoverflow comment said this eliminates memory leak
     CGContextRelease(context1);
+    CGColorSpaceRelease(colorSpace);
     free(bitmapData1);
+    viewController.view.layer.contents = nil; // Stackoverflow comment said this eliminates memory leak
     return scaledImage;
 }
 
@@ -199,31 +202,33 @@
     int fontSize = [[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"];
     numberOfPanelsInScrollView++;
     // Render view controller into image
-    switchPanelViewController *viewController = [switchPanelViewController alloc];
-    [viewController setUrlToLoad:url];
-    [[viewController view] setFrame:CGRectMake(0, 20, 1024, 748)]; // Init as if we were full-size
-    // Create the specified button
-    id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [myButton setFrame:CGRectMake(origin.x, origin.y, buttonSize.width, buttonSize.height)];
-    // Also set rectangle for label
-    CGRect panelNameLabelRect = CGRectMake(origin.x, origin.y + buttonSize.height, buttonSize.width, textSize.height);
-    [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)]; 
-    [panelSelectionScrollView addSubview:myButton];
-    UIImage *scaledImage = [self imageFromViewController:viewController scaledTo:[myButton bounds].size];
-    [myButton setBackgroundImage:scaledImage forState:UIControlStateNormal];
-    // Add text label
-    UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
-    [panelNameLabel setBackgroundColor:[UIColor blackColor]];
-    [panelNameLabel setTextColor:[UIColor whiteColor]];
-    [panelNameLabel setText:[viewController switchPanelName]];
-    [myButton setTitle:[viewController switchPanelName] forState:UIControlStateNormal]; // Used by test code to find buttons
-    [myButton setTitleColor:[UIColor clearColor] forState:UIControlStateNormal]; // Make title invisible
-    [[myButton titleLabel] setFont:[UIFont systemFontOfSize:fontSize]];
-    [panelNameLabel setTextAlignment:UITextAlignmentCenter];
-    [panelNameLabel setFont:[UIFont systemFontOfSize:fontSize]];
-    [panelSelectionScrollView addSubview:panelNameLabel];
-    [[self switchPanelURLDictionary] setObject:url forKey:[NSValue valueWithNonretainedObject:myButton]];
-    [switchScanner addButtonToScan:myButton withLabel:panelNameLabel];
+    @autoreleasepool {
+        switchPanelViewController *viewController = [switchPanelViewController alloc];
+        [viewController setUrlToLoad:url];
+        [[viewController view] setFrame:CGRectMake(0, 20, 1024, 748)]; // Init as if we were full-size
+        // Create the specified button
+        id myButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [myButton setFrame:CGRectMake(origin.x, origin.y, buttonSize.width, buttonSize.height)];
+        // Also set rectangle for label
+        CGRect panelNameLabelRect = CGRectMake(origin.x, origin.y + buttonSize.height, buttonSize.width, textSize.height);
+        [myButton addTarget:self action:@selector(launchSwitchPanel:) forControlEvents:(UIControlEventTouchUpInside)];
+        [panelSelectionScrollView addSubview:myButton];
+        UIImage *scaledImage = [self imageFromViewController:viewController scaledTo:[myButton bounds].size];
+        [myButton setBackgroundImage:scaledImage forState:UIControlStateNormal];
+        // Add text label
+        UILabel *panelNameLabel = [[UILabel alloc] initWithFrame:panelNameLabelRect];
+        [panelNameLabel setBackgroundColor:[UIColor blackColor]];
+        [panelNameLabel setTextColor:[UIColor whiteColor]];
+        [panelNameLabel setText:[viewController switchPanelName]];
+        [myButton setTitle:[viewController switchPanelName] forState:UIControlStateNormal]; // Used by test code to find buttons
+        [myButton setTitleColor:[UIColor clearColor] forState:UIControlStateNormal]; // Make title invisible
+        [[myButton titleLabel] setFont:[UIFont systemFontOfSize:fontSize]];
+        [panelNameLabel setTextAlignment:UITextAlignmentCenter];
+        [panelNameLabel setFont:[UIFont systemFontOfSize:fontSize]];
+        [panelSelectionScrollView addSubview:panelNameLabel];
+        [[self switchPanelURLDictionary] setObject:url forKey:[NSValue valueWithNonretainedObject:myButton]];
+        [switchScanner addButtonToScan:myButton withLabel:panelNameLabel];
+    }
     return true;
 }
 
@@ -320,11 +325,17 @@
     for(thisView in subviewArray) {
         NSArray *subviewArray2 = [thisView subviews];
         UIView *thisView2;
+        //NSLog(@"View");
         for(thisView2 in subviewArray2) {
+            //NSLog(@"Subview, in turn with %d subviews", [[thisView2 subviews] count]);
             [thisView2 removeFromSuperview];
         }
         [thisView removeFromSuperview];
     }
+    // Also reset the scanner
+    [switchScanner removeAllScanButtons];
+    // Also release references to buttons from URL dictionary
+    [[self switchPanelURLDictionary] removeAllObjects];
     // Reinitialize the scroll panel
     NSString *sampleText = @"Steering Plus";
     CGSize textSize = [sampleText sizeWithFont:[UIFont systemFontOfSize:[[NSUserDefaults standardUserDefaults] integerForKey:@"textSizePreference"]]];
