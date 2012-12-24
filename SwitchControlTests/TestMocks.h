@@ -10,6 +10,7 @@
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigDriver.h"
 #import "../../SwitchamajigDriver/SwitchamajigDriver/SwitchamajigControllerDeviceDriver.h"
 #import "SwitchControlAppDelegate.h"
+#import "mach/mach.h"
 
 @interface MockNavigationController : UINavigationController {
 @public
@@ -47,4 +48,7 @@
 }
 + (id) findEditColorButtonInView:(UIView *)superview withColor:(UIColor *)color;
 + (id) findSubviewOf:(UIView *)view withText:(NSString *)text;
++ (vm_size_t) usedMemory;
++ (vm_size_t) freeMemory;
++ (void) logMemUsage;
 @end
