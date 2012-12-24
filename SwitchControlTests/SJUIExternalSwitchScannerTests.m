@@ -8,6 +8,7 @@
 
 #import "SJUIExternalSwitchScannerTests.h"
 #import "TestEnables.h"
+#import "TestMocks.h"
 
 @implementation SJUIExternalSwitchScannerTests
 - (void) SJUIExternalSwitchScannerItemWasSelected:(id)item {
@@ -43,6 +44,7 @@
 - (void)tearDown
 {
     [super tearDown];
+    [HandyTestStuff logMemUsage];
 }
 
 - (void) setUpScanner:(SJUIExternalSwitchScanner*)scanner {
@@ -168,6 +170,8 @@ BOOL rectsEqual(CGRect rect1, CGRect rect2) {
     STAssertTrue(rectsEqual([[[superView subviews] objectAtIndex:1] frame], originalRect), @"Button 1 highlighted after auto scan");
     STAssertTrue(rectsEqual([[[superView subviews] objectAtIndex:2] frame], originalRect), @"Button 2  highlighted after auto scan");
     STAssertTrue(rectsEqual([[[superView subviews] objectAtIndex:3] frame], originalRect), @"Label highlighted after auto scan");
+    [scanner removeAllScanButtons];
+    STAssertTrue([scanner->buttonsToScan count] == 0, @"Failed to remove buttons from scanner.");
 }
 
 - (void)test_002_step_scanning {

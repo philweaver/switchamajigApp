@@ -24,7 +24,8 @@ const int button_highlight_size_increase = 50;
         indexOfSelection = -1;
         if(scanType != SCANNING_STYLE_NONE) {
             // Set up for scanning
-            textField = [[UITextField alloc] initWithFrame:CGRectMake(0,0,1,1)];
+            UITextField *tempTextField = [[UITextField alloc] initWithFrame:CGRectMake(0,0,1,1)];
+            textField = tempTextField;
             [textField setHidden:YES];
             [textField setDelegate:self];
             [textField becomeFirstResponder];
@@ -39,6 +40,10 @@ const int button_highlight_size_increase = 50;
 - (void) addButtonToScan:(UIButton*)button withLabel:(UILabel*)label {
     NSDictionary *controlDictionary = [NSDictionary dictionaryWithObjectsAndKeys:button, @"button", label, @"label", nil];
     [buttonsToScan addObject:controlDictionary];
+}
+
+- (void) removeAllScanButtons {
+    [buttonsToScan removeAllObjects];
 }
 
 - (UIButton*) currentlySelectedButton {

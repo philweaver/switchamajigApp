@@ -21,7 +21,7 @@ enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=
     NSMutableArray *buttonsToScan;
     int scanType;
     int indexOfSelection;
-    UITextField *textField;
+    __weak UITextField *textField; // Prevents a strong reference loop
     CGRect originalRectOfCurrentButton;
     CGRect originalRectOfCurrentLabel;
     NSTimer *autoScanTimer;
@@ -30,6 +30,7 @@ enum {SCANNING_STYLE_NONE=0,SCANNING_STYLE_AUTO_SCAN=1,SCANNING_STYLE_STEP_SCAN=
 @property (nonatomic, weak) id<SJUIExternalSwitchScannerDelegate> delegate;
 @property NSNumber *autoScanInterval;
 - (void) addButtonToScan:(UIButton*)button withLabel:(UILabel*)label;
+- (void) removeAllScanButtons;
 - (id) initWithSuperview:(UIView*)superview andScanType:(int)scanTypeInit;
 - (UIButton*) currentlySelectedButton;
 - (void) superviewDidAppear;
