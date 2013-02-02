@@ -25,7 +25,7 @@
     if(self != nil) {
         [self setActions:actionsInit];
         [self setAppDelegate:theAppDelegate];
-        [self setContentSizeForViewInPopover:CGSizeMake(800, 600)];
+        [self setContentSizeForViewInPopover:CGSizeMake(900, 600)];
         [[theAppDelegate statusInfoLock] lock];
         friendlyNamesArray = [[NSMutableArray alloc] initWithArray:[[appDelegate friendlyNameSwitchamajigDictionary] allKeys]];
         [[theAppDelegate statusInfoLock] unlock];

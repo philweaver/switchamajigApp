@@ -35,7 +35,7 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions);
     [filterFunctionButton setHidden:YES];
     [[[self defineActionVC] view] addSubview:filterFunctionButton];
     
-    irPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 300, 800, 162)];
+    irPicker = [[UIPickerView alloc] initWithFrame:CGRectMake(0, 300, 900, 162)];
     [irPicker setDelegate:self];
     [irPicker setDataSource:self];
     [irPicker setShowsSelectionIndicator:YES];
@@ -45,10 +45,10 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions);
     [irPicker selectRow:0 inComponent:0 animated:NO];
     [self pickerView:irPicker didSelectRow:0 inComponent:0];
     
-    irPickerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 250, 800, 44)];
+    irPickerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 250, 900, 44)];
     [irPickerLabel setBackgroundColor:[UIColor blackColor]];
     [irPickerLabel setTextColor:[UIColor whiteColor]];
-    [irPickerLabel setText:@"Brand                         Device                         Code Set                Function"];
+    [irPickerLabel setText:@"Brand                         Device                         Code Set                Function              Repeat"];
     [irPickerLabel setTextAlignment:UITextAlignmentCenter];
     [irPickerLabel setFont:[UIFont systemFontOfSize:20]];
     [irPickerLabel setHidden:YES];
@@ -89,7 +89,7 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions);
     NSString *codeset = [self getCurrentCodeSet];
     NSString *function = [self getCurrentFunction];
     NSString *irCommand = [SwitchamajigIRDeviceDriver irCodeForFunction:function inCodeSet:codeset onDevice:device forBrand:brand];
-    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"%@:%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", brand, device, codeset, function, irCommand];
+    NSString *irXmlCommand = [NSString stringWithFormat:@"<docommand key=\"0\" repeat=\"%d\" seq=\"0\" command=\"%@:%@:%@:%@\" ir_data=\"%@\" ch=\"0\"></docommand>", [irPicker selectedRowInComponent:4], brand, device, codeset, function, irCommand];
     NSLog(@"irCommand = %@", irCommand);
     NSDictionary *commandDict = [NSDictionary dictionaryWithObjectsAndKeys:@"brand", brand, @"device", device, @"function", function, nil];
     [Flurry logEvent:@"IR Database Command XMLStringForAction" withParameters:commandDict];
@@ -136,6 +136,18 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions);
         return NO;
     [irPicker selectRow:functionIndex inComponent:3 animated:NO];
     [self pickerView:irPicker didSelectRow:functionIndex inComponent:3];
+    DDXMLNode *repeatNode = [actionElement attributeForName:@"repeat"];
+    if(!repeatNode)
+        return NO;
+    NSString *repeatString = [repeatNode stringValue];
+    if(!repeatString)
+        return NO;
+    NSScanner *repeatScan = [[NSScanner alloc] initWithString:repeatString];
+    int repeatCount;
+    if(![repeatScan scanInt:&repeatCount])
+        repeatCount = 0;
+    [irPicker selectRow:repeatCount inComponent:4 animated:NO];
+
     return YES;
 };
 
@@ -290,11 +302,15 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions) {
     [[[[self defineActionVC] appDelegate] statusInfoLock] unlock];
 }
 
+#define NUM_REPEAT_COUNT_STRINGS 10
+static NSString *RepeatCountStrings[NUM_REPEAT_COUNT_STRINGS] = {
+    @"Once", @"2x", @"3x", @"4x", @"5x", @"6x", @"7x", @"8x", @"9x", @"10x"
+};
 
 // UIPickerViewDataSource
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
     if(pickerView == irPicker)
-        return 4;
+        return 5;
     NSLog(@"SJActionUIIRDatabaseCommand: numberOfComponentsInPickerView: PickerView unrecognized.");
     return 0;
 }
@@ -310,6 +326,8 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions) {
             return [codeSets count];
         if(component == 3)
             return [functions count];
+        if(component == 4)
+            return NUM_REPEAT_COUNT_STRINGS;
         return 0;
     }
     NSLog(@"SJActionUIIRDatabaseCommand: pickerView numberOfRowsInComponent: PickerView unrecognized.");
@@ -375,6 +393,11 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions) {
                 return [[functions objectAtIndex:row] capitalizedString];
             NSLog(@"SJActionUIIRDatabaseCommand: pickerView titleForRow out of bounds for functions");
             return nil;
+        } else if (component == 4) {
+            if(row < NUM_REPEAT_COUNT_STRINGS)
+                return RepeatCountStrings[row];
+            NSLog(@"SJActionUIIRDatabaseCommand: pickerView titleForRow out of bounds for RepeatCountStrings");
+            return nil;
         }
         return nil;
     }
@@ -389,6 +412,7 @@ static NSArray *filterFunctions(NSArray *bigListOfFunctions) {
             case 1: return 225;
             case 2: return 125;
             case 3: return 200;
+            case 4: return 100;
         }
     }
     NSLog(@"SJActionUIIRDatabaseCommand: pickerView widthForComponent: PickerView unrecognized.");

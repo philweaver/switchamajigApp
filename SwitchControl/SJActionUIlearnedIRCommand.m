@@ -278,7 +278,7 @@
 }
 
 #define NUM_REPEAT_COUNT_STRINGS 10
-NSString *RepeatCountStrings[NUM_REPEAT_COUNT_STRINGS] = {
+static NSString *RepeatCountStrings[NUM_REPEAT_COUNT_STRINGS] = {
   @"Once", @"2x", @"3x", @"4x", @"5x", @"6x", @"7x", @"8x", @"9x", @"10x" 
 };
 // UIPickerViewDataSource
