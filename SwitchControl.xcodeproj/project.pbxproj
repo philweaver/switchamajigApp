@@ -20,8 +20,6 @@
 		AD0BA77E160A934C001A419A /* SJActionUIIRQuickstart.m in Sources */ = {isa = PBXBuildFile; fileRef = AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */; };
 		AD0BA780160BEC22001A419A /* libFlurry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AD0BA77F160BEC22001A419A /* libFlurry.a */; };
 		AD0BA782160BED80001A419A /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD3DD727141AD54E00DB8AEB /* SystemConfiguration.framework */; };
-		AD0BA785160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_50.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA783160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_50.png */; };
-		AD0BA786160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_72.png in Resources */ = {isa = PBXBuildFile; fileRef = AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */; };
 		AD1D3B40164B99B900550A23 /* switchPanelViewControllerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B3F164B99B900550A23 /* switchPanelViewControllerTests.m */; };
 		AD1D3B44164D863200550A23 /* TestMocks.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B43164D863200550A23 /* TestMocks.m */; };
 		AD1D3B48164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = AD1D3B47164DE7D600550A23 /* SJUIExternalSwitchScannerTests.m */; };
@@ -46,6 +44,8 @@
 		AD8A725E164ACC1B009C5A5C /* SJUIExternalSwitchScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = AD8A725D164ACC1B009C5A5C /* SJUIExternalSwitchScanner.m */; };
 		AD921B04157D6CA100940981 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B03157D6CA000940981 /* CFNetwork.framework */; };
 		AD921B06157D6CAC00940981 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AD921B05157D6CAC00940981 /* Security.framework */; };
+		ADA7D2FE16D2B24600D57BC1 /* SwitchamajigLogo_50.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA7D2FC16D2B24600D57BC1 /* SwitchamajigLogo_50.png */; };
+		ADA7D2FF16D2B24600D57BC1 /* SwitchamajigLogo_72.png in Resources */ = {isa = PBXBuildFile; fileRef = ADA7D2FD16D2B24600D57BC1 /* SwitchamajigLogo_72.png */; };
 		ADB1EE2215C0D34E003BABDC /* defineActionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */; };
 		ADB1EE2315C0D34E003BABDC /* defineActionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */; };
 		ADB75BF013DB539C00448025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADB75BEF13DB539C00448025 /* UIKit.framework */; };
@@ -136,8 +136,6 @@
 		AD0BA77D160A934C001A419A /* SJActionUIIRQuickstart.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJActionUIIRQuickstart.m; sourceTree = "<group>"; };
 		AD0BA77F160BEC22001A419A /* libFlurry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFlurry.a; path = Flurry/libFlurry.a; sourceTree = "<group>"; };
 		AD0BA781160BEC35001A419A /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Flurry.h; path = Flurry/Flurry.h; sourceTree = "<group>"; };
-		AD0BA783160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_icon_rects_remote_and_plug_50.png; sourceTree = "<group>"; };
-		AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchamajig_icon_rects_remote_and_plug_72.png; sourceTree = "<group>"; };
 		AD1D3B3E164B99B900550A23 /* switchPanelViewControllerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = switchPanelViewControllerTests.h; sourceTree = "<group>"; };
 		AD1D3B3F164B99B900550A23 /* switchPanelViewControllerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = switchPanelViewControllerTests.m; sourceTree = "<group>"; };
 		AD1D3B42164D863200550A23 /* TestMocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestMocks.h; sourceTree = "<group>"; };
@@ -173,6 +171,8 @@
 		AD8A725D164ACC1B009C5A5C /* SJUIExternalSwitchScanner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SJUIExternalSwitchScanner.m; sourceTree = "<group>"; };
 		AD921B03157D6CA000940981 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		AD921B05157D6CAC00940981 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		ADA7D2FC16D2B24600D57BC1 /* SwitchamajigLogo_50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SwitchamajigLogo_50.png; sourceTree = "<group>"; };
+		ADA7D2FD16D2B24600D57BC1 /* SwitchamajigLogo_72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = SwitchamajigLogo_72.png; sourceTree = "<group>"; };
 		ADB1EE2015C0D34E003BABDC /* defineActionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defineActionViewController.h; sourceTree = "<group>"; };
 		ADB1EE2115C0D34E003BABDC /* defineActionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = defineActionViewController.m; sourceTree = "<group>"; };
 		ADB75BEB13DB539C00448025 /* SwitchControl.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwitchControl.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -297,9 +297,9 @@
 		ADB75BE013DB539C00448025 = {
 			isa = PBXGroup;
 			children = (
+				ADA7D2FC16D2B24600D57BC1 /* SwitchamajigLogo_50.png */,
+				ADA7D2FD16D2B24600D57BC1 /* SwitchamajigLogo_72.png */,
 				ADCDFD80163FA20200980F78 /* QuartzCore.framework */,
-				AD0BA783160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_50.png */,
-				AD0BA784160D2CAE001A419A /* switchamajig_icon_rects_remote_and_plug_72.png */,
 				AD0BA781160BEC35001A419A /* Flurry.h */,
 				AD0BA77F160BEC22001A419A /* libFlurry.a */,
 				ADF7AAFF15F6D1D20052F96C /* Panels */,
@@ -614,8 +614,8 @@
 				AD0BA77716045B8C001A419A /* qs_tv.xml in Resources */,
 				AD0BA779160A4B6E001A419A /* qs_dvd.xml in Resources */,
 				AD0BA77B160A54A5001A419A /* qs_cable.xml in Resources */,
-				AD0BA785160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_50.png in Resources */,
-				AD0BA786160D2CAF001A419A /* switchamajig_icon_rects_remote_and_plug_72.png in Resources */,
+				ADA7D2FE16D2B24600D57BC1 /* SwitchamajigLogo_50.png in Resources */,
+				ADA7D2FF16D2B24600D57BC1 /* SwitchamajigLogo_72.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

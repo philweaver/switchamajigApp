@@ -175,7 +175,8 @@ static NSArray *filterBrands(NSArray *bigListOfBrands) {
         if([brand isEqualToString:@"Kenwood"]) [filteredBrands addObject:brand];
         if([brand isEqualToString:@"Pioneer"]) [filteredBrands addObject:brand];
         if([brand isEqualToString:@"Apple"]) [filteredBrands addObject:brand];
-    }
+        if([brand isEqualToString:@"Insteon"]) [filteredBrands addObject:brand];
+   }
     return filteredBrands;
 }
 

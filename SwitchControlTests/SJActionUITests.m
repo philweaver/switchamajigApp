@@ -223,7 +223,7 @@
     STAssertTrue([actualCommand isEqualToString:expectedCommand], @"Actual command mismatches. Got %@", actualCommand);
     // Verify that more/fewer brands works
     int numBrands = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:0];
-    STAssertTrue(numBrands == 20, @"Num brands wrong when reduced list shown. Has %d brands.", numBrands);
+    STAssertTrue(numBrands == 21, @"Num brands wrong when reduced list shown. Has %d brands.", numBrands);
     STAssertTrue([[actionUI->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"], @"Text wrong on show more brands");
     [actionUI->filterBrandButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue([[actionUI->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show Fewer Brands"], @"Text wrong on show fewer brands");
@@ -232,7 +232,7 @@
     [actionUI->filterBrandButton sendActionsForControlEvents:UIControlEventTouchUpInside];
     STAssertTrue([[actionUI->filterBrandButton titleForState:UIControlStateNormal] isEqualToString:@"Show More Brands"], @"Text wrong on show more brands after activating toggle twice");
     numBrands = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:0];
-    STAssertTrue(numBrands == 20, @"Num brands wrong when reduced list reshown. Has %d brands.", numBrands);
+    STAssertTrue(numBrands == 21, @"Num brands wrong when reduced list reshown. Has %d brands.", numBrands);
     // Verify that more/fewer functions works
     int numFunctions = [actionUI pickerView:actionUI->irPicker numberOfRowsInComponent:3];
     STAssertTrue(numFunctions == 4, @"Num functions wrong when reduced list shown. Has %d functions.", numFunctions);

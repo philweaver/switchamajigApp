@@ -2,6 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>SwitchamajigLogo_72.png</string>
+				<string>SwitchamajigLogo_50.png</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<true/>
+		</dict>
+	</dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -12,13 +25,6 @@
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
-	<key>CFBundleIconFile</key>
-	<string>switchamajig_icon_rects_remote_and_plug_72.png</string>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>switchamajig_icon_rects_remote_and_plug_72.png</string>
-		<string>switchamajig_icon_rects_remote_and_plug_50.png</string>
-	</array>
 	<key>CFBundleIdentifier</key>
 	<string>YPRKWB2F6B.com.paw-solutions.Switchamajig</string>
 	<key>CFBundleInfoDictionaryVersion</key>
