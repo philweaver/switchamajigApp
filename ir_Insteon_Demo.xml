@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<panel>
+	<panelname>Insteon Demo</panelname>
+	<panelelement>
+		<frame>44 75 450 300</frame>
+		<rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
+		<switchtext>Outlet on</switchtext>
+		<onswitchactivate>
+			<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key="0" repeat="0" seq="0" command="Insteon:Aux:IR Linc:SCENE G RAISE" ir_data="P7e89 6794 b114 4fa9 5576 dbc7 342a 2921 ff49 df38 432e 6989 81d9 acce dc0b ec37 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c 3b9c cea3 c9bf 47ff 29d4 3e1b b127 7fcf bb45 0dbf 13d4 11ea 0f46 d62d 6e07 7a05 43d4 9fd2 2b4a 3116 8cbe 42fe c4d6 519e 129c 2830 63a6 d00d 89c0 fb32 5f9e c0c5 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c ef8a d08c c3b6 0543 0150 d90c e31f cbe5 c39d 062b 443b e96c 5f88 6633 6403 24c6  " ch="0"></docommand></actionsequence></actionsequenceondevice>
+		</onswitchactivate>
+		<onswitchdeactivate>
+			<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence></actionsequence></actionsequenceondevice>
+		</onswitchdeactivate>
+	</panelelement>
+	<panelelement>
+		<frame>534 75 450 300</frame>
+		<rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+		<switchtext>Outlet off</switchtext>
+		<onswitchactivate>
+			<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key="0" repeat="0" seq="0" command="Insteon:Aux:IR Linc:SCENE G LOWER" ir_data="P7e89 6794 b114 4fa9 5576 dbc7 342a 2921 ff49 df38 432e 6989 81d9 acce dc0b ec37 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c 3b9c cea3 c9bf 47ff 29d4 3e1b b127 7fcf 43d4 9fd2 2b4a 3116 8cbe 42fe c4d6 519e 43d4 9fd2 2b4a 3116 8cbe 42fe c4d6 519e 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c ef8a d08c c3b6 0543 0150 d90c e31f cbe5 b7af cc74 7704 fd08 4db3 cc81 8f83 21d4  " ch="0"></docommand></actionsequence></actionsequenceondevice>
+		</onswitchactivate>
+		<onswitchdeactivate>
+			<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence></actionsequence></actionsequenceondevice>
+		</onswitchdeactivate>
+	</panelelement>
+	<panelelement>
+		<frame>44 425 450 300</frame>
+		<rgbacolor>0.0 1.0 0.0 1.0</rgbacolor>
+		<switchtext>Bulb on</switchtext>
+		<onswitchactivate>
+			<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key="0" repeat="0" seq="0" command="Insteon:Aux:IR Linc:SCENE B RAISE" ir_data="P7e89 6794 b114 4fa9 5576 dbc7 342a 2921 ff49 df38 432e 6989 81d9 acce dc0b ec37 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c 3b9c cea3 c9bf 47ff 29d4 3e1b b127 7fcf bb45 0dbf 13d4 11ea 0f46 d62d 6e07 7a05 129c 2830 63a6 d00d 89c0 fb32 5f9e c0c5 129c 2830 63a6 d00d 89c0 fb32 5f9e c0c5 bb45 0dbf 13d4 11ea 0f46 d62d 6e07 7a05 ef8a d08c c3b6 0543 0150 d90c e31f cbe5 afdc 5452 0f32 8412 4531 c113 16be c6da  " ch="0"></docommand></actionsequence></actionsequenceondevice>
+		</onswitchactivate>
+		<onswitchdeactivate>
+		</onswitchdeactivate>
+	</panelelement>
+	<panelelement>
+		<frame>534 425 450 300</frame>
+		<rgbacolor>1.0 0.0 0.0 1.0</rgbacolor>
+		<switchtext>Bulb off</switchtext>
+		<onswitchactivate>
+			<actionsequenceondevice><friendlyname>Default</friendlyname><actionsequence><docommand key="0" repeat="0" seq="0" command="Insteon:Aux:IR Linc:SCENE B LOWER" ir_data="P7e89 6794 b114 4fa9 5576 dbc7 342a 2921 ff49 df38 432e 6989 81d9 acce dc0b ec37 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c 3b9c cea3 c9bf 47ff 29d4 3e1b b127 7fcf 43d4 9fd2 2b4a 3116 8cbe 42fe c4d6 519e 129c 2830 63a6 d00d 89c0 fb32 5f9e c0c5 24d0 3633 16dd a03c 2b0a 73d6 f87b 980c bb45 0dbf 13d4 11ea 0f46 d62d 6e07 7a05 ef8a d08c c3b6 0543 0150 d90c e31f cbe5 baac 9a26 38b7 d57e 4675 7f0f 6c72 7b50  " ch="0"></docommand></actionsequence></actionsequenceondevice>
+		</onswitchactivate>
+		<onswitchdeactivate>
+		</onswitchdeactivate>
+	</panelelement>
+<scanorder>0 1 </scanorder></panel>
