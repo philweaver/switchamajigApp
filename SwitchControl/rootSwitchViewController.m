@@ -118,6 +118,11 @@
     // Do any additional setup after loading the view from its nib.
     switchScanner = [[SJUIExternalSwitchScanner alloc] initWithSuperview:[self view] andScanType:[[NSUserDefaults standardUserDefaults] integerForKey:@"scanningStylePreference"]];
     [switchScanner setDelegate:self];
+    float autoScanIntervalFloat = (float)[[NSUserDefaults standardUserDefaults] integerForKey:@"autoScanIntervalPreference"];
+    if(autoScanIntervalFloat < 0.1)
+        autoScanIntervalFloat = 0.5;
+    [switchScanner setAutoScanInterval:[NSNumber numberWithFloat:autoScanIntervalFloat]];
+
     [self initializeScrollPanelWithTextSize:textSize];
     appDelegate->panelWasEdited = NO;
 }
