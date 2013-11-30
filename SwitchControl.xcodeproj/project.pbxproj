@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AD0355FE1749F7DF002405E4 /* ir_Insteon_Demo.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD0355FD1749F7DF002405E4 /* ir_Insteon_Demo.xml */; };
 		AD05170D1603B6B4005E240A /* quickStartSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD05170C1603B6B4005E240A /* quickStartSettingsViewController.m */; };
 		AD05170F1603B7A9005E240A /* quickStartSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD05170E1603B7A9005E240A /* quickStartSettingsViewController.xib */; };
 		AD09604E15C728A4003F4212 /* unused_scanning_settings.plist in Resources */ = {isa = PBXBuildFile; fileRef = AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */; };
@@ -119,6 +120,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AD0355FD1749F7DF002405E4 /* ir_Insteon_Demo.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ir_Insteon_Demo.xml; sourceTree = "<group>"; };
 		AD05170B1603B6B4005E240A /* quickStartSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quickStartSettingsViewController.h; sourceTree = "<group>"; };
 		AD05170C1603B6B4005E240A /* quickStartSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = quickStartSettingsViewController.m; sourceTree = "<group>"; };
 		AD05170E1603B7A9005E240A /* quickStartSettingsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = quickStartSettingsViewController.xib; sourceTree = "<group>"; };
@@ -468,6 +470,7 @@
 		ADF7AAFF15F6D1D20052F96C /* Panels */ = {
 			isa = PBXGroup;
 			children = (
+				AD0355FD1749F7DF002405E4 /* ir_Insteon_Demo.xml */,
 				AD762F3D14F3650D00812CF8 /* ctrl_6_steering.xml */,
 				AD4D399F14AAEF3600ADA893 /* ctrl_6_tworows.xml */,
 				AD554843154F318A008C246D /* ir_simple_tv.xml */,
@@ -621,6 +624,7 @@
 				AD0BA77B160A54A5001A419A /* qs_cable.xml in Resources */,
 				ADA7D2FE16D2B24600D57BC1 /* SwitchamajigLogo_50.png in Resources */,
 				ADA7D2FF16D2B24600D57BC1 /* SwitchamajigLogo_72.png in Resources */,
+				AD0355FE1749F7DF002405E4 /* ir_Insteon_Demo.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

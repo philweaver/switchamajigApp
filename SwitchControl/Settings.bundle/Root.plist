@@ -40,6 +40,16 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
+			<string>Show Default Panels</string>
+			<key>Key</key>
+			<string>showDefaultPanelsPreference</string>
+			<key>DefaultValue</key>
+			<true/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+			<key>Title</key>
 			<string>Single-Tap Back Button</string>
 			<key>Key</key>
 			<string>singleTapBackButtonPreference</string>

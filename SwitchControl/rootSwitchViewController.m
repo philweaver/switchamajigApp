@@ -118,6 +118,11 @@
     // Do any additional setup after loading the view from its nib.
     switchScanner = [[SJUIExternalSwitchScanner alloc] initWithSuperview:[self view] andScanType:[[NSUserDefaults standardUserDefaults] integerForKey:@"scanningStylePreference"]];
     [switchScanner setDelegate:self];
+    float autoScanIntervalFloat = (float)[[NSUserDefaults standardUserDefaults] integerForKey:@"autoScanIntervalPreference"];
+    if(autoScanIntervalFloat < 0.1)
+        autoScanIntervalFloat = 0.5;
+    [switchScanner setAutoScanInterval:[NSNumber numberWithFloat:autoScanIntervalFloat]];
+
     [self initializeScrollPanelWithTextSize:textSize];
     appDelegate->panelWasEdited = NO;
 }
@@ -253,10 +258,12 @@
         BOOL isIR = [[NSPredicate predicateWithFormat:@"SELF CONTAINS \"ir_\""] evaluateWithObject:[url absoluteString]];
         BOOL isCtrl = [[NSPredicate predicateWithFormat:@"SELF CONTAINS \"ctrl_\""] evaluateWithObject:[url absoluteString]];
         BOOL isBlank = [[NSPredicate predicateWithFormat:@"SELF CONTAINS \"blank\""] evaluateWithObject:[url absoluteString]];
-        if(isIR && [[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigIRPreference"])
-            displayThisPanel = YES;
-        if(isCtrl && [[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigControllerPreference"])
-            displayThisPanel = YES;
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"showDefaultPanelsPreference"]) {
+            if(isIR && [[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigIRPreference"])
+                displayThisPanel = YES;
+            if(isCtrl && [[NSUserDefaults standardUserDefaults] boolForKey:@"supportSwitchamajigControllerPreference"])
+                displayThisPanel = YES;
+        }
         if(isBlank && [[NSUserDefaults standardUserDefaults] boolForKey:@"allowEditingOfSwitchPanelsPreference"])
             displayThisPanel = YES;
         if(displayThisPanel) {

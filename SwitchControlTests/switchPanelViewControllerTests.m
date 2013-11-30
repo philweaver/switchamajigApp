@@ -713,6 +713,7 @@
     [[scanningTextField delegate] textField:scanningTextField shouldChangeCharactersInRange:NSMakeRange(0,0) replacementString:@"3"];
     STAssertTrue([mockDelegate->commandsReceived count]==1, @"No command received for step scan select");
 }
+#endif // RUN_ALL_SWITCH_PANEL_VC_TESTS
 
 - (void)test_002_SwitchPanelViewController_011_SetScanOrder {
     // Make sure button exists when appropriate
@@ -755,9 +756,15 @@
     STAssertFalse([panelVC->backButton isHidden], @"Back button should be restored after scan");
     NSArray *expectedScanOrder = [NSArray arrayWithObjects:[NSNumber numberWithInt:1], [NSNumber numberWithInt:0], [NSNumber numberWithInt:2], [NSNumber numberWithInt:1], nil];
     STAssertTrue([expectedScanOrder isEqualToArray:panelVC->scanOrderIndices], @"Scan order indices wrong");
+    // Delete a switch. The scan order needs to adjust by removing references to deleted
+    // switch and adjusting the index of switches above it
+    panelVC->currentButton = [[view subviews] objectAtIndex:0];
+    [panelVC deleteSwitch:panelVC->confirmDeleteButton];
+    expectedScanOrder = [NSArray arrayWithObjects:[NSNumber numberWithInt:0], [NSNumber numberWithInt:1], [NSNumber numberWithInt:0], nil];
+    STAssertTrue([expectedScanOrder isEqualToArray:panelVC->scanOrderIndices], @"Scan order indices wrong after deleting switch");
+
 }
 
-#endif // RUN_ALL_SWITCH_PANEL_VC_TESTS
 
 
 @end

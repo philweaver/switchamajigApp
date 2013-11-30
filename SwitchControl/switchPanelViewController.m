@@ -395,6 +395,10 @@
         // If we're not editing, support scanning
         switchScanner = [[SJUIExternalSwitchScanner alloc] initWithSuperview:[self view] andScanType:[[NSUserDefaults standardUserDefaults] integerForKey:@"scanningStylePreference"]];
         [switchScanner setDelegate:self];
+        float autoScanIntervalFloat = (float)[[NSUserDefaults standardUserDefaults] integerForKey:@"autoScanIntervalPreference"];
+        if(autoScanIntervalFloat < 0.1)
+            autoScanIntervalFloat = 0.5;
+        [switchScanner setAutoScanInterval:[NSNumber numberWithFloat:autoScanIntervalFloat]];
     }
     // Set up scanning
     NSArray *scanOrderNodes = [xmlDoc nodesForXPath:@".//panel/scanorder" error:&xmlError];
@@ -686,6 +690,24 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
         [[NSFileManager defaultManager] removeItemAtPath:[currentButton audioFilePath] error:&fileError];
         if(fileError)
             NSLog(@"Error deleting image at %@: %@", [currentButton audioFilePath], fileError);
+        // With the switch deleted, the indices in the scan order need to change
+        int index = [[[self view] subviews] indexOfObject:currentButton];
+        if(index == NSNotFound) {
+            NSLog(@"deleteSwitch: index of current button not found.\n");
+            return;
+        }
+        NSArray *oldScanOrderIndices = [scanOrderIndices copy];
+        [scanOrderIndices removeAllObjects];
+        NSNumber *scanOrderIndex;
+        for(scanOrderIndex in oldScanOrderIndices) {
+            int scanOrderIndexInt = [scanOrderIndex integerValue];
+            if(scanOrderIndexInt == index)
+                continue;
+            if(scanOrderIndexInt > index)
+                scanOrderIndexInt--;
+            [scanOrderIndices addObject:[NSNumber numberWithInt:scanOrderIndexInt]];
+        }
+        // Destroy the actual button
         [currentButton removeFromSuperview];
         currentButton = nil;
         return;

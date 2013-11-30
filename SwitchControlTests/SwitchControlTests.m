@@ -514,8 +514,12 @@
     STAssertTrue([naviControl->lastViewController isKindOfClass:[switchPanelViewController class]], @"Switch panel did not display");
 }
 
+
 // Check settings for various support
 - (void)test_001_RootViewController_006_LaunchSwitchPanel {
+    // Enable showing of default panels
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showDefaultPanelsPreference"];
+    // Disable individual support
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigControllerPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"supportSwitchamajigIRPreference"];
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"allowEditingOfSwitchPanelsPreference"];
@@ -532,8 +536,17 @@
     STAssertNotNil([HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"], @"Yellow panel not shown with controller support enabled.");
     STAssertNotNil([HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Simple TV"], @"IR Basic panel not shown with IR support enabled.");
     STAssertNotNil([HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Blank"], @"Blank panel not shown with editing support enabled.");
+    // Disable showing of default panels
+    [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"showDefaultPanelsPreference"];
+    [rootViewController ResetScrollPanel];
+    // Again shouldn't see much
+    STAssertNil([HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Yellow"], @"Yellow panel shown with default panels turned off.");
+    STAssertNil([HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"Simple TV"], @"IR Basic panel shown with default panels turned off.");
+    // Re-enable support for default panels
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"showDefaultPanelsPreference"];
 
 }
+
 - (void)test_001_RootViewController_007_Scanning {
     // Disable scanning
     [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"scanningStylePreference"];
