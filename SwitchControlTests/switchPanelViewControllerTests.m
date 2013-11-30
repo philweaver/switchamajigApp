@@ -297,7 +297,7 @@
     newPanelButton = [HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"hoopy"];
     STAssertNil(newPanelButton, @"Panel still appears after being deleted.");
 }
-
+#endif
 - (void)test_002_SwitchPanelViewController_006_EditingSwitchTextAndColor {
     SwitchControlAppDelegate *app_delegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication] delegate];
     UINavigationController *nav_controller = [app_delegate navigationController];
@@ -314,6 +314,7 @@
     viewController = (switchPanelViewController *) [nav_controller visibleViewController];
     id switch1 = [HandyTestStuff findSubviewOf:[viewController view] withText:@"1"];
     [switch1 sendActionsForControlEvents:UIControlEventTouchDown];
+    //[switch1 sendAction:NSSelectorFromString([[switch1 actionsForTarget:switch1 forControlEvent:UIControlEventTouchDown] objectAtIndex:0]) to:switch1 forEvent:nil];
     // Change the switch name text
     [viewController->switchNameTextField setText:@"frood"];
     [viewController->switchNameTextField sendActionsForControlEvents:UIControlEventEditingDidEndOnExit];
@@ -335,7 +336,7 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
-
+#if RUN_ALL_SWITCH_PANEL_VC_TESTS
 - (void)test_002_SwitchPanelViewController_007_CreateAndDeleteSwitch {
     SwitchControlAppDelegate *app_delegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication] delegate];
     UINavigationController *nav_controller = [app_delegate navigationController];
@@ -713,7 +714,6 @@
     [[scanningTextField delegate] textField:scanningTextField shouldChangeCharactersInRange:NSMakeRange(0,0) replacementString:@"3"];
     STAssertTrue([mockDelegate->commandsReceived count]==1, @"No command received for step scan select");
 }
-#endif // RUN_ALL_SWITCH_PANEL_VC_TESTS
 
 - (void)test_002_SwitchPanelViewController_011_SetScanOrder {
     // Make sure button exists when appropriate
@@ -764,6 +764,7 @@
     STAssertTrue([expectedScanOrder isEqualToArray:panelVC->scanOrderIndices], @"Scan order indices wrong after deleting switch");
 
 }
+#endif // RUN_ALL_SWITCH_PANEL_VC_TESTS
 
 
 

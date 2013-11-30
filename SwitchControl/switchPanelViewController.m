@@ -753,7 +753,8 @@ NSURL *GetURLWithNoConflictWithName(NSString *name, NSString *extension) {
     [confirmDeleteButton setHidden:YES];
     currentButton = sender;
     currentButtonBeingDragged = sender;
-    currentButtonBeingDraggedLastPoint = [[[event allTouches] anyObject] locationInView:self.view];
+    if([event respondsToSelector:@selector(allTouches)])
+        currentButtonBeingDraggedLastPoint = [[[event allTouches] anyObject] locationInView:self.view];
     if(settingScanOrder) {
         int index = [[[self view] subviews] indexOfObject:sender];
         if(index == NSNotFound) {

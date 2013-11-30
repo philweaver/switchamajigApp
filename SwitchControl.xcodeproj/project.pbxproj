@@ -38,7 +38,6 @@
 		AD68FCEC15A6A57200A7E7DF /* __TEST001.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD68FCEB15A6A57200A7E7DF /* __TEST001.xml */; };
 		AD762F3B14F31BB700812CF8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AD762F3A14F31BB700812CF8 /* Settings.bundle */; };
 		AD762F3E14F3650E00812CF8 /* ctrl_6_steering.xml in Resources */ = {isa = PBXBuildFile; fileRef = AD762F3D14F3650D00812CF8 /* ctrl_6_steering.xml */; };
-		AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */; };
 		AD84EAD415BCAE5D00C27938 /* iphone_delete_button.png in Resources */ = {isa = PBXBuildFile; fileRef = AD84EAD315BCAE5D00C27938 /* iphone_delete_button.png */; };
 		AD86623414B567AB00C5860D /* configViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = AD86623214B567AB00C5860D /* configViewController.m */; };
 		AD86623514B567AB00C5860D /* configViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = AD86623314B567AB00C5860D /* configViewController.xib */; };
@@ -163,8 +162,6 @@
 		AD68FCEB15A6A57200A7E7DF /* __TEST001.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = __TEST001.xml; path = SwitchControl/__TEST001.xml; sourceTree = "<group>"; };
 		AD762F3A14F31BB700812CF8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		AD762F3D14F3650D00812CF8 /* ctrl_6_steering.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = ctrl_6_steering.xml; sourceTree = "<group>"; };
-		AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socket_switchamajig1_cfg.cpp; sourceTree = "<group>"; };
-		AD83006214E068C6007E5773 /* socket_switchamajig1_cfg.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = socket_switchamajig1_cfg.hpp; sourceTree = "<group>"; };
 		AD84EAD315BCAE5D00C27938 /* iphone_delete_button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iphone_delete_button.png; sourceTree = "<group>"; };
 		AD86623114B567AB00C5860D /* configViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = configViewController.h; sourceTree = "<group>"; };
 		AD86623214B567AB00C5860D /* configViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = configViewController.m; sourceTree = "<group>"; };
@@ -371,8 +368,6 @@
 				AD86623114B567AB00C5860D /* configViewController.h */,
 				AD86623214B567AB00C5860D /* configViewController.m */,
 				AD86623314B567AB00C5860D /* configViewController.xib */,
-				AD83005F14E068A7007E5773 /* socket_switchamajig1_cfg.cpp */,
-				AD83006214E068C6007E5773 /* socket_switchamajig1_cfg.hpp */,
 				AD09604D15C728A4003F4212 /* unused_scanning_settings.plist */,
 				ADF7AAE115F673500052F96C /* chooseIconViewController.h */,
 				ADF7AAE215F673500052F96C /* chooseIconViewController.m */,
@@ -667,7 +662,6 @@
 				ADC7C18D142D62970045ABD0 /* rootSwitchViewController.m in Sources */,
 				ADE97CEA1443DA5500521DE0 /* helpDisplayViewController.m in Sources */,
 				AD86623414B567AB00C5860D /* configViewController.m in Sources */,
-				AD83006014E068A7007E5773 /* socket_switchamajig1_cfg.cpp in Sources */,
 				ADD3AEC3158D22CA0067602A /* SJUIStatusMessageLabel.m in Sources */,
 				ADB1EE2215C0D34E003BABDC /* defineActionViewController.m in Sources */,
 				AD09605215C9FBED003F4212 /* SJUIRecordAudioViewController.m in Sources */,
@@ -739,7 +733,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COMPRESS_PNG_FILES = YES;
@@ -764,7 +758,7 @@
 				);
 				PRODUCT_NAME = Switchamajig;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos;
+				SDKROOT = iphoneos6.1;
 				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
@@ -774,7 +768,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COMPRESS_PNG_FILES = YES;
@@ -793,7 +787,7 @@
 				);
 				PRODUCT_NAME = Switchamajig;
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
-				SDKROOT = iphoneos;
+				SDKROOT = iphoneos6.1;
 				SKIP_INSTALL = NO;
 				TARGETED_DEVICE_FAMILY = 2;
 				VALIDATE_PRODUCT = NO;
