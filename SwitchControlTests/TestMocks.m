@@ -48,6 +48,15 @@
 
 @end
 
+@implementation MockSwitchamajigInsteonDriver
+- (void)issueCommandFromXMLNode:(DDXMLNode *)command error:(NSError **)err {
+    //NSLog(@"Mock driver command issued. count = %d", [commandsReceived count]);
+    //NSLog(@"Command = %@", [command XMLString]);
+    [commandsReceived addObject:[command XMLString]];
+    //NSLog(@"Mock driver count = %d on exit", [commandsReceived count]);
+}
+@end
+
 @implementation MockSwitchamajigIRDriver
 - (void)issueCommandFromXMLNode:(DDXMLNode *)command error:(NSError **)err {
     //NSLog(@"Mock driver command issued. count = %d", [commandsReceived count]);

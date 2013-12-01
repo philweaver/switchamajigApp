@@ -298,6 +298,28 @@
     STAssertTrue([commandString isEqualToString:@"<docommand key=\"0\" repeat=\"1\" seq=\"0\" command=\"0\" ir_data=\"P6501 802c 4a32 dbaa dc4d dd2c a526 3d20 427f 8cc4 0f67 d291 9f35 bff7 d926 dda7 137d eb0b ac1e eba4 fd0d 8a2b 872c e5aa 9d57 e90d 30d1 aa22 a451 10cc 9a9e 4c40  \" ch=\"0\"/>"], @"Did not receive simple command. Instead got %@", commandString);
 }
 
+- (void)test_000_AppDelegate_005_Insteon {
+    // Confirm that the appdelegate is the delegate for the insteon listener
+    STAssertEqualObjects([app_delegate->sjigInsteonListener delegate], app_delegate, @"App Delegate isn't set up to listen for Insteons.");
+    // Confirm that we respond to Insteon found
+    SwitchamajigInsteonDeviceListener *listener = [SwitchamajigInsteonDeviceListener alloc];
+    [[app_delegate friendlyNameSwitchamajigDictionary] removeAllObjects];
+    [app_delegate SwitchamajigDeviceListenerFoundDevice:listener hostname:@"localhost" friendlyname:@"insteon_test"];
+    STAssertEqualObjects([[[app_delegate friendlyNameSwitchamajigDictionary] objectForKey:@"insteon_test"] class], [SwitchamajigInsteonDeviceDriver class], @"Insteon driver not set up after listener reports found");
+    // Confirm that commands are sent along to driver
+    MockSwitchamajigInsteonDriver *driver = [MockSwitchamajigInsteonDriver alloc];
+    driver->commandsReceived = [[NSMutableArray alloc] initWithCapacity:5];
+    [[app_delegate friendlyNameSwitchamajigDictionary] setObject:driver forKey:@"insteon_test"];
+    // Verify that the command is passed to the controller
+    NSError *error;
+    DDXMLDocument *node1 = [[DDXMLDocument alloc] initWithXMLString:@"<actionsequenceondevice><friendlyname>insteon_test</friendlyname><actionsequence><insteon_send><dst_addr>2016B7</dst_addr><command>ON</command><username>admin</username><password>shadow</password></insteon_send></actionsequence></actionsequenceondevice>" options:0 error:&error];
+    [app_delegate performActionSequence:node1];
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)0.1]];
+    STAssertTrue([driver->commandsReceived count] == 1, @"Driver did not receive ir command.");
+    NSString *commandString = [driver->commandsReceived objectAtIndex:0];
+    STAssertTrue([commandString isEqualToString:@"<insteon_send><dst_addr>2016B7</dst_addr><command>ON</command><username>admin</username><password>shadow</password></insteon_send>"], @"Did not receive insteon command. Instead got %@", commandString);
+}
+
 - (void)test_001_RootViewController_001_Help
 {
     // Disable scanning, enable help button

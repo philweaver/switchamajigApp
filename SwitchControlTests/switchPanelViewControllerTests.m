@@ -297,7 +297,7 @@
     newPanelButton = [HandyTestStuff findSubviewOf:[rootViewController panelSelectionScrollView] withText:@"hoopy"];
     STAssertNil(newPanelButton, @"Panel still appears after being deleted.");
 }
-#endif
+
 - (void)test_002_SwitchPanelViewController_006_EditingSwitchTextAndColor {
     SwitchControlAppDelegate *app_delegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication] delegate];
     UINavigationController *nav_controller = [app_delegate navigationController];
@@ -336,7 +336,7 @@
     [viewController deletePanel:viewController->confirmDeleteButton];
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:(NSTimeInterval)1.0]];
 }
-#if RUN_ALL_SWITCH_PANEL_VC_TESTS
+
 - (void)test_002_SwitchPanelViewController_007_CreateAndDeleteSwitch {
     SwitchControlAppDelegate *app_delegate = (SwitchControlAppDelegate *) [[UIApplication sharedApplication] delegate];
     UINavigationController *nav_controller = [app_delegate navigationController];

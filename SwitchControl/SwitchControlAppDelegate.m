@@ -66,6 +66,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     // Listen for Switchamajigs
     sjigControllerListener = [[SwitchamajigControllerDeviceListener alloc] initWithDelegate:self];
     sjigIRListener = [[SwitchamajigIRDeviceListener alloc] initWithDelegate:self];
+    sjigInsteonListener = [[SwitchamajigInsteonDeviceListener alloc] initWithDelegate:self];
     // Prepare to run status timer
     statusMessageTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(statusMessageCallback) userInfo:nil repeats:NO]; 
     friendlyNameDictionaryIndex = 0;
@@ -461,7 +462,10 @@ void uncaughtExceptionHandler(NSException *exception) {
         SwitchamajigIRDeviceDriver *sjirdriver = [SwitchamajigIRDeviceDriver alloc];
         [Flurry logEvent:@"Found Switchamajig IR"];
         driver = sjirdriver;
-    } else {
+    } else if ([listener isKindOfClass:[SwitchamajigInsteonDeviceListener class]]) {
+        SwitchamajigInsteonDeviceDriver *insteonDriver = [SwitchamajigInsteonDeviceDriver alloc];
+        driver = insteonDriver;
+    }else {
         // Unrecognized
         NSLog(@"SwitchamajigDeviceListenerFoundDevice: Unrecognized listener");
         [statusInfoLock unlock];
